@@ -12,9 +12,11 @@ export class Main extends Component {
       float: 'left',
     };
 
+    const { children } = this.props;
+
     return (
       <main style={styles}>
-                Маин!
+        {children}
       </main>
     );
   }
