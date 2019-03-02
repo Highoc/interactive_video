@@ -3,7 +3,7 @@ import './App.css';
 
 import { Switch, Route } from 'react-router-dom';
 
-import { Header } from './components/Header';
+import Header from './components/Header';
 import { MenuLeft } from './components/MenuLeft';
 import { MenuRight } from './components/MenuRight';
 import { Main } from './components/Main';
