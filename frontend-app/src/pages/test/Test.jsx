@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import WatchVideo from './player/Player';
 
 class Test extends Component {
   constructor(props) {
@@ -17,7 +18,7 @@ class Test extends Component {
   }
 
   onChange(event) {
-    const file = event.target.files[0]
+    const file = event.target.files[0];
     this.setState({ source: file, name: file.name });
   }
 
@@ -40,14 +41,15 @@ class Test extends Component {
     formData.append('content', source);
 
     axios.post(
-      'http://192.168.1.205:8000/video/upload_source/',
+      'http://192.168.1.205:8000/video/source_upload/',
       formData,
       {
         headers: {
-          'Authorization': `JWT ${localStorage.getItem('jwt-token')}`,
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
           'Content-Type': 'multipart/form-data',
         },
-      })
+      },
+    )
       .then((result) => {
         console.log(result.data);
         this.setState({ condition: 'sent' });
@@ -60,11 +62,14 @@ class Test extends Component {
     event.preventDefault();
   }
 
+
   render() {
     return (
       <div>
         <div>
-          FORM: {this.state.condition}
+          FORM:
+          {' '}
+          {this.state.condition}
         </div>
         <form
           onSubmit={this.handleSubmit}
@@ -73,6 +78,8 @@ class Test extends Component {
           <input name="content" type="file" onChange={this.onChange} />
           <input type="submit" value="Submit" />
         </form>
+
+        <WatchVideo/>
       </div>
     );
   }
