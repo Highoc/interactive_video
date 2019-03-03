@@ -1,80 +1,80 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import authentication, permissions, status
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import status, permissions
 
-'''
-from django.core.files.base import ContentFile
-import base64, hashlib, json
+from application import settings
 
-from jsonrpc import jsonrpc_method
-from users.models import User
-from core.models import File
-from django.http.response import HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect, HttpResponse
+from .serializers import SourceSerializer
+from .models import Source
+from .helpers.video import generate_key, is_supported_mime_type, get_file_url
 
 
-from rest_framework.decorators import api_view
-from .serializers import UserSerializer, UserSerializerWithToken
+class SourceUploadView(APIView):
 
-
-@api_view(['GET'])
-def current_user(request):
-    """
-    Determine the current user by their token, and return their data
-    """
-
-    serializer = UserSerializer(request.user)
-    return Response(serializer.data)
-
-
-class UserList(APIView):
-    """
-    Create a new user. It's called 'UserList' because normally we'd have a get
-    method here too, for retrieving a list of all User objects.
-    """
-
-    permission_classes = (permissions.AllowAny,)
-
-    def post(self, request, format=None):
-        serializer = UserSerializerWithToken(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-'''
-
-class UploadSourceView(APIView):
-
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.IsAuthenticated,)
+    parser_classes = (MultiPartParser, FormParser)
 
     def get(self, request):
-        return Response(request.user)
+        return Response({ 'username': request.user.username })
 
-    def post(self, requset):
-        pass
+    def post(self, request):
+        source_serializer = SourceSerializer(data=request.data)
 
-'''
-@jsonrpc_method( 'api.upload_file' )
-def upload_file( request, user_pk, file_json ):
-    file = json.loads(file_json)
+        if source_serializer.is_valid():
+            name = request.data['name']
+            description = request.data['description']
+            content = request.data['content']
 
-    content = base64.b64decode( file['content'] ).decode('utf-8')
-    key = generate_key( file['filename'] )
-    owner = User.objects.filter( id=user_pk ).first()
+            user = request.user
+            key = generate_key()
 
-    new_file = File.objects.filter(key=key, owners=owner).first()
-    if not new_file is None:
-        new_file.content.save('{}/{}'.format(user_pk, key), ContentFile(content.encode('utf-8')))
-        new_file.save()
-    else:
-        new_file = File()
-        new_file.key = key
-        new_file.name = file['filename']
-        new_file.mime = file['mime_type']
-        new_file.content.save('{}/{}'.format(user_pk, key), ContentFile(content.encode('utf-8')))
-        new_file.save()
-        new_file.owners.add(owner)
+            if not is_supported_mime_type(content.content_type):
+                return Response('This MIME type isn\'t supported.', status=status.HTTP_400_BAD_REQUEST)
 
-return key
+            if Source.objects.filter(owner=user, key=key):
+                return Response('Source key exists. Retry later.', status=status.HTTP_400_BAD_REQUEST)
 
-'''
+            source = Source(
+                name=name,
+                description=description,
+                owner=user,
+                mime=content.content_type,
+                key=key,
+            )
+
+            source.content.save(f'{user.id}/{key}', content)
+            source.save()
+
+            return Response({'key': key }, status=status.HTTP_201_CREATED)
+        else:
+
+            return Response(source_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SourceInfoView(APIView):
+
+    def get(self, request):
+        sources = Source.objects.filter(owner=request.user)
+        short_sources_list = []
+        for source in sources:
+            short_sources_list.append({ source.key: source.name})
+        return Response({ 'sources': short_sources_list })
+
+
+class SourceGetView(APIView):
+
+    def get(self, request, key=None):
+        sources = Source.objects.filter(owner=request.user, key=key)
+
+        if not sources:
+            return Response('This source doesn\'t exist', status=status.HTTP_404_NOT_FOUND)
+
+        source = sources[0]
+        url = get_file_url(settings.AWS_STORAGE_BUCKET_NAME, request.user, key)
+
+        return Response({
+            'name': source.name,
+            'description': source.description,
+            'content_url': url,
+            'created': source.created,
+        })

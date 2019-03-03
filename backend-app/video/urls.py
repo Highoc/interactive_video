@@ -1,6 +1,8 @@
-from django.urls import path
-from .views import UploadSourceView
+from django.conf.urls import url
+from .views import SourceUploadView, SourceInfoView, SourceGetView
 
 urlpatterns = [
-    path('upload_source/', UploadSourceView.as_view()),
+    url(r'^source_upload/$', SourceUploadView.as_view()),
+    url(r'^source_info/$', SourceInfoView.as_view()),
+    url(r'^source_get/(?P<key>[0-9a-f]{32})/$', SourceGetView.as_view()),
 ]

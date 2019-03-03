@@ -30,7 +30,7 @@ export const login = (username, password) => (dispatch) => {
   axios.post('http://192.168.1.205:8000/token-auth/', { username, password })
     .then((result) => {
       const { token, user } = result.data;
-      console.log(result)
+      console.log(result);
       localStorage.setItem('jwt-token', token);
       dispatch(loginSuccess(token, user.username));
     })
