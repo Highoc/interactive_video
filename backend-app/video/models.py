@@ -45,10 +45,12 @@ class Source(models.Model):
         verbose_name='Дата загрузки'
     )
 
-    is_deleted = models.BooleanField(
+    '''
+    status = models.BooleanField(
         default=False,
         verbose_name='Удалено'
     )
+    '''
 
     class Meta:
         verbose_name = 'Видео'
