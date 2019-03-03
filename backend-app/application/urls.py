@@ -21,6 +21,7 @@ from rest_framework_jwt.views import obtain_jwt_token
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    path('token-auth/', obtain_jwt_token),
-    path('core/', include('core.urls'))
+    url(r'^token-auth/', obtain_jwt_token),
+    url(r'^core/', include('core.urls')),
+    url(r'^video/', include('video.urls'))
 ]

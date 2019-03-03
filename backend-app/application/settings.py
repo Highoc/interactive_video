@@ -25,7 +25,10 @@ SECRET_KEY = '8lvp&489^c(f3f^6fog80nyac0bf8)+z6^zjlt54zl4m^e)5-v'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '192.168.1.205',
+    'localhost'
+]
 
 
 # Application definition
@@ -40,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'core.apps.CoreConfig',
+    'video.apps.VideoConfig'
 ]
 
 MIDDLEWARE = [
@@ -98,8 +102,11 @@ WSGI_APPLICATION = 'application.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE':   'django.db.backends.mysql',
+        'NAME': 'interactive_video',
+        'USER': 'django',
+        'PASSWORD': '2346785Das_',
+        'HOST': 'localhost'
     }
 }
 
@@ -141,3 +148,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# MCS
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_S3_ENDPOINT_URL     = 'http://hb.bizmrg.com'
+AWS_STORAGE_BUCKET_NAME = 'interactive_video'
+AWS_ACCESS_KEY_ID       = 'quZTPp3V28P7V1SGJRXxvs'
+AWS_SECRET_ACCESS_KEY   = '7arUgwahLMmhHpreUJh9RTkHB7LdD5UNcTjA5VLSP59G'
