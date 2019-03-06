@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import WatchVideo from './player/Player';
+import VideoEditor from './index';
 
 class Test extends Component {
   constructor(props) {
@@ -78,8 +79,7 @@ class Test extends Component {
           <input name="content" type="file" onChange={this.onChange} />
           <input type="submit" value="Submit" />
         </form>
-
-        <WatchVideo/>
+        <VideoEditor/>
       </div>
     );
   }
