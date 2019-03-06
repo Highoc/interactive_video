@@ -94,6 +94,17 @@ class VideoGetView(APIView):
     pass
 
 
+class TestView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+
+        with open("/home/highoc/projects/interactive_video/backend-app/video/frag_bunny.mp4", "rb") as file:
+            data = file.read()
+
+        return Response(len(data))
+
+
 # Протестить
 class VideoPartGetView(APIView):
     def get(self, request, key=None):

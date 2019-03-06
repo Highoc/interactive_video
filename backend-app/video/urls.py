@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from .views import SourceUploadView, SourceInfoView, SourceGetView
 from .views import VideoUploadView, VideoGetView, VideoPartGetView
+from .views import TestView
 
 urlpatterns = [
     url(r'^source/upload/$', SourceUploadView.as_view()),
@@ -13,4 +14,7 @@ urlpatterns = [
 
     # url для channel/urls.py
     url(r'^get/(?P<short_key>[0-9a-z]{12})/$', VideoGetView.as_view()),
+
+    # тест
+    url(r'^test/$', TestView.as_view()),
 ]
