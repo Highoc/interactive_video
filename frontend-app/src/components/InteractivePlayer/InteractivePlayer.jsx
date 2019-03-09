@@ -145,10 +145,6 @@ class AppendQueue {
   addSourceBuffer(sourceBuffer) {
     this.sourceBuffer = sourceBuffer;
     this.isReady = true;
-
-    this.sourceBuffer.addEventListener('updateend', () => {
-      this.checkQueue();
-    });
   }
 
   pushKey(key) {
@@ -169,15 +165,21 @@ class AppendQueue {
   }
 
   checkQueue() {
+    console.log('+');
     if (!this.isReady || this.sourceBuffer.updating || !this.queue.length) {
       return;
     }
 
     if (this.queue[0].isLoaded) {
       const currentPart = this.queue.shift();
-      console.log(currentPart);
-      // currentPart.time
-      this.sourceBuffer.timestampOffset += 60;
+      this.sourceBuffer.addEventListener('updateend', (event) => {
+        // currentPart.time
+        console.log(event);
+        this.sourceBuffer.timestampOffset += 60;
+        console.log(this.sourceBuffer.timestampOffset);
+        // this.checkQueue();
+      });
+      console.log('-');
       this.sourceBuffer.appendBuffer(currentPart.buf);
     }
   }

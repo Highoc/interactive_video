@@ -78,9 +78,6 @@ export class VideoPlayer extends Component {
         sourceBuffer.timestampOffset += 60;
         i -= 1;
         if (i === 0) {
-          mediaSource.endOfStream();
-          const video = document.getElementById('video');
-          video.play();
           console.log('exit');
           return;
         }
@@ -118,51 +115,6 @@ export class VideoPlayer extends Component {
 }
 
 function fetchData(url, cb) {
-  /*  const xhr = new XMLHttpRequest();
-    xhr.open('get', url);
-    xhr.onload = () => {
-      //cb(xhr.response);
-      console.log(xhr.response);
-    };
-  xhr.send();
-  */
-
-  /* document.getElementById('file').addEventListener('change', (event) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const arrayBuffer = event.target.result;
-      const array = new Uint8Array(arrayBuffer);
-      cb(array);
-    };
-    reader.readAsArrayBuffer(event.target.files[0]);
-  });
-  */
-
-  /* axios.get('https://hb.bizmrg.com/interactive_video/frag_bunny.mp4', {
-
-    mode: 'no-cors',
-  })
-    .then((response) => {
-      // handle success
-      console.log('+');
-      console.log(response.data);
-    })
-    .catch((error) => {
-      // handle error
-      if (error.response) {
-        console.log(1);
-        console.log(error.response.headers);
-      } else if (error.request) {
-        console.log(2);
-        console.log(error.request);
-      } else {
-        console.log(3);
-        console.log(error.message);
-      }
-      console.log(error.config);
-    });
-  */
-
   const testURL = 'https://hb.bizmrg.com/interactive_video/frag_bunny.mp4';
   const myInit = {
     method: 'GET',
