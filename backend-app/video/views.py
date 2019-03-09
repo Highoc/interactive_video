@@ -1,12 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework import status, permissions
 
 from application import settings
 
 from .serializers import SourceSerializer
-from .models import Source
+from .models import Source, VideoPart, Video
 from .helpers.video import generate_key, is_supported_mime_type, get_file_url
 
 
@@ -57,7 +57,7 @@ class SourceInfoView(APIView):
         sources = Source.objects.filter(owner=request.user)
         short_sources_list = []
         for source in sources:
-            short_sources_list.append({ source.key: source.name})
+            short_sources_list.append({ source.key: source.name })
         return Response({ 'sources': short_sources_list })
 
 
@@ -78,3 +78,55 @@ class SourceGetView(APIView):
             'content_url': url,
             'created': source.created,
         })
+
+
+class VideoUploadView(APIView):
+    parser_classes = (JSONParser, )
+
+    def get(self, request):
+        return Response({'username': request.user.username})
+
+    def post(self, request):
+        pass
+
+
+class VideoGetView(APIView):
+    pass
+
+
+class TestView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+
+        with open("/home/highoc/projects/interactive_video/backend-app/video/frag_bunny.mp4", "rb") as file:
+            data = file.read()
+
+        return Response(len(data))
+
+
+# Протестить
+class VideoPartGetView(APIView):
+    def get(self, request, key=None):
+        video_parts = VideoPart.objects.filter(key=key)
+
+        if not video_parts:
+            return Response('This video_part doesn\'t exist', status=status.HTTP_404_NOT_FOUND)
+
+        # Проверка на доступность видео
+
+        video_part = video_parts[0]
+        url = get_file_url(
+            settings.AWS_STORAGE_BUCKET_NAME,
+            video_part.owner,
+            video_part.source.key
+        )
+
+        responce = {
+            'content_url': url,
+            'time': video_part.time,
+            'text': video_part.text,
+            'children': [ child.key for child in video_part.children ],
+        }
+
+        return Response(responce)

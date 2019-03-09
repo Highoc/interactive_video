@@ -1,7 +1,64 @@
-import React from 'react';
+import React, { Component } from 'react';
+import axios from 'axios';
+import { InteractivePlayer } from '../../components/InteractivePlayer';
 
-export const WatchVideo = props => (
-  <div>
-    Я смотрю видео {props.match.params.v_id} на канале {props.match.params.ch_id}
-  </div>
-);
+
+export class WatchVideo extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      status: statuses.NOT_LOADED,
+      video: null,
+    };
+  }
+
+  componentDidMount() {
+    const url = 'http://192.168.1.205:8000/video/get/a1b2c3x4y5z6';
+
+    const config = {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+      },
+    };
+
+    axios.get(url, config).then(
+      (result) => {
+        console.log(result.data);
+
+        this.setState({ status: statuses.LOADED, video: result.data });
+      },
+    ).catch((error) => {
+      console.log(error);
+      this.setState({ status: statuses.ERROR });
+    });
+  }
+
+
+  render() {
+    const { status, video } = this.state;
+
+    let result = null;
+    if (status === statuses.LOADED) {
+      result = (
+        <div>
+          Название: { video.name } <br />
+          Создано : { video.created } <br />
+          Описание: { video.description } <br />
+          <InteractivePlayer main={video.head_video_part} />
+        </div>
+      );
+    } else if (status === statuses.NOT_LOADED) {
+      result = <div>Not loaded</div>;
+    } else {
+      result = <div>Error</div>;
+    }
+
+    return result;
+  }
+}
+
+const statuses = {
+  LOADED: 1,
+  NOT_LOADED: 2,
+  ERROR: 3,
+};
