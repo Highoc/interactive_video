@@ -10,9 +10,11 @@ export class InteractivePlayer extends Component {
       video: null,
       append_queue: [],
     };
+    this._isMounted = false;
   }
 
   componentDidMount() {
+    this._isMounted = true;
     const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
     if ('MediaSource' in window && MediaSource.isTypeSupported(mimeCodec)) {
       const mediaSource = new MediaSource();
@@ -46,12 +48,13 @@ export class InteractivePlayer extends Component {
           responseType: 'arraybuffer',
         }).then(
           (response2) => {
-
-            response.data.buf = response2.data;
-            this.setState({
-              children: [response.data],
-            });
-            this.videoByChoice(main);
+            if (this._isMounted) {
+              response.data.buf = response2.data;
+              this.setState({
+                children: [response.data],
+              });
+              this.videoByChoice(main);
+            }
           },
         ).catch(
           (error) => {
@@ -69,6 +72,7 @@ export class InteractivePlayer extends Component {
 
   sourceOpen(_) {
     const { mediaSource } = this.state;
+
     const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
     console.log('-');
     const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
@@ -90,6 +94,7 @@ export class InteractivePlayer extends Component {
 * аппенд для всех детей
 * */
   videoByChoice(key) {
+    this._isMounted = true;
     const current_video = this.state.children.find(child => child.key === key);
     this.setState({ current_video });
     const config = {
@@ -112,9 +117,11 @@ export class InteractivePlayer extends Component {
             responseType: 'arraybuffer',
           }).then(
             (response2) => {
-              response.data.buf = response2.data;
-              const newChildren = [...this.state.children, response.data ];
-              this.setState({ children: newChildren });
+              if (this._isMounted) {
+                response.data.buf = response2.data;
+                const newChildren = [...this.state.children, response.data];
+                this.setState({children: newChildren});
+              }
             },
           ).catch(
             (error) => {
@@ -130,39 +137,48 @@ export class InteractivePlayer extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.state.append_queue.size !== 0 && this.state.sourceBuffer !== undefined) {
-      this.updateBuffer();
-    }
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
-  updateBuffer() {
-    const { append_queue, children, current_video, sourceBuffer, mediaSource } = this.state;
-    const now_key = append_queue[0];
-    if (current_video === undefined) return;
-    const child = children.find(child => child.key === now_key);
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    const { append_queue, children, current_video, sourceBuffer, mediaSource, video } = prevState;
+    if (append_queue.length > 0 && sourceBuffer !== undefined) {
 
-    if (!sourceBuffer.updating) {
-      if (current_video.key === now_key) {
-        sourceBuffer.addEventListener('updateend', () => {
+      const now_key = append_queue[0];
+      if (current_video === undefined) return;
+      const child = children.find(child => child.key === now_key);
 
-          //sourceBuffer.timestampOffset += 60;
-          //this.updateBuffer();
-        });
-        append_queue.shift();
-        console.log('2');
-        sourceBuffer.appendBuffer(current_video.buf);
+      if (!sourceBuffer.updating) {
+        if (current_video.key === now_key) {
+          console.log(now_key);
+          console.log(mediaSource.readyState);
+          sourceBuffer.addEventListener('updateend', () => {
+            console.log(mediaSource.readyState);
+            sourceBuffer.timestampOffset += 10;
+            //this.updateBuffer();
+            mediaSource.endOfStream();
+            video.play();
 
-        console.log('3');
-      } else if (child !== null) {
+          });
+          append_queue.shift();
+          console.log('2');
+          sourceBuffer.appendBuffer(current_video.buf);
+
+        } /*else if (child !== null) {
         sourceBuffer.addEventListener('updateend', () => {
           //sourceBuffer.timestampOffset += 60;
           //this.updateBuffer();
         });
         append_queue.shift();
         //sourceBuffer.appendBuffer(child.buf);
+      }*/
       }
     }
+  }
+
+  updateBuffer(_) {
+
   }
 
   render() {
