@@ -27,7 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '192.168.1.205',
-    'localhost'
+    '192.168.0.112',
+    'localhost',
 ]
 
 
@@ -42,8 +43,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'mptt',
     'core.apps.CoreConfig',
-    'video.apps.VideoConfig'
+    'video.apps.VideoConfig',
+    'channel.apps.ChannelConfig'
 ]
 
 MIDDLEWARE = [

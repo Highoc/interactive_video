@@ -1,4 +1,8 @@
 from django.db import models
+from mptt.models import MPTTModel, TreeForeignKey
+
+from channel.models import Channel
+import uuid
 
 class Source(models.Model):
 
@@ -45,6 +49,12 @@ class Source(models.Model):
         verbose_name='Дата загрузки'
     )
 
+    time = models.TimeField(
+        auto_now=False,
+        auto_now_add=False,
+        verbose_name='Длительность видео'
+    )
+
     '''
     status = models.BooleanField(
         default=False,
@@ -59,3 +69,89 @@ class Source(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class VideoPart(MPTTModel):
+
+    source = models.ForeignKey(
+        Source,
+        null=True,
+        related_name='video_parts',
+        verbose_name='Источник видео',
+        on_delete=models.SET_NULL
+    )
+
+    key = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        verbose_name='Ключ видео',
+    )
+
+    parent = TreeForeignKey(
+        'self',
+        null=True,
+        related_name='children',
+        verbose_name='Родительская часть видео',
+        on_delete=models.CASCADE
+    )
+
+    text = models.CharField(
+        max_length=32,
+        verbose_name='Текст к видео'
+    )
+
+    main_video =  models.ForeignKey(
+        'video.Video',
+        related_name='video_parts',
+        verbose_name='Главное видео',
+        on_delete=models.CASCADE
+    )
+
+    class MPTTMeta:
+        order_insertion_by = ['parent']
+
+
+class Video(models.Model):
+
+    name = models.CharField(
+        max_length=127,
+        verbose_name='Название интерактивного видео'
+    )
+
+    description = models.TextField(
+        max_length=4096,
+        verbose_name='Описание интерактивного видео'
+    )
+
+    key = models.CharField(
+        max_length=12,
+        verbose_name='Ключ интерактивного видео'
+    )
+
+    preview_picture = models.ImageField(
+        upload_to='preview_video',
+        null=True,
+        verbose_name='Превью интерактивного видео'
+    )
+
+    owner = models.ForeignKey(
+        'auth.User',
+        related_name='video',
+        verbose_name='Автор видео',
+        on_delete=models.CASCADE
+    )
+
+    head_video_part = models.ForeignKey(
+        VideoPart,
+        related_name='video',
+        verbose_name='Стартовый фрагмент видео',
+        on_delete=models.CASCADE
+    )
+
+    created = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата создания'
+    )
+
+
