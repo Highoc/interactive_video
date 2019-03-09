@@ -14,35 +14,25 @@ export class InteractivePlayer extends Component {
 
   componentDidMount() {
     const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
-    if ('MediaSource' in window && MediaSource.isTypeSupported(mimeCodec)) {
-      const mediaSource = new MediaSource();
-      const url = URL.createObjectURL(mediaSource);
-      mediaSource.addEventListener('sourceopen', this.sourceOpen.bind(this));
-
-      this.setState({
-        mediaSource,
-        url,
-      });
-    } else {
-      console.error('Unsupported MIME type or codec: ', mimeCodec);
-    }
+    const { videoQueue } = this.state;
+    const mediaSourceUrl = videoQueue.addMediaSource(mimeCodec);
+    this.setState({ url: mediaSourceUrl });
 
     const { main } = this.props;
     const url = `http://192.168.1.205:8000/video/part/get/${main}`;
-
     const config = {
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
       },
     };
 
-    const { videoQueue } = this.state;
     videoQueue.pushKey(main);
 
     axios.get(url, config).then(
       (response) => {
         console.log(response);
-        axios.get(response.data.content_url, {
+        // response.data.content_url
+        axios.get('https://hb.bizmrg.com/interactive_video/frag_bunny.mp4', {
           responseType: 'arraybuffer',
         }).then(
           (responseSource) => {
@@ -55,13 +45,6 @@ export class InteractivePlayer extends Component {
         ).catch(error => console.log(error));
       },
     ).catch(error => console.log(error));
-  }
-
-  sourceOpen() {
-    const { mediaSource, videoQueue } = this.state;
-    const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
-    const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
-    videoQueue.addSourceBuffer(sourceBuffer);
   }
 
   /*
@@ -97,7 +80,8 @@ export class InteractivePlayer extends Component {
       axios.get(url, config).then(
         (response) => {
           console.log(response);
-          axios.get(response.data.content_url, {
+          // response.data.content_url
+          axios.get('https://hb.bizmrg.com/interactive_video/frag_bunny.mp4', {
             responseType: 'arraybuffer',
           }).then(
             (responseSource) => {
@@ -139,16 +123,30 @@ export class InteractivePlayer extends Component {
 
 class AppendQueue {
   constructor() {
+    this.mediaSource = null;
     this.sourceBuffer = null;
     this.isReady = false;
     this.queue = [];
+  }
+
+  addMediaSource(mimeCodec) {
+    if ('MediaSource' in window && MediaSource.isTypeSupported(mimeCodec)) {
+      this.mediaSource = new MediaSource();
+      this.mediaSource.addEventListener('sourceopen', () => {
+        const sourceBuffer = this.mediaSource.addSourceBuffer(mimeCodec);
+        this.addSourceBuffer(sourceBuffer);
+      });
+    } else {
+      console.error('Unsupported MIME type or codec: ', mimeCodec);
+    }
+    return URL.createObjectURL(this.mediaSource);
   }
 
   addSourceBuffer(sourceBuffer) {
     this.sourceBuffer = sourceBuffer;
     this.isReady = true;
 
-    this.sourceBuffer.addEventListener('onupdateend', () => {
+    this.sourceBuffer.addEventListener('updateend', () => {
       this.checkQueue();
     });
   }
@@ -178,7 +176,8 @@ class AppendQueue {
     if (this.queue[0].isLoaded) {
       const currentPart = this.queue.shift();
       console.log(currentPart);
-      this.sourceBuffer.timestampOffset += currentPart.time;
+      // currentPart.time
+      this.sourceBuffer.timestampOffset += 60;
       this.sourceBuffer.appendBuffer(currentPart.buf);
     }
   }
