@@ -13,7 +13,7 @@ export class VideoPlayer extends Component {
   }
 
   componentDidMount() {
-    this.setState({ video: document.getElementById('video') })
+    this.setState({ video: document.getElementById('video') });
 
     const mimeCodec = 'video/mp4';
     if ('MediaSource' in window && MediaSource.isTypeSupported(mimeCodec)) {
@@ -103,7 +103,7 @@ export class VideoPlayer extends Component {
           muted
           controls
         >
-          Interactive Video Player
+
         </video>
         <br />
         <button onClick={this.handlePlay}>Play</button>

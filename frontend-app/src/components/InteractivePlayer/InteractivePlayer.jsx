@@ -8,7 +8,7 @@ export class InteractivePlayer extends Component {
       isReady: true,
       children: [],
       video: null,
-      append_queue: [],
+      videoQueue: new AppendQueue(),
     };
   }
 
@@ -16,12 +16,12 @@ export class InteractivePlayer extends Component {
     const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
     if ('MediaSource' in window && MediaSource.isTypeSupported(mimeCodec)) {
       const mediaSource = new MediaSource();
-      this.setState({ mediaSource });
       const url = URL.createObjectURL(mediaSource);
       mediaSource.addEventListener('sourceopen', this.sourceOpen.bind(this));
+
       this.setState({
+        mediaSource,
         url,
-        video: document.getElementById('video'),
       });
     } else {
       console.error('Unsupported MIME type or codec: ', mimeCodec);
@@ -36,45 +36,32 @@ export class InteractivePlayer extends Component {
       },
     };
 
-    // добавить ключ в очередь append
-    this.state.append_queue.push(main);
+    const { videoQueue } = this.state;
+    videoQueue.pushKey(main);
 
     axios.get(url, config).then(
       (response) => {
-        console.log(response.data);
+        console.log(response);
         axios.get(response.data.content_url, {
           responseType: 'arraybuffer',
         }).then(
-          (response2) => {
-
-            response.data.buf = response2.data;
+          (responseSource) => {
+            videoQueue.pushSource(main, responseSource.data, response.data.time);
             this.setState({
               children: [response.data],
             });
             this.videoByChoice(main);
           },
-        ).catch(
-          (error) => {
-            console.log(error);
-          },
-        );
+        ).catch(error => console.log(error));
       },
-    ).catch(
-      (error) => {
-        console.log(error);
-      },
-    );
-    //tut
+    ).catch(error => console.log(error));
   }
 
-  sourceOpen(_) {
-    const { mediaSource } = this.state;
+  sourceOpen() {
+    const { mediaSource, videoQueue } = this.state;
     const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
-    console.log('-');
     const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
-    console.log('+');
-    this.setState({ sourceBuffer: sourceBuffer });
-    console.log('1');
+    videoQueue.addSourceBuffer(sourceBuffer);
   }
 
   /*
@@ -89,6 +76,7 @@ export class InteractivePlayer extends Component {
 * childr: { key: ... }
 * аппенд для всех детей
 * */
+
   videoByChoice(key) {
     const current_video = this.state.children.find(child => child.key === key);
     this.setState({ current_video });
@@ -100,68 +88,26 @@ export class InteractivePlayer extends Component {
 
     this.setState({ children: [] });
 
-    for (const now_Key of current_video.children) {
+    const { videoQueue } = this.state;
+
+    for (const now_key of current_video.children) {
       // добавить ключ в очередь append
-      this.state.append_queue.push(now_Key);
-      const url = `http://192.168.1.205:8000/video/part/get/${now_Key}`;
+      videoQueue.pushKey(now_key);
+      const url = `http://192.168.1.205:8000/video/part/get/${now_key}`;
       axios.get(url, config).then(
         (response) => {
-          console.log(response.data);
-
+          console.log(response);
           axios.get(response.data.content_url, {
             responseType: 'arraybuffer',
           }).then(
-            (response2) => {
-              response.data.buf = response2.data;
-              const newChildren = [...this.state.children, response.data ];
+            (responseSource) => {
+              videoQueue.pushSource(now_key, responseSource.data, response.data.time);
+              const newChildren = [...this.state.children, response.data];
               this.setState({ children: newChildren });
             },
-          ).catch(
-            (error) => {
-              console.log(error);
-            },
-          );
+          ).catch(error => console.log(error));
         },
-      ).catch(
-        (error) => {
-          console.log(error);
-        },
-      );
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.state.append_queue.size !== 0 && this.state.sourceBuffer !== undefined) {
-      this.updateBuffer();
-    }
-  }
-
-  updateBuffer() {
-    const { append_queue, children, current_video, sourceBuffer, mediaSource } = this.state;
-    const now_key = append_queue[0];
-    if (current_video === undefined) return;
-    const child = children.find(child => child.key === now_key);
-
-    if (!sourceBuffer.updating) {
-      if (current_video.key === now_key) {
-        sourceBuffer.addEventListener('updateend', () => {
-
-          //sourceBuffer.timestampOffset += 60;
-          //this.updateBuffer();
-        });
-        append_queue.shift();
-        console.log('2');
-        sourceBuffer.appendBuffer(current_video.buf);
-
-        console.log('3');
-      } else if (child !== null) {
-        sourceBuffer.addEventListener('updateend', () => {
-          //sourceBuffer.timestampOffset += 60;
-          //this.updateBuffer();
-        });
-        append_queue.shift();
-        //sourceBuffer.appendBuffer(child.buf);
-      }
+      ).catch(error => console.log(error));
     }
   }
 
@@ -171,12 +117,7 @@ export class InteractivePlayer extends Component {
     if (isReady) {
       result = (
         <div>
-          <div>
-            Ready:
-            {' '}
-            {this.state.currentVideoPart}
-            <br />
-          </div>
+          <div>Ready</div>
           <video
             id="video"
             src={url}
@@ -184,7 +125,7 @@ export class InteractivePlayer extends Component {
             muted
             controls
           >
-            XXX
+            Interactive Video Player
           </video>
         </div>
       );
@@ -192,5 +133,58 @@ export class InteractivePlayer extends Component {
       result = <div>Not ready</div>;
     }
     return result;
+  }
+}
+
+
+class AppendQueue {
+  constructor() {
+    this.sourceBuffer = null;
+    this.isReady = false;
+    this.queue = [];
+  }
+
+  addSourceBuffer(sourceBuffer) {
+    this.sourceBuffer = sourceBuffer;
+    this.isReady = true;
+
+    this.sourceBuffer.addEventListener('onupdateend', () => {
+      this.checkQueue();
+    });
+  }
+
+  pushKey(key) {
+    this.queue.push({
+      key,
+      isLoaded: false,
+      buf: null,
+      time: 0,
+    });
+  }
+
+  pushSource(key, buf, time) {
+    const videoPart = this.queue.find(elem => elem.key === key);
+    videoPart.isLoaded = true;
+    videoPart.buf = buf;
+    videoPart.time = AppendQueue.getSeconds(time);
+    this.checkQueue();
+  }
+
+  checkQueue() {
+    if (!this.isReady || this.sourceBuffer.updating || !this.queue.length) {
+      return;
+    }
+
+    if (this.queue[0].isLoaded) {
+      const currentPart = this.queue.shift();
+      console.log(currentPart);
+      this.sourceBuffer.timestampOffset += currentPart.time;
+      this.sourceBuffer.appendBuffer(currentPart.buf);
+    }
+  }
+
+  static getSeconds(time) {
+    const splitted = time.split(':');
+    return parseFloat(splitted[0]) * 3600 + parseFloat(splitted[1]) * 60 + parseFloat(splitted[2]);
   }
 }
