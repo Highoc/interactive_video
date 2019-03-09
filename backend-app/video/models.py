@@ -49,6 +49,12 @@ class Source(models.Model):
         verbose_name='Дата загрузки'
     )
 
+    time = models.TimeField(
+        auto_now=False,
+        auto_now_add=False,
+        verbose_name='Длительность видео'
+    )
+
     '''
     status = models.BooleanField(
         default=False,
@@ -78,30 +84,32 @@ class VideoPart(MPTTModel):
     key = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
-        unique=True
+        unique=True,
+        verbose_name='Ключ видео',
     )
 
     parent = TreeForeignKey(
         'self',
         null=True,
         related_name='children',
-        verbose_name='Часть видео',
+        verbose_name='Родительская часть видео',
         on_delete=models.CASCADE
     )
 
     text = models.CharField(
         max_length=32,
-        verbose_name='Название видео'
+        verbose_name='Текст к видео'
     )
 
-    time = models.TimeField(
-        auto_now=False,
-        auto_now_add=False,
-        verbose_name='Длительность видео'
+    main_video =  models.ForeignKey(
+        'video.Video',
+        related_name='video_parts',
+        verbose_name='Главное видео',
+        on_delete=models.CASCADE
     )
 
     class MPTTMeta:
-        order_insertion_by = ['name']
+        order_insertion_by = ['parent']
 
 
 class Video(models.Model):
@@ -118,7 +126,7 @@ class Video(models.Model):
 
     key = models.CharField(
         max_length=12,
-        verbose_name='ID интерактивного видео'
+        verbose_name='Ключ интерактивного видео'
     )
 
     preview_picture = models.ImageField(

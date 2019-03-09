@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 
 export class VideoPlayer extends Component {
   constructor(props) {
@@ -111,7 +112,6 @@ export class VideoPlayer extends Component {
         <button onClick={this.handleNext2}>2</button>
         <button onClick={this.handleNextTime}>+5 sec</button>
         <button onClick={this.handlePrevTime}>-5 sec</button>
-        <input id="file" type="file" />
       </div>
     );
   }
@@ -127,7 +127,7 @@ function fetchData(url, cb) {
   xhr.send();
   */
 
-  document.getElementById('file').addEventListener('change', (event) => {
+  /* document.getElementById('file').addEventListener('change', (event) => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const arrayBuffer = event.target.result;
@@ -135,5 +135,48 @@ function fetchData(url, cb) {
       cb(array);
     };
     reader.readAsArrayBuffer(event.target.files[0]);
+  });
+  */
+
+  /* axios.get('https://hb.bizmrg.com/interactive_video/frag_bunny.mp4', {
+
+    mode: 'no-cors',
+  })
+    .then((response) => {
+      // handle success
+      console.log('+');
+      console.log(response.data);
+    })
+    .catch((error) => {
+      // handle error
+      if (error.response) {
+        console.log(1);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        console.log(2);
+        console.log(error.request);
+      } else {
+        console.log(3);
+        console.log(error.message);
+      }
+      console.log(error.config);
+    });
+  */
+
+  const testURL = 'https://hb.bizmrg.com/interactive_video/frag_bunny.mp4';
+  const myInit = {
+    method: 'GET',
+    mode: 'cors',
+  };
+
+  const myRequest = new Request(testURL, myInit);
+
+  fetch(myRequest).then((response) => {
+    return response.arrayBuffer();
+  }).then((array) => {
+    console.log(array);
+    cb(array);
+  }).catch((e) => {
+    console.log(e);
   });
 }

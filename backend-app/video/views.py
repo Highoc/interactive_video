@@ -90,10 +90,59 @@ class VideoUploadView(APIView):
         pass
 
 
+# Протестить
 class VideoGetView(APIView):
-    pass
+    def get(self, request, key=None):
+        video_list = Video.objects.filter(key=key)
+
+        if not video_list:
+            return Response('This video_part doesn\'t exist', status=status.HTTP_204_NO_CONTENT)
+
+        # Проверка на доступность видео (video еще может быть не опубликовано)
+
+        video = video_list[0]
+
+        responce = {
+            'name': video.name,
+            'description': video.description,
+            'head_video_part': video.head_video_part.key.hex,
+            'created': video.created,
+        }
+
+        return Response(responce, status.HTTP_200_OK)
 
 
+# Протестить
+class VideoPartGetView(APIView):
+    def get(self, request, key=None):
+        video_parts = VideoPart.objects.filter(key=key)
+
+        if not video_parts:
+            return Response('This video_part doesn\'t exist', status=status.HTTP_204_NO_CONTENT)
+
+        # Проверка на доступность видео (video еще может быть не опубликовано)
+
+        video_part = video_parts[0]
+        source = video_part.source
+
+        url = get_file_url(
+            settings.AWS_STORAGE_BUCKET_NAME,
+            video_part.main_video.owner,
+            source.key
+        )
+
+        responce = {
+            'key': key,
+            'content_url': url,
+            'time': source.time,
+            'text': video_part.text,
+            'children': [ child.key.hex for child in video_part.children.all() ],
+        }
+
+        return Response(responce, status.HTTP_200_OK)
+
+
+'''
 class TestView(APIView):
     permission_classes = (permissions.AllowAny,)
 
@@ -103,30 +152,4 @@ class TestView(APIView):
             data = file.read()
 
         return Response(len(data))
-
-
-# Протестить
-class VideoPartGetView(APIView):
-    def get(self, request, key=None):
-        video_parts = VideoPart.objects.filter(key=key)
-
-        if not video_parts:
-            return Response('This video_part doesn\'t exist', status=status.HTTP_404_NOT_FOUND)
-
-        # Проверка на доступность видео
-
-        video_part = video_parts[0]
-        url = get_file_url(
-            settings.AWS_STORAGE_BUCKET_NAME,
-            video_part.owner,
-            video_part.source.key
-        )
-
-        responce = {
-            'content_url': url,
-            'time': video_part.time,
-            'text': video_part.text,
-            'children': [ child.key for child in video_part.children ],
-        }
-
-        return Response(responce)
+'''
