@@ -3,7 +3,7 @@ import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 
 import { ChannelView } from './ChannelView';
-import { CreateVideo } from './CreateVideo';
+import CreateVideo from './CreateVideo';
 import { WatchVideo } from './WatchVideo';
 
 export const Channel = () => (

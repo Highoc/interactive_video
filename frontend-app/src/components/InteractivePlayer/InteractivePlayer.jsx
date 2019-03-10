@@ -1,5 +1,49 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import 'video-react/dist/video-react.css';
+import PropTypes from 'prop-types';
+
+import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button/index';
+
+import {
+  Player,
+  ControlBar,
+  ReplayControl,
+  ForwardControl,
+  VolumeMenuButton,
+  CurrentTimeDisplay,
+  TimeDivider,
+  BigPlayButton,
+} from 'video-react';
+
+const propTypes = {
+  player: PropTypes.object,
+  className: PropTypes.string,
+};
+
+const videoStyles = {
+  position: 'relative',
+  paddingBottom: '56.25%',
+  height: '0',
+  overflow: 'hidden',
+};
+const buttonStyles = {
+  position: 'absolute',
+  bottom: '25%',
+  left: '40%',
+};
+
+const styles = theme => ({
+  button: {
+    margin: theme.spacing.unit,
+    position: 'absolute',
+  },
+  input: {
+    display: 'none',
+  },
+
+});
 
 export class InteractivePlayer extends Component {
   constructor(props) {
@@ -8,79 +52,55 @@ export class InteractivePlayer extends Component {
       isReady: true,
       children: [],
       video: null,
-      append_queue: [],
+      videoQueue: new AppendQueue(),
     };
-    this._isMounted = false;
+    this._handleEvents();
+  }
+
+  _handleEvents() {
+    this.play = this.play.bind(this);
+    this.pause = this.pause.bind(this);
+    this.load = this.load.bind(this);
+    this.changeCurrentTime = this.changeCurrentTime.bind(this);
+    this.seek = this.seek.bind(this);
   }
 
   componentDidMount() {
-    this._isMounted = true;
+    this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
+
     const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
-    if ('MediaSource' in window && MediaSource.isTypeSupported(mimeCodec)) {
-      const mediaSource = new MediaSource();
-      this.setState({ mediaSource });
-      const url = URL.createObjectURL(mediaSource);
-      mediaSource.addEventListener('sourceopen', this.sourceOpen.bind(this));
-      this.setState({
-        url,
-        video: document.getElementById('video'),
-      });
-    } else {
-      console.error('Unsupported MIME type or codec: ', mimeCodec);
-    }
+    const { videoQueue } = this.state;
+    const mediaSourceUrl = videoQueue.addMediaSource(mimeCodec);
+    this.setState({ url: mediaSourceUrl });
 
     const { main } = this.props;
     const url = `http://192.168.1.205:8000/video/part/get/${main}`;
-
     const config = {
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
       },
     };
 
-    // добавить ключ в очередь append
-    this.state.append_queue.push(main);
+    videoQueue.pushKey(main);
 
     axios.get(url, config).then(
       (response) => {
-        console.log(response.data);
-        axios.get(response.data.content_url, {
+        console.log(response);
+        // response.data.content_url
+        axios.get('https://hb.bizmrg.com/interactive_video/frag_bunny.mp4', {
           responseType: 'arraybuffer',
         }).then(
-          (response2) => {
-            if (this._isMounted) {
-              response.data.buf = response2.data;
-              this.setState({
-                children: [response.data],
-              });
-              this.videoByChoice(main);
-            }
+          (responseSource) => {
+            videoQueue.pushSource(main, responseSource.data, response.data.time);
+            this.setState({
+              children: [response.data],
+            });
+            this.videoByChoice(main);
           },
-        ).catch(
-          (error) => {
-            console.log(error);
-          },
-        );
+        ).catch(error => console.log(error));
       },
-    ).catch(
-      (error) => {
-        console.log(error);
-      },
-    );
-    //tut
+    ).catch(error => console.log(error));
   }
-
-  sourceOpen(_) {
-    const { mediaSource } = this.state;
-
-    const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
-    console.log('-');
-    const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
-    console.log('+');
-    this.setState({ sourceBuffer: sourceBuffer });
-    console.log('1');
-  }
-
   /*
 * children: [
 * { key: ... , url: ..., children: [..., ....] }
@@ -93,8 +113,8 @@ export class InteractivePlayer extends Component {
 * childr: { key: ... }
 * аппенд для всех детей
 * */
+
   videoByChoice(key) {
-    this._isMounted = true;
     const current_video = this.state.children.find(child => child.key === key);
     this.setState({ current_video });
     const config = {
@@ -105,108 +125,158 @@ export class InteractivePlayer extends Component {
 
     this.setState({ children: [] });
 
-    for (const now_Key of current_video.children) {
+    const { videoQueue } = this.state;
+
+    for (const now_key of current_video.children) {
       // добавить ключ в очередь append
-      this.state.append_queue.push(now_Key);
-      const url = `http://192.168.1.205:8000/video/part/get/${now_Key}`;
+      videoQueue.pushKey(now_key);
+      const url = `http://192.168.1.205:8000/video/part/get/${now_key}`;
       axios.get(url, config).then(
         (response) => {
-          console.log(response.data);
-
-          axios.get(response.data.content_url, {
+          console.log(response);
+          // response.data.content_url
+          axios.get('https://hb.bizmrg.com/interactive_video/test_video_dashinit.mp4', {
             responseType: 'arraybuffer',
           }).then(
-            (response2) => {
-              if (this._isMounted) {
-                response.data.buf = response2.data;
-                const newChildren = [...this.state.children, response.data];
-                this.setState({children: newChildren});
-              }
+            (responseSource) => {
+              videoQueue.pushSource(now_key, responseSource.data, response.data.time);
+              const newChildren = [...this.state.children, response.data];
+              this.setState({ children: newChildren });
             },
-          ).catch(
-            (error) => {
-              console.log(error);
-            },
-          );
+          ).catch(error => console.log(error));
         },
-      ).catch(
-        (error) => {
-          console.log(error);
-        },
-      );
+      ).catch(error => console.log(error));
     }
   }
 
-  componentWillUnmount() {
-    this._isMounted = false;
+  handleStateChange(state, prevState) {
+    // copy player state to this component's state
+    this.setState({
+      player: state,
+    });
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    const { append_queue, children, current_video, sourceBuffer, mediaSource, video } = prevState;
-    if (append_queue.length > 0 && sourceBuffer !== undefined) {
-
-      const now_key = append_queue[0];
-      if (current_video === undefined) return;
-      const child = children.find(child => child.key === now_key);
-
-      if (!sourceBuffer.updating) {
-        if (current_video.key === now_key) {
-          console.log(now_key);
-          console.log(mediaSource.readyState);
-          sourceBuffer.addEventListener('updateend', () => {
-            console.log(mediaSource.readyState);
-            sourceBuffer.timestampOffset += 10;
-            //this.updateBuffer();
-            mediaSource.endOfStream();
-            video.play();
-
-          });
-          append_queue.shift();
-          console.log('2');
-          sourceBuffer.appendBuffer(current_video.buf);
-
-        } /*else if (child !== null) {
-        sourceBuffer.addEventListener('updateend', () => {
-          //sourceBuffer.timestampOffset += 60;
-          //this.updateBuffer();
-        });
-        append_queue.shift();
-        //sourceBuffer.appendBuffer(child.buf);
-      }*/
-      }
-    }
+  play() {
+    this.refs.player.play();
   }
 
-  updateBuffer(_) {
+  pause() {
+    this.refs.player.pause();
+  }
 
+  load() {
+    this.refs.player.load();
+  }
+
+  changeCurrentTime(seconds) {
+    return () => {
+      const { player } = this.refs.player.getState();
+      const currentTime = player.currentTime;
+      this.refs.player.seek(currentTime + seconds);
+    };
+  }
+
+  seek(seconds) {
+    return () => {
+      this.refs.player.seek(seconds);
+    };
   }
 
   render() {
+    const { classes } = this.props;
     const { isReady, url } = this.state;
     let result = null;
+
     if (isReady) {
       result = (
         <div>
-          <div>
-            Ready:
-            {' '}
-            {this.state.currentVideoPart}
-            <br />
+          <div style={videoStyles}>
+            <Player ref="player" src={url} >
+              <BigPlayButton position="center" />
+              <ControlBar autoHide={true}>
+                <ReplayControl seconds={10} order={1.1} />
+                <ForwardControl seconds={10} order={1.2} />
+                <CurrentTimeDisplay order={4.1} />
+                <TimeDivider order={4.2} />
+                <VolumeMenuButton order={7} vertical />
+              </ControlBar>
+            </Player>
           </div>
-          <video
-            id="video"
-            src={url}
-            height="300px"
-            muted
-            controls
-          >
-            XXX
-          </video>
         </div>
       );
     } else {
       result = <div>Not ready</div>;
     }
     return result;
+  }
+}
+
+
+class AppendQueue {
+  constructor() {
+    this.mediaSource = null;
+    this.sourceBuffer = null;
+    this.isReady = false;
+    this.queue = [];
+  }
+
+  addMediaSource(mimeCodec) {
+    if ('MediaSource' in window && MediaSource.isTypeSupported(mimeCodec)) {
+      this.mediaSource = new MediaSource();
+      this.mediaSource.addEventListener('sourceopen', () => {
+        const sourceBuffer = this.mediaSource.addSourceBuffer(mimeCodec);
+        this.addSourceBuffer(sourceBuffer);
+      });
+    } else {
+      console.error('Unsupported MIME type or codec: ', mimeCodec);
+    }
+    return URL.createObjectURL(this.mediaSource);
+  }
+
+  addSourceBuffer(sourceBuffer) {
+    this.sourceBuffer = sourceBuffer;
+    this.isReady = true;
+  }
+
+  pushKey(key) {
+    this.queue.push({
+      key,
+      isLoaded: false,
+      buf: null,
+      time: 0,
+    });
+  }
+
+  pushSource(key, buf, time) {
+    const videoPart = this.queue.find(elem => elem.key === key);
+    videoPart.isLoaded = true;
+    videoPart.buf = buf;
+    videoPart.time = AppendQueue.getSeconds(time);
+    this.checkQueue();
+  }
+
+  checkQueue() {
+    if (!this.isReady || this.sourceBuffer.updating || !this.queue.length) {
+      return;
+    }
+
+    if (this.queue[0].isLoaded) {
+      const currentPart = this.queue.shift();
+      this.sourceBuffer.appendBuffer(currentPart.buf);
+      this.sourceBuffer.addEventListener('updateend', (event) => {
+        // currentPart.time
+        console.log(event);
+        this.sourceBuffer.timestampOffset += 60;
+        console.log('+');
+        console.log(this.sourceBuffer.timestampOffset);
+        // this.checkQueue();
+      });
+      console.log('-');
+    }
+  }
+
+  static getSeconds(time) {
+    const splitted = time.split(':');
+    return parseFloat(splitted[0]) * 3600 + parseFloat(splitted[1]) * 60 + parseFloat(splitted[2]);
   }
 }

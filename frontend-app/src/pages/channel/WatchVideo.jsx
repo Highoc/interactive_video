@@ -2,6 +2,12 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { InteractivePlayer } from '../../components/InteractivePlayer';
 
+const textStyles = {
+  position: 'relative',
+  overflow: 'hidden',
+  paddingLeft: '5%',
+  paddingRight: '5%',
+};
 
 export class WatchVideo extends Component {
   constructor(props) {
@@ -40,7 +46,7 @@ export class WatchVideo extends Component {
     let result = null;
     if (status === statuses.LOADED) {
       result = (
-        <div>
+        <div style={textStyles}>
           Название: { video.name } <br />
           Создано : { video.created } <br />
           Описание: { video.description } <br />

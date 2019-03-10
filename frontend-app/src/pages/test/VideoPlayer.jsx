@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 
 export class VideoPlayer extends Component {
   constructor(props) {
@@ -12,9 +13,9 @@ export class VideoPlayer extends Component {
   }
 
   componentDidMount() {
-    this.setState({ video: document.getElementById('video') })
+    this.setState({ video: document.getElementById('video') });
 
-    const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
+    const mimeCodec = 'video/mp4';
     if ('MediaSource' in window && MediaSource.isTypeSupported(mimeCodec)) {
       const mediaSource = new MediaSource();
       const url = URL.createObjectURL(mediaSource);
@@ -66,9 +67,9 @@ export class VideoPlayer extends Component {
 
   sourceOpen(_) {
     const mediaSource = this;
-    const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
+    const mimeCodec = 'video/mp4';
     const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
-    const assetURL = 'https://github.com/nickdesaulniers/netfix/blob/gh-pages/demo/frag_bunny.mp4';
+    const assetURL = 'http://localhost:8000/video/test/';
     let i = 2;
 
     fetchData(assetURL, (buf) => {
@@ -77,9 +78,6 @@ export class VideoPlayer extends Component {
         sourceBuffer.timestampOffset += 60;
         i -= 1;
         if (i === 0) {
-          mediaSource.endOfStream();
-          const video = document.getElementById('video');
-          video.play();
           console.log('exit');
           return;
         }
@@ -102,7 +100,7 @@ export class VideoPlayer extends Component {
           muted
           controls
         >
-          Interactive Video Player
+
         </video>
         <br />
         <button onClick={this.handlePlay}>Play</button>
@@ -111,40 +109,26 @@ export class VideoPlayer extends Component {
         <button onClick={this.handleNext2}>2</button>
         <button onClick={this.handleNextTime}>+5 sec</button>
         <button onClick={this.handlePrevTime}>-5 sec</button>
-        <input id="file" type="file" />
       </div>
     );
   }
 }
 
-
 function fetchData(url, cb) {
-  /*
-  document.getElementById('file').addEventListener('change', (event) => {
-   const reader = new FileReader();
-   reader.onload = (event) => {
-     const arrayBuffer = event.target.result;
-     const array = new Uint8Array(arrayBuffer);
-     cb(array);
-   };
-   console.log(event.target.files[0]);
-   reader.readAsArrayBuffer(event.target.files[0]);
-  });*/
-  const proxyurl = "https://cors-anywhere.herokuapp.com/";
-
-  fetch(proxyurl + url) // https://cors-anywhere.herokuapp.com/https://example.com
-    .then(response => response.arrayBuffer())
-    .then(contents => console.log(contents))
-    .catch(() => console.log("Cant access " + url + " response. Blocked by browser?"))
-
-  console.log(url);
-  const xhr = new XMLHttpRequest;
-  xhr.open('get', url, true);
-  xhr.responseType = 'arraybuffer';
-  xhr.onload = function () {
-    cb(xhr.response);
+  const testURL = 'https://hb.bizmrg.com/interactive_video/frag_bunny.mp4';
+  const myInit = {
+    method: 'GET',
+    mode: 'cors',
   };
-  xhr.send();
 
+  const myRequest = new Request(testURL, myInit);
+
+  fetch(myRequest).then((response) => {
+    return response.arrayBuffer();
+  }).then((array) => {
+    console.log(array);
+    cb(array);
+  }).catch((e) => {
+    console.log(e);
+  });
 }
-
