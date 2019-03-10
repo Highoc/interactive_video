@@ -18,6 +18,7 @@ const propTypes = {
   player: PropTypes.object,
   className: PropTypes.string,
 };
+
 const videoStyles = {
   position: 'relative',
   maxhight: '560',
@@ -29,6 +30,7 @@ const buttonStyles = {
   bottom: '25%',
   left: '40%',
 };
+
 const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
@@ -44,40 +46,29 @@ export class InteractivePlayer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isReady: true,
       children: [],
       videoQueue: new AppendQueue(),
       timeResolver: new TimeResolver(),
-      current_time: 0,
+      currentTime: 0,
       questions: [],
-      time_frame: {
+      timeFrame: {
         begin: 0,
         end: 0,
       },
     };
 
-    this._handleEvents();
-  }
-
-  _handleEvents() {
-    this.play = this.play.bind(this);
-    this.pause = this.pause.bind(this);
-    this.load = this.load.bind(this);
-    this.changeCurrentTime = this.changeCurrentTime.bind(this);
-    this.seek = this.seek.bind(this);
-    //    this.onButton2Click = this.onButton2Click.bind(this);
-    //    this.onButtonClick = this.onButtonClick.bind(this);
+    this.handleEvents();
   }
 
   componentDidMount() {
     this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
 
-    const mimeCodec = `video/mp4; codecs="${this.props.codec}"`;
-    const { videoQueue, timeResolver } = this.state;
-    const mediaSourceUrl = videoQueue.addMediaSource(mimeCodec);
-    this.setState({ url: mediaSourceUrl });
+    const { codec, main } = this.props;
+    const mimeCodec = `video/mp4; codecs="${codec}"`;
 
-    const { main } = this.props;
+    const { videoQueue, timeResolver } = this.state;
+    this.setState({ url: videoQueue.addMediaSource(mimeCodec) });
+
     const url = `http://192.168.1.205:8000/video/part/get/${main}/`;
     const config = {
       headers: {
@@ -101,7 +92,7 @@ export class InteractivePlayer extends Component {
 
             this.setState({
               children: [response.data],
-              time_frame: timeResolver.getTimeFrame(main),
+              timeFrame: timeResolver.getTimeFrame(main),
             });
 
             this.videoByChoice(main);
@@ -111,25 +102,35 @@ export class InteractivePlayer extends Component {
     ).catch(error => console.log(error));
   }
 
-  /*
-* children: [
-* { key: ... , url: ..., children: [..., ....] }
-* key: { ... }
-*
-* ]
-*
-* curr_video = { ... }
-* забрать всех детей
-* childr: { key: ... }
-* аппенд для всех детей
-* */
+  componentWillUpdate(nextProps, nextState, nextContext) {
+    const { currentTime, timeFrame } = nextState;
+    const d = timeFrame.end - currentTime;
+    if (d < 0) {
+      this.videoByChoice(nextState.nextKey);
+    }
+  }
 
-  videoByChoice(keyV) {
-    this.setState({ time_frame: this.state.timeResolver.getTimeFrame(keyV) });
-    this.seek(this.state.time_frame.begin);
+  handleEvents() {
+    this.play = this.play.bind(this);
+    this.pause = this.pause.bind(this);
+    this.seek = this.seek.bind(this);
+  }
 
-    const current_video = this.state.children.find(child => child.key === keyV);
-    this.setState({ current_video, questions: [] });
+  videoByChoice(answerKey) {
+    const { videoQueue, timeResolver, children } = this.state;
+
+    const currentVideo = children.find(child => child.key === answerKey);
+    const timeFrame = timeResolver.getTimeFrame(answerKey);
+
+    this.setState({
+      currentVideo,
+      timeFrame,
+      questions: [],
+      children: [],
+      nextKey: currentVideo.children[0],
+    });
+
+    this.seek(timeFrame.begin);
 
     const config = {
       headers: {
@@ -137,16 +138,11 @@ export class InteractivePlayer extends Component {
       },
     };
 
-    const { videoQueue, timeResolver } = this.state;
-    this.setState({ children: [], time_frame: timeResolver.getTimeFrame(keyV) });
+    for (const childKey of currentVideo.children) {
+      videoQueue.pushKey(childKey);
+      timeResolver.pushTimeKey(childKey);
 
-
-    for (const now_key of current_video.children) {
-      // добавить ключ в очередь append
-      videoQueue.pushKey(now_key);
-      timeResolver.pushTimeKey(now_key);
-
-      const url = `http://192.168.1.205:8000/video/part/get/${now_key}/`;
+      const url = `http://192.168.1.205:8000/video/part/get/${childKey}/`;
       axios.get(url, config).then(
         (response) => {
           console.log(response.data);
@@ -161,12 +157,11 @@ export class InteractivePlayer extends Component {
             responseType: 'arraybuffer',
           }).then(
             (responseSource) => {
-              videoQueue.pushSource(now_key, responseSource.data, response.data.time);
-              timeResolver.pushTimeSource(now_key, response.data.time);
+              videoQueue.pushSource(childKey, responseSource.data, response.data.time);
+              timeResolver.pushTimeSource(childKey, response.data.time);
 
-              const newChildren = [...this.state.children, response.data];
               this.setState({
-                children: newChildren,
+                children: [...this.state.children, response.data],
               });
             },
           ).catch(error => console.log(error));
@@ -177,7 +172,7 @@ export class InteractivePlayer extends Component {
 
   handleStateChange(state, prevState) {
     this.setState({
-      current_time: state.currentTime,
+      currentTime: state.currentTime,
     });
   }
 
@@ -189,50 +184,27 @@ export class InteractivePlayer extends Component {
     this.refs.player.pause();
   }
 
-  load() {
-    this.refs.player.load();
-  }
-
-  changeCurrentTime(seconds) {
-    return () => {
-      const { player } = this.refs.player.getState();
-      const currentTime = player.currentTime;
-      player.seek(currentTime + seconds);
-    };
-  }
-
   seek(seconds) {
-    return () => {
-      this.refs.player.seek(seconds);
-    };
+    this.refs.player.seek(seconds);
   }
 
   handleAnswer(key) {
     console.log(key);
-    this.setState({ next_key: key });
+    this.setState({ nextKey: key });
   }
 
-  componentWillUpdate(nextProps, nextState) {
-    const { current_time, time_frame } = nextState;
-    const d = time_frame.end - current_time;
-    if (d < 0) {
-      this.videoByChoice(nextState.next_key);
-    }
-  }
- 
   render() {
     const {
-      isReady, url, current_time, time_frame, questions,
+      url, currentTime, timeFrame, questions,
     } = this.state;
 
-    let buttons = <div>Пока нет кнопок</div>;
-    const d = time_frame.end - current_time;
+    let buttons = <div />;
+    const d = timeFrame.end - currentTime;
     if (d > 0 && d < 5) {
-      //  state.questions = [ { key: ..., question: ... } ]
       buttons = (
         <div>
           {questions.map(elem => (
-            <button key={elem.key} onClick={() => this.handleAnswer(elem.key)}>
+            <button type="submit" key={elem.key} onClick={() => this.handleAnswer(elem.key)}>
               {elem.text}
             </button>
           ))}
@@ -240,29 +212,21 @@ export class InteractivePlayer extends Component {
       );
     }
 
-    let result = null;
-    if (isReady) {
-      result = (
-        <div>
-          <div style={videoStyles}>
-            {buttons}
-            <Player ref="player" src={url} fluid={false}>
-              <BigPlayButton position="center" />
-              <ControlBar autoHide>
-                <ReplayControl seconds={10} order={1.1} />
-                <ForwardControl seconds={10} order={1.2} />
-                <CurrentTimeDisplay order={4.1} />
-                <TimeDivider order={4.2} />
-                <VolumeMenuButton order={7} vertical />
-              </ControlBar>
-            </Player>
-          </div>
-        </div>
-      );
-    } else {
-      result = <div>Not ready</div>;
-    }
-    return result;
+    return (
+      <div style={videoStyles}>
+        {buttons}
+        <Player ref="player" src={url} fluid={false}>
+          <BigPlayButton position="center" />
+          <ControlBar autoHide>
+            <ReplayControl seconds={10} order={1.1} />
+            <ForwardControl seconds={10} order={1.2} />
+            <CurrentTimeDisplay order={4.1} />
+            <TimeDivider order={4.2} />
+            <VolumeMenuButton order={7} vertical />
+          </ControlBar>
+        </Player>
+      </div>
+    );
   }
 }
 
