@@ -15,7 +15,7 @@ export class VideoPlayer extends Component {
   componentDidMount() {
     this.setState({ video: document.getElementById('video') });
 
-    const mimeCodec = 'video/mp4';
+    const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
     if ('MediaSource' in window && MediaSource.isTypeSupported(mimeCodec)) {
       const mediaSource = new MediaSource();
       const url = URL.createObjectURL(mediaSource);
@@ -67,7 +67,7 @@ export class VideoPlayer extends Component {
 
   sourceOpen(_) {
     const mediaSource = this;
-    const mimeCodec = 'video/mp4';
+    const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
     const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
     const assetURL = 'http://localhost:8000/video/test/';
     let i = 2;
@@ -75,7 +75,7 @@ export class VideoPlayer extends Component {
     fetchData(assetURL, (buf) => {
       sourceBuffer.addEventListener('updateend', () => {
         console.log(i);
-        sourceBuffer.timestampOffset += 60;
+        sourceBuffer.timestampOffset += 70.008;
         i -= 1;
         if (i === 0) {
           console.log('exit');
@@ -115,7 +115,7 @@ export class VideoPlayer extends Component {
 }
 
 function fetchData(url, cb) {
-  const testURL = 'https://hb.bizmrg.com/interactive_video/frag_bunny.mp4';
+  const testURL = 'https://hb.bizmrg.com/interactive_video/public_test/part3_dashinit.mp4';
   const myInit = {
     method: 'GET',
     mode: 'cors',

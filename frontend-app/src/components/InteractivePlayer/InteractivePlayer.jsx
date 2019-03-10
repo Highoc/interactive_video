@@ -32,7 +32,7 @@ export class InteractivePlayer extends Component {
       (response) => {
         console.log(response);
         // response.data.content_url
-        axios.get('https://hb.bizmrg.com/interactive_video/frag_bunny.mp4', {
+        axios.get(response.data.content_url, {
           responseType: 'arraybuffer',
         }).then(
           (responseSource) => {
@@ -40,7 +40,7 @@ export class InteractivePlayer extends Component {
             this.setState({
               children: [response.data],
             });
-            this.videoByChoice(main);
+            // this.videoByChoice(main);
           },
         ).catch(error => console.log(error));
       },
@@ -175,7 +175,7 @@ class AppendQueue {
       this.sourceBuffer.addEventListener('updateend', (event) => {
         // currentPart.time
         console.log(event);
-        this.sourceBuffer.timestampOffset += 60;
+        this.sourceBuffer.timestampOffset += 10;
         console.log(this.sourceBuffer.timestampOffset);
         // this.checkQueue();
       });

@@ -13,8 +13,8 @@ import { Homepage } from './pages/homepage';
 import { Account } from './pages/account';
 import { Channel } from './pages/channel';
 
-import { VideoPlayer } from './pages/test';
-
+// import { VideoPlayer } from './pages/test';
+import { Test } from './pages/test';
 
 class App extends Component {
   render() {
@@ -29,7 +29,7 @@ class App extends Component {
             <Route exact path="/guest" component={Guest} />
             <Route path="/account" component={Account} />
             <Route path="/channel" component={Channel} />
-            <Route path="/test" component={VideoPlayer} />
+            <Route path="/test" component={Test} />
           </Switch>
         </Main>
       </div>
