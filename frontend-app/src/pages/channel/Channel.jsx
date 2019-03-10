@@ -11,7 +11,7 @@ export const Channel = () => (
     <Switch>
       <Route exact path="/channel/:ch_id" component={ChannelView} />
       <Route exact path="/channel/:ch_id/create" component={CreateVideo} />
-      <Route exact path="/channel/:ch_id/watch/:v_id" component={WatchVideo} />
+      <Route exact path="/channel/:ch_id/watch/:key" component={WatchVideo} />
     </Switch>
   </div>
 );

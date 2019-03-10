@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import WatchVideo from './player/Player';
-import VideoEditor from './index';
 
-class Test extends Component {
+export class Test extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -42,7 +40,7 @@ class Test extends Component {
     formData.append('content', source);
 
     axios.post(
-      'http://192.168.1.205:8000/video/source_upload/',
+      'http://192.168.1.205:8000/video/source/upload/',
       formData,
       {
         headers: {
@@ -79,9 +77,8 @@ class Test extends Component {
           <input name="content" type="file" onChange={this.onChange} />
           <input type="submit" value="Submit" />
         </form>
-        <VideoEditor/>
       </div>
     );
   }
 }
-export default Test;
+

@@ -125,11 +125,11 @@ class MenuRight extends Component {
         <IconButton color="primary" className={classes.button} component="span" >
           <VideoCamera fontSize="large"/>
         </IconButton>
-        <Link to="/channel/1/create/"> Create Video </Link>
-        <br/ >
-        <Link to="/channel/1/watch/5"> Watch me </Link>
-        <br/ >
-        <Link to="/"> Home page </Link>
+        <Link to="/channel/1/watch/12deadbeef21"> Watch me 1 ! </Link>
+        <br />
+        <Link to="/channel/1/watch/21deadbeef12"> Watch me 2 ! </Link>
+        <br />
+        <Link to="/">Home</Link>
       </div>
     );
   }

@@ -3,9 +3,6 @@ import axios from 'axios';
 import 'video-react/dist/video-react.css';
 import PropTypes from 'prop-types';
 
-import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button/index';
-
 import {
   Player,
   ControlBar,
@@ -21,11 +18,10 @@ const propTypes = {
   player: PropTypes.object,
   className: PropTypes.string,
 };
-
 const videoStyles = {
   position: 'relative',
+  maxhight: '560',
   paddingBottom: '56.25%',
-  height: '0',
   overflow: 'hidden',
 };
 const buttonStyles = {
@@ -33,7 +29,6 @@ const buttonStyles = {
   bottom: '25%',
   left: '40%',
 };
-
 const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
@@ -51,9 +46,16 @@ export class InteractivePlayer extends Component {
     this.state = {
       isReady: true,
       children: [],
-      video: null,
       videoQueue: new AppendQueue(),
+      timeResolver: new TimeResolver(),
+      current_time: 0,
+      questions: [],
+      time_frame: {
+        begin: 0,
+        end: 0,
+      },
     };
+
     this._handleEvents();
   }
 
@@ -63,18 +65,20 @@ export class InteractivePlayer extends Component {
     this.load = this.load.bind(this);
     this.changeCurrentTime = this.changeCurrentTime.bind(this);
     this.seek = this.seek.bind(this);
+    //    this.onButton2Click = this.onButton2Click.bind(this);
+    //    this.onButtonClick = this.onButtonClick.bind(this);
   }
 
   componentDidMount() {
     this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
 
-    const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
-    const { videoQueue } = this.state;
+    const mimeCodec = `video/mp4; codecs="${this.props.codec}"`;
+    const { videoQueue, timeResolver } = this.state;
     const mediaSourceUrl = videoQueue.addMediaSource(mimeCodec);
     this.setState({ url: mediaSourceUrl });
 
     const { main } = this.props;
-    const url = `http://192.168.1.205:8000/video/part/get/${main}`;
+    const url = `http://192.168.1.205:8000/video/part/get/${main}/`;
     const config = {
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
@@ -82,25 +86,31 @@ export class InteractivePlayer extends Component {
     };
 
     videoQueue.pushKey(main);
+    timeResolver.pushTimeKey(main);
 
     axios.get(url, config).then(
       (response) => {
-        console.log(response);
-        // response.data.content_url
-        axios.get('https://hb.bizmrg.com/interactive_video/frag_bunny.mp4', {
+        console.log(response.data);
+
+        axios.get(response.data.content_url, {
           responseType: 'arraybuffer',
         }).then(
           (responseSource) => {
             videoQueue.pushSource(main, responseSource.data, response.data.time);
+            timeResolver.pushTimeSource(main, response.data.time);
+
             this.setState({
               children: [response.data],
+              time_frame: timeResolver.getTimeFrame(main),
             });
+
             this.videoByChoice(main);
           },
         ).catch(error => console.log(error));
       },
     ).catch(error => console.log(error));
   }
+
   /*
 * children: [
 * { key: ... , url: ..., children: [..., ....] }
@@ -114,34 +124,50 @@ export class InteractivePlayer extends Component {
 * аппенд для всех детей
 * */
 
-  videoByChoice(key) {
-    const current_video = this.state.children.find(child => child.key === key);
-    this.setState({ current_video });
+  videoByChoice(keyV) {
+    this.setState({ time_frame: this.state.timeResolver.getTimeFrame(keyV) });
+    this.seek(this.state.time_frame.begin);
+
+    const current_video = this.state.children.find(child => child.key === keyV);
+    this.setState({ current_video, questions: [] });
+
     const config = {
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
       },
     };
 
-    this.setState({ children: [] });
+    const { videoQueue, timeResolver } = this.state;
+    this.setState({ children: [], time_frame: timeResolver.getTimeFrame(keyV) });
 
-    const { videoQueue } = this.state;
 
     for (const now_key of current_video.children) {
       // добавить ключ в очередь append
       videoQueue.pushKey(now_key);
-      const url = `http://192.168.1.205:8000/video/part/get/${now_key}`;
+      timeResolver.pushTimeKey(now_key);
+
+      const url = `http://192.168.1.205:8000/video/part/get/${now_key}/`;
       axios.get(url, config).then(
         (response) => {
-          console.log(response);
-          // response.data.content_url
-          axios.get('https://hb.bizmrg.com/interactive_video/test_video_dashinit.mp4', {
+          console.log(response.data);
+
+          const { questions } = this.state;
+          const { key, text } = response.data;
+          this.setState({
+            questions: [...questions, { key, text }],
+          });
+
+          axios.get(response.data.content_url, {
             responseType: 'arraybuffer',
           }).then(
             (responseSource) => {
               videoQueue.pushSource(now_key, responseSource.data, response.data.time);
+              timeResolver.pushTimeSource(now_key, response.data.time);
+
               const newChildren = [...this.state.children, response.data];
-              this.setState({ children: newChildren });
+              this.setState({
+                children: newChildren,
+              });
             },
           ).catch(error => console.log(error));
         },
@@ -150,9 +176,8 @@ export class InteractivePlayer extends Component {
   }
 
   handleStateChange(state, prevState) {
-    // copy player state to this component's state
     this.setState({
-      player: state,
+      current_time: state.currentTime,
     });
   }
 
@@ -172,7 +197,7 @@ export class InteractivePlayer extends Component {
     return () => {
       const { player } = this.refs.player.getState();
       const currentTime = player.currentTime;
-      this.refs.player.seek(currentTime + seconds);
+      player.seek(currentTime + seconds);
     };
   }
 
@@ -182,18 +207,48 @@ export class InteractivePlayer extends Component {
     };
   }
 
-  render() {
-    const { classes } = this.props;
-    const { isReady, url } = this.state;
-    let result = null;
+  handleAnswer(key) {
+    console.log(key);
+    this.setState({ next_key: key });
+  }
 
+  componentWillUpdate(nextProps, nextState) {
+    const { current_time, time_frame } = nextState;
+    const d = time_frame.end - current_time;
+    if (d < 0) {
+      this.videoByChoice(nextState.next_key);
+    }
+  }
+ 
+  render() {
+    const {
+      isReady, url, current_time, time_frame, questions,
+    } = this.state;
+
+    let buttons = <div>Пока нет кнопок</div>;
+    const d = time_frame.end - current_time;
+    if (d > 0 && d < 5) {
+      //  state.questions = [ { key: ..., question: ... } ]
+      buttons = (
+        <div>
+          {questions.map(elem => (
+            <button key={elem.key} onClick={() => this.handleAnswer(elem.key)}>
+              {elem.text}
+            </button>
+          ))}
+        </div>
+      );
+    }
+
+    let result = null;
     if (isReady) {
       result = (
         <div>
           <div style={videoStyles}>
-            <Player ref="player" src={url} >
+            {buttons}
+            <Player ref="player" src={url} fluid={false}>
               <BigPlayButton position="center" />
-              <ControlBar autoHide={true}>
+              <ControlBar autoHide>
                 <ReplayControl seconds={10} order={1.1} />
                 <ForwardControl seconds={10} order={1.2} />
                 <CurrentTimeDisplay order={4.1} />
@@ -211,13 +266,16 @@ export class InteractivePlayer extends Component {
   }
 }
 
-
 class AppendQueue {
   constructor() {
     this.mediaSource = null;
     this.sourceBuffer = null;
+
     this.isReady = false;
+
     this.queue = [];
+
+    this.totalDuration = 0;
   }
 
   addMediaSource(mimeCodec) {
@@ -236,6 +294,12 @@ class AppendQueue {
   addSourceBuffer(sourceBuffer) {
     this.sourceBuffer = sourceBuffer;
     this.isReady = true;
+
+    this.sourceBuffer.addEventListener('updateend', () => {
+      this.sourceBuffer.timestampOffset = this.totalDuration;
+      this.mediaSource.duration = this.totalDuration;
+      this.checkQueue();
+    });
   }
 
   pushKey(key) {
@@ -251,7 +315,7 @@ class AppendQueue {
     const videoPart = this.queue.find(elem => elem.key === key);
     videoPart.isLoaded = true;
     videoPart.buf = buf;
-    videoPart.time = AppendQueue.getSeconds(time);
+    videoPart.time = time;
     this.checkQueue();
   }
 
@@ -260,23 +324,60 @@ class AppendQueue {
       return;
     }
 
+    if (this.queue[0].key === null) {
+      this.queue.shift();
+      this.end();
+    }
+
     if (this.queue[0].isLoaded) {
       const currentPart = this.queue.shift();
+      this.totalDuration += currentPart.time;
       this.sourceBuffer.appendBuffer(currentPart.buf);
-      this.sourceBuffer.addEventListener('updateend', (event) => {
-        // currentPart.time
-        console.log(event);
-        this.sourceBuffer.timestampOffset += 60;
-        console.log('+');
-        console.log(this.sourceBuffer.timestampOffset);
-        // this.checkQueue();
-      });
-      console.log('-');
     }
   }
 
-  static getSeconds(time) {
-    const splitted = time.split(':');
-    return parseFloat(splitted[0]) * 3600 + parseFloat(splitted[1]) * 60 + parseFloat(splitted[2]);
+  end() {
+    this.isReady = false;
+    this.mediaSource.endOfStream();
+  }
+}
+
+
+class TimeResolver {
+  constructor() {
+    this.timestore = [];
+  }
+
+  pushTimeKey(key) {
+    this.timestore.push({
+      key,
+      isLoaded: false,
+      duration: null,
+    });
+  }
+
+  pushTimeSource(key, time) {
+    const videoPart = this.timestore.find(elem => elem.key === key);
+    videoPart.isLoaded = true;
+    videoPart.duration = time;
+  }
+
+  getTimeFrame(key) {
+    let beginTime = 0;
+    let duration = 0;
+    for (const time of this.timestore) {
+      if (!time.isLoaded) {
+        console.log('Err');
+      }
+      if (time.key === key) {
+        duration = time.duration;
+        break;
+      }
+      beginTime += time.duration;
+    }
+    return {
+      begin: beginTime,
+      end: beginTime + duration,
+    };
   }
 }

@@ -6,7 +6,7 @@ export class Main extends Component {
       padding: '5px',
       width: '65%',
       maxWidth: 1203,
-      height: '600px',
+      height: '660px',
       margin: '1.5% 1.5% 0 1.5%',
       overflow: 'hidden',
     };
