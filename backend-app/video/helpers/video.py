@@ -1,5 +1,12 @@
 from application import settings
 
+
+import short_url
+
+def get_short_key(id):
+    return short_url.encode_url(id, min_length=12)
+
+
 import boto3
 
 def get_file_url(bucket, user, key):
