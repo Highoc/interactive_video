@@ -117,8 +117,6 @@ class VideoGetView(APIView):
         if not video_list:
             return Response('This video_part doesn\'t exist', status=status.HTTP_204_NO_CONTENT)
 
-        # Проверка на доступность видео (video еще может быть не опубликовано)
-
         video = video_list[0]
 
         responce = {
@@ -141,7 +139,7 @@ class VideoPartGetView(APIView):
             return Response('This video_part doesn\'t exist', status=status.HTTP_204_NO_CONTENT)
 
         video_part = video_parts[0]
-        if video_part.main_video.statuses != Video.PUBLISHED:
+        if video_part.main_video.status != Video.PUBLISHED:
             return Response('This video_part doesn\'t exist', status=status.HTTP_204_NO_CONTENT)
 
         source = video_part.source
@@ -149,7 +147,7 @@ class VideoPartGetView(APIView):
         url = get_file_url(
             settings.AWS_STORAGE_BUCKET_NAME,
             video_part.main_video.owner,
-            source.key
+            source.key.hex
         )
 
         responce = {

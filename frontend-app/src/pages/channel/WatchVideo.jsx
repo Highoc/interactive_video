@@ -13,7 +13,8 @@ export class WatchVideo extends Component {
   }
 
   componentDidMount() {
-    const url = 'http://192.168.1.205:8000/video/get/a1b2c3x4y5z6';
+    const { key } = this.props.match.params;
+    const url = `http://192.168.1.205:8000/video/get/${key}`;
 
     const config = {
       headers: {
@@ -44,7 +45,7 @@ export class WatchVideo extends Component {
           Название: { video.name } <br />
           Создано : { video.created } <br />
           Описание: { video.description } <br />
-          <InteractivePlayer main={video.head_video_part} />
+          <InteractivePlayer main={video.head_video_part} codec={video.codec} />
         </div>
       );
     } else if (status === statuses.NOT_LOADED) {

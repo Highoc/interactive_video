@@ -13,7 +13,7 @@ export class InteractivePlayer extends Component {
   }
 
   componentDidMount() {
-    const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
+    const mimeCodec = `video/mp4; codecs="${this.props.codec}"`;
     const { videoQueue } = this.state;
     const mediaSourceUrl = videoQueue.addMediaSource(mimeCodec);
     this.setState({ url: mediaSourceUrl });
@@ -30,8 +30,7 @@ export class InteractivePlayer extends Component {
 
     axios.get(url, config).then(
       (response) => {
-        console.log(response);
-        // response.data.content_url
+        console.log(response.data);
         axios.get(response.data.content_url, {
           responseType: 'arraybuffer',
         }).then(
@@ -40,7 +39,7 @@ export class InteractivePlayer extends Component {
             this.setState({
               children: [response.data],
             });
-            // this.videoByChoice(main);
+            this.videoByChoice(main);
           },
         ).catch(error => console.log(error));
       },
@@ -79,9 +78,8 @@ export class InteractivePlayer extends Component {
       const url = `http://192.168.1.205:8000/video/part/get/${now_key}`;
       axios.get(url, config).then(
         (response) => {
-          console.log(response);
-          // response.data.content_url
-          axios.get('https://hb.bizmrg.com/interactive_video/frag_bunny.mp4', {
+          console.log(response.data);
+          axios.get(response.data.content_url, {
             responseType: 'arraybuffer',
           }).then(
             (responseSource) => {
@@ -125,8 +123,12 @@ class AppendQueue {
   constructor() {
     this.mediaSource = null;
     this.sourceBuffer = null;
+
     this.isReady = false;
+
     this.queue = [];
+
+    this.totalDuration = 0;
   }
 
   addMediaSource(mimeCodec) {
@@ -145,6 +147,12 @@ class AppendQueue {
   addSourceBuffer(sourceBuffer) {
     this.sourceBuffer = sourceBuffer;
     this.isReady = true;
+
+    this.sourceBuffer.addEventListener('updateend', () => {
+      this.sourceBuffer.timestampOffset = this.totalDuration;
+      this.mediaSource.duration = this.totalDuration;
+      this.checkQueue();
+    });
   }
 
   pushKey(key) {
@@ -160,32 +168,29 @@ class AppendQueue {
     const videoPart = this.queue.find(elem => elem.key === key);
     videoPart.isLoaded = true;
     videoPart.buf = buf;
-    videoPart.time = AppendQueue.getSeconds(time);
+    videoPart.time = time;
     this.checkQueue();
   }
 
   checkQueue() {
-    console.log('+');
     if (!this.isReady || this.sourceBuffer.updating || !this.queue.length) {
       return;
     }
 
+    if (this.queue[0].key === null) {
+      this.queue.shift();
+      this.end();
+    }
+
     if (this.queue[0].isLoaded) {
       const currentPart = this.queue.shift();
-      this.sourceBuffer.addEventListener('updateend', (event) => {
-        // currentPart.time
-        console.log(event);
-        this.sourceBuffer.timestampOffset += 10;
-        console.log(this.sourceBuffer.timestampOffset);
-        // this.checkQueue();
-      });
-      console.log('-');
+      this.totalDuration += currentPart.time;
       this.sourceBuffer.appendBuffer(currentPart.buf);
     }
   }
 
-  static getSeconds(time) {
-    const splitted = time.split(':');
-    return parseFloat(splitted[0]) * 3600 + parseFloat(splitted[1]) * 60 + parseFloat(splitted[2]);
+  end() {
+    this.isReady = false;
+    this.mediaSource.endOfStream();
   }
 }

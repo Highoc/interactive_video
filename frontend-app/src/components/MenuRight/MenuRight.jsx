@@ -16,7 +16,12 @@ export class MenuRight extends Component {
     return (
       <aside style={styles}>
                 Правое меню!
-        <Link to="/channel/1/watch/5"> Watch me </Link>
+        <br />
+        <Link to="/channel/1/watch/12deadbeef21"> Watch me 1 ! </Link>
+        <br />
+        <Link to="/channel/1/watch/21deadbeef12"> Watch me 2 ! </Link>
+        <br />
+        <Link to="/">Home</Link>
       </aside>
     );
   }
