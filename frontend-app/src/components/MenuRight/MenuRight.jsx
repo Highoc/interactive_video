@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import {Link, Route} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -15,6 +15,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 
 import IconButton from '@material-ui/core/IconButton';
 import VideoCamera from '@material-ui/icons/Videocam';
+import CreateVideo from "../../pages/channel/CreateVideo";
 
 const elements = [
   {
@@ -125,11 +126,14 @@ class MenuRight extends Component {
         <IconButton color="primary" className={classes.button} component="span" >
           <VideoCamera fontSize="large"/>
         </IconButton>
+        <br />
         <Link to="/channel/1/watch/12deadbeef21"> Watch me 1 ! </Link>
         <br />
         <Link to="/channel/1/watch/21deadbeef12"> Watch me 2 ! </Link>
         <br />
         <Link to="/">Home</Link>
+        <br />
+        <Link to="/channel/:ch_id/create">Create Video </Link>
       </div>
     );
   }
