@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 
 export class MenuRight extends Component {
   render() {
@@ -15,6 +16,12 @@ export class MenuRight extends Component {
     return (
       <aside style={styles}>
                 Правое меню!
+        <br />
+        <Link to="/channel/1/watch/12deadbeef21"> Watch me 1 ! </Link>
+        <br />
+        <Link to="/channel/1/watch/21deadbeef12"> Watch me 2 ! </Link>
+        <br />
+        <Link to="/">Home</Link>
       </aside>
     );
   }
