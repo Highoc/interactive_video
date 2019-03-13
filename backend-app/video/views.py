@@ -70,17 +70,18 @@ class SourceUploadView(APIView):
             return Response(source_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SourceInfoView(APIView):
+class SourceListView(APIView):
 
     def get(self, request):
-        sources = Source.objects.filter(owner=request.user)
-        short_sources_list = []
-        for source in sources:
-            short_sources_list.append({ source.key: source.name })
-        return Response({ 'sources': short_sources_list })
+        # 4 части с Ready
+        sources = Source.objects.filter(owner=request.user, status=Source.READY)
+        responce = [{
+            'key': source.key.hex,
+            'name': source.name,
+        } for source in sources ]
+        return Response(responce, status=status.HTTP_200_OK)
 
-
-class SourceGetView(APIView):
+class SourceView(APIView):
 
     def get(self, request, key=None):
         sources = Source.objects.filter(owner=request.user, key=key, status=Source.READY)
@@ -110,11 +111,7 @@ class VideoUploadView(APIView):
         if video_serializer.is_valid() and 'main' in request.data:
             video = video_serializer.create()
             video.owner = request.user
-            '''
-            key=
-            head_video_part=
-            codec=
-            '''
+
             try:
                 main = request.data['main']
                 video_parts = self.get_video_parts(main, user=request.user)
@@ -122,18 +119,25 @@ class VideoUploadView(APIView):
             except Exception as e:
                 return Response("Video parts are incorrect", status=status.HTTP_400_BAD_REQUEST)
 
-            '''
-            video.save()
+            print(video_parts)
+            print(request.data)
+
+            #video.save()
 
             for part in video_parts: 
-                part.main_video = video
-                part.save()
+                print(part.__dict__)
+            #   part.main_video = video
+            #   part.save()
             
-            head = video_parts[0]
-            video.key = get_short_key(video.id)
-            video.head_video_part = head
-            video.codec = head.source.codec
-            video.save()
+            #head = video_parts[0]
+            #video.key = get_short_key(video.id)
+            #video.head_video_part = head
+            #video.codec = head.source.codec
+            #video.save()
+
+            '''
+            for all sources
+            status = used
             '''
 
             return Response({ 'key': video.key }, status=status.HTTP_201_CREATED)
@@ -148,25 +152,28 @@ class VideoUploadView(APIView):
         if video_part_serializer.is_valid():
             if 'children' not in data:
                 video_part = video_part_serializer.create()
+                video_part.parent_ref = parent
                 video_part.parent = parent
                 video_part.source = Source.objects.get(key=data['source_key'], owner=user)
+
                 return [ video_part, ]
 
             elif isinstance(data['children'], list):
 
                 video_part = video_part_serializer.create()
+                video_part.parent_ref = parent
                 video_part.parent = parent
                 video_part.source = Source.objects.get(key=data['source_key'], owner=user)
+
                 child_list = [ video_part, ]
 
                 for child in data['children']:
-                    child_list += self.get_video_part(child, parent, user)
-
+                    child_list += self.get_video_part(child, video_part, user)
                 return child_list
             else:
                 raise Exception
 
-class VideoGetView(APIView):
+class VideoView(APIView):
     def get(self, request, key=None):
         video_list = Video.objects.filter(key=key, status=Video.PUBLISHED)
 
@@ -186,7 +193,7 @@ class VideoGetView(APIView):
         return Response(responce, status.HTTP_200_OK)
 
 
-class VideoPartGetView(APIView):
+class VideoPartView(APIView):
     def get(self, request, key=None):
         video_parts = VideoPart.objects.filter(key=key)
 
@@ -216,7 +223,7 @@ class VideoPartGetView(APIView):
         return Response(responce, status.HTTP_200_OK)
 
 
-class VideoListGetView(APIView):
+class VideoListView(APIView):
     def get(self, request):
         video_list = Video.objects.filter(owner=request.user, status=Video.PUBLISHED)
 
