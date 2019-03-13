@@ -1,1 +1,3 @@
-export * from './MenuLeft';
+import MenuLeft from './MenuLeft';
+
+export default MenuLeft;

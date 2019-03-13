@@ -1,1 +1,3 @@
-export * from './MenuRight';
+import MenuRight from './MenuRight';
+
+export default MenuRight;

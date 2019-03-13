@@ -2,6 +2,12 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { InteractivePlayer } from '../../components/InteractivePlayer';
 
+const textStyles = {
+  position: 'relative',
+  overflow: 'hidden',
+  paddingLeft: '5%',
+  paddingRight: '5%',
+};
 
 export class WatchVideo extends Component {
   constructor(props) {
@@ -14,7 +20,7 @@ export class WatchVideo extends Component {
 
   componentDidMount() {
     const { key } = this.props.match.params;
-    const url = `http://192.168.1.205:8000/video/get/${key}`;
+    const url = `http://100.100.150.128:8000/video/get/${key}`;
 
     const config = {
       headers: {
@@ -41,7 +47,7 @@ export class WatchVideo extends Component {
     let result = null;
     if (status === statuses.LOADED) {
       result = (
-        <div>
+        <div style={textStyles}>
           Название: { video.name } <br />
           Создано : { video.created } <br />
           Описание: { video.description } <br />
