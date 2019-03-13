@@ -58,10 +58,13 @@ class CreateVideo extends Component {
         text: '',
         sourceKey: '',
       },
+      uploadStatus: false,
+      videoKey: 'creating',
     };
 
     this.addChildNode = this.addChildNode.bind(this);
     this.removeNode = this.removeNode.bind(this);
+    this.uploadVideo = this.uploadVideo.bind(this);
   }
 
   componentDidMount() {
@@ -208,11 +211,55 @@ class CreateVideo extends Component {
     return this.nodeCounter;
   }
 
+  getVideoData() {
+    return {
+      name: document.getElementById('name').value,
+      description: document.getElementById('description').value,
+      main: this.getVideoPart(this.state.tree),
+    };
+  }
+
+  getVideoPart(node) {
+    const obj = {
+      text: node.text,
+      source_key: node.sourceKey,
+    };
+
+    if (node.children === undefined || node.children.length === 0) {
+      return obj;
+    }
+
+    obj.children = [];
+    for (const child of node.children) {
+      obj.children.push(this.getVideoPart(child));
+    }
+
+    return obj;
+  }
+
+  uploadVideo() {
+    axios.post(
+      'http://100.100.150.128:8000/video/upload/', this.getVideoData(),
+      {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+      .then((result) => {
+        this.setState({ videoKey: result.data.key });
+      })
+      .catch((error) => {
+        this.setState({ videoKey: 'error' });
+      });
+  }
+
   render() {
     const { sources, tree, dialogOpen, selectOpen, inputData } = this.state;
     return (
       <div styles={styles}>
-        <div id="treeWrapper" style={{ width: '1000px', height: '550px' }}>
+        <div id="treeWrapper" style={{ width: '1000px', height: '500px' }}>
 
           <Tree
             data={tree}
@@ -226,6 +273,7 @@ class CreateVideo extends Component {
         </div>
         <button onClick={this.addChildNode}>Add Child</button>
         <button onClick={this.removeNode}>Remove Node</button>
+        <span> {this.state.videoKey}</span>
         <Dialog
           onClose={this.handleClose}
           open={dialogOpen}
@@ -266,6 +314,23 @@ class CreateVideo extends Component {
             </Button>
           </DialogActions>
         </Dialog>
+        <TextField
+          autoFocus
+          label="Название видео"
+          margin="dense"
+          id="name"
+          type="text"
+          fullWidth
+        />
+        <TextField
+          autoFocus
+          label="Описание к видео"
+          margin="dense"
+          id="description"
+          type="text"
+          fullWidth
+        />
+        <button onClick={this.uploadVideo}>Сохранить</button>
       </div>
     );
   }
