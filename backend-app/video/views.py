@@ -119,21 +119,25 @@ class VideoUploadView(APIView):
             except Exception as e:
                 return Response("Video parts are incorrect", status=status.HTTP_400_BAD_REQUEST)
 
-            print(video_parts)
-            print(request.data)
+            #print(video_parts)
+            #print(request.data)
 
-            #video.save()
+            video.save()
 
             for part in video_parts: 
-                print(part.__dict__)
-            #   part.main_video = video
-            #   part.save()
+                if part.parent_ref is None:
+                    part.parent = None
+                else:
+                    part.parent = part.parent_ref
+
+                part.main_video = video
+                part.save()
             
-            #head = video_parts[0]
-            #video.key = get_short_key(video.id)
-            #video.head_video_part = head
-            #video.codec = head.source.codec
-            #video.save()
+            head = video_parts[0]
+            video.key = get_short_key(video.id)
+            video.head_video_part = head
+            video.codec = head.source.codec
+            video.save()
 
             '''
             for all sources
