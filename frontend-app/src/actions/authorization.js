@@ -27,7 +27,7 @@ export const logout = () => {
 export const login = (username, password) => (dispatch) => {
   dispatch(loginStart());
 
-  axios.post('http://172.20.10.6:8000/token-auth/', { username, password })
+  axios.post('http://localhost:8000/token-auth/', { username, password })
     .then((result) => {
       const { token, user } = result.data;
       console.log(result);

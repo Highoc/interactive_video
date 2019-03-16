@@ -4,81 +4,54 @@ import axios from 'axios';
 export class Test extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      condition: 'not-sent',
-      source: null,
-      name: '',
-      description: '',
-    };
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.nameChange = this.nameChange.bind(this);
-    this.descriptionChange = this.descriptionChange.bind(this);
-    this.onChange = this.onChange.bind(this);
   }
 
-  onChange(event) {
-    const file = event.target.files[0];
-    this.setState({ source: file, name: file.name });
-  }
+  handleSubmit() {
+    const data = {
+      name: 'Azazaza',
+      description: 'Zazazaza',
+      main: {
+        text: '1',
+        source_key: '8e29fd3593194b479eed083fc994dfa0',
+        children: [{
+          text: '2',
+          source_key: '8e29fd3593194b479eed083fc994dfa0',
+          children: [{
+            text: '4',
+            source_key: '8e29fd3593194b479eed083fc994dfa0',
+          }, {
+            text: '5',
+            source_key: '8e29fd3593194b479eed083fc994dfa0',
+          }],
+        }, {
+          text: '3',
+          source_key: '8e29fd3593194b479eed083fc994dfa0',
+        }],
+      },
+    };
 
-  nameChange(event) {
-    this.setState({ name: event.target.value });
-  }
-
-  descriptionChange(event) {
-    this.setState({ description: event.target.value });
-  }
-
-  handleSubmit(event) {
-    this.setState({ condition: 'sending' });
-
-    const { name, description, source } = this.state;
-
-    const formData = new FormData();
-    formData.set('name', name);
-    formData.set('description', description);
-    formData.append('content', source);
+    console.log(data);
 
     axios.post(
-      'http://192.168.1.205:8000/video/source/upload/',
-      formData,
+      'http://localhost:8000/video/upload/', data,
       {
         headers: {
           Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
       },
     )
-      .then((result) => {
-        console.log(result.data);
-        this.setState({ condition: 'sent' });
-      })
-      .catch((error) => {
-        console.log(error);
-        this.setState({ condition: 'error' });
-      });
-
-    event.preventDefault();
+      .then(result => console.log(result.data))
+      .catch(error => console.log(error));
   }
 
 
   render() {
     return (
       <div>
-        <div>
-          FORM:
-          {' '}
-          {this.state.condition}
-        </div>
-        <form
-          onSubmit={this.handleSubmit}
-        >
-          <input name="description" type="textarea" onChange={this.descriptionChange} />
-          <input name="content" type="file" onChange={this.onChange} />
-          <input type="submit" value="Submit" />
-        </form>
+        <button onClick={this.handleSubmit}>ШЛИ!</button>
       </div>
     );
   }
 }
-

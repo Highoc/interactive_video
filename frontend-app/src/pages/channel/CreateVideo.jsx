@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import 'react-tree-graph/dist/style.css';
 
 import Tree from 'react-d3-tree';
-import axios from 'axios';
+import axios from "axios";
 
 import clone from 'clone';
 
@@ -156,7 +156,7 @@ class CreateVideo extends Component {
 
   uploadVideo() {
     axios.post(
-      'http://172.20.10.6:8000/video/upload/', this.getVideoData(),
+      'http://localhost:8000/video/upload/', this.getVideoData(),
       {
         headers: {
           Authorization: `JWT ${localStorage.getItem('jwt-token')}`,

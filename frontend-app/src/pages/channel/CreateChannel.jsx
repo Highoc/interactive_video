@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import classNames from 'classnames';
+import Fab from '@material-ui/core/Fab';
+import NavigationIcon from '@material-ui/icons/Navigation';
 import Input from '../../components/Input/Input';
-
-
-
 /*
 state={
   controls: {
@@ -37,18 +39,55 @@ state={
   },
 */
 
+
+const styles = theme => ({
+  margin: {
+    margin: theme.spacing.unit,
+  },
+  extendedIcon: {
+    marginRight: theme.spacing.unit,
+  },
+  button: {
+
+  }
+});
+
+
 class CreateChannel extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isLoaded: false,
-      inputs: [],
+      isValid: false,
+      inputs: [
+        {
+          type: 'text',
+          name: 'name',
+          value: '',
+          description: 'Название канала',
+          rules: {
+            max_length: 64,
+            required: true,
+          },
+          valid: true,
+        },
+        {
+          type: 'textarea',
+          name: 'description',
+          value: '',
+          description: 'Описание канала',
+          rules: {
+            max_length: 4096,
+            required: false,
+          },
+          valid: true,
+        }],
     };
   }
 
   componentDidMount() {
     const url = 'http://172.20.10.6:8000/channel/update/';
-
+    /*
     const config = {
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
@@ -58,11 +97,11 @@ class CreateChannel extends Component {
     axios.get(url, config).then(
       (result) => {
         console.log(result.data);
-        this.setState({ inputs: result.data, isLoaded: true});
+        this.setState({ inputs: result.data, isLoaded: true });
       },
     ).catch((error) => {
       console.log(error);
-    });
+    });*/
   }
 
   inputChangedHandler = (event, key) => {
@@ -77,11 +116,57 @@ class CreateChannel extends Component {
     this.setState({ inputs: updatedInputs });
   };
 
+  submitHandler(event) {
+    const { inputs } = this.state;
+    let checkValid = true;
+    for (const key in inputs)
+    {
+      console.log(event);
+      inputs[key].valid = this.checkValidity(event.target.value, inputs[key].rules);
+      checkValid = checkValid && inputs[key].valid;
+    }
+    console.log(checkValid);
+
+    if (checkValid) {
+      console.log(inputs);
+    }
+    else {
+      console.log('Invalid input');
+    }
+    event.preventDefault();
+  };
+
+  checkValidity(value, rules) {
+    let isValid = true;
+    if (rules.required) {
+      if (value === undefined) {
+        return false;
+      }
+      isValid = value.trim() !== '' && isValid;
+    }
+
+    if (rules.minLength) {
+      if (value === undefined) {
+        return false;
+      }
+      isValid = value.length >= rules.minLength && isValid;
+    }
+
+    if (rules.max_length) {
+      if (value === undefined) {
+        return true;
+      }
+      isValid = value.length <= rules.max_length && isValid;
+    }
+
+    return isValid;
+  }
 
   render() {
     const { inputs, isLoaded } = this.state;
+    const { classes } = this.props;
     let status = <div>Загружается</div>;
-    if (isLoaded){
+    if (isLoaded) {
       status = <div>Загрузилось</div>;
     }
     const Inputs = Object.keys(inputs).map((key) => {
@@ -89,12 +174,13 @@ class CreateChannel extends Component {
       return (
         <Input
           key={key}
-          elementType={inputElement.type}
-          elementName={inputElement.name}
-          elementDescription={inputElement.description}
+          type={inputElement.type}
+          name={inputElement.name}
+          description={inputElement.description}
           value={inputElement.value}
           rules={inputElement.rules}
           changed={event => this.inputChangedHandler(event, key)}
+          valid={inputElement.valid}
         />
       );
     });
@@ -104,7 +190,16 @@ class CreateChannel extends Component {
         <form>
           <h2>Создание канала</h2>
           {Inputs}
-          <button type="submit">Отправить</button>
+          <Fab variant="extended"
+               color="primary"
+               aria-label="Add"
+               className={classes.margin}
+               style={styles.button}
+               onClick={event => this.submitHandler(event)}
+          >
+            <NavigationIcon className={classes.extendedIcon} />
+            Создать
+          </Fab>
         </form>
         {status}
       </div>
@@ -112,7 +207,11 @@ class CreateChannel extends Component {
   }
 }
 
-export default CreateChannel;
+CreateChannel.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(CreateChannel);
 
 /*
 const response = [
@@ -148,24 +247,8 @@ const response = [
     };
 
 
-  submitHandler = (event) => {
-    event.preventDefault();
-    console.log('sent');
-  };
 
-  checkValidity(value, rules) {
-    let isValid = true;
 
-    if (rules.required) {
-      isValid = value.trim() !== '' && isValid;
-    }
-
-    if (rules.minLength) {
-      isValid = value.length >= rules.minLength && isValid;
-    }
-
-    return isValid;
-  }
 
 
 
