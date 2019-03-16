@@ -2,6 +2,8 @@ from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 
 from channel.models import Playlist
+from comment.models import Comment
+
 import uuid
 
 

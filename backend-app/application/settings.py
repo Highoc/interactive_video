@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'mptt',
     'core.apps.CoreConfig',
     'video.apps.VideoConfig',
-    'channel.apps.ChannelConfig'
+    'channel.apps.ChannelConfig',
+    'comment.apps.CommentConfig'
 ]
 
 MIDDLEWARE = [

@@ -9,5 +9,6 @@ urlpatterns = [
     url(r'^token-auth/', obtain_jwt_token),
     url(r'^core/', include('core.urls')),
     url(r'^video/', include('video.urls')),
-    url(r'^channel/', include('channel.urls'))
+    url(r'^channel/', include('channel.urls')),
+    url(r'^comment/', include('comment.urls'))
 ]

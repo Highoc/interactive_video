@@ -81,6 +81,7 @@ class SourceListView(APIView):
         } for source in sources ]
         return Response(responce, status=status.HTTP_200_OK)
 
+
 class SourceView(APIView):
 
     def get(self, request, key=None):
@@ -179,7 +180,7 @@ class VideoUploadView(APIView):
 
 class VideoView(APIView):
     def get(self, request, key=None):
-        video_list = Video.objects.filter(key=key, status=Video.PUBLISHED)
+        video_list = Video.objects.filter(key=key, status=Video.PUBLIC)
 
         if not video_list:
             return Response('This video_part doesn\'t exist', status=status.HTTP_204_NO_CONTENT)
@@ -190,6 +191,7 @@ class VideoView(APIView):
             'name': video.name,
             'description': video.description,
             'head_video_part': video.head_video_part.key.hex,
+            'head_comments': [ comment.id for comment in video.comments.filter(parent=None) ],
             'codec': video.codec,
             'created': video.created,
         }
@@ -205,7 +207,7 @@ class VideoPartView(APIView):
             return Response('This video_part doesn\'t exist', status=status.HTTP_204_NO_CONTENT)
 
         video_part = video_parts[0]
-        if video_part.main_video.status != Video.PUBLISHED:
+        if video_part.main_video.status != Video.PUBLIC:
             return Response('This video_part doesn\'t exist', status=status.HTTP_204_NO_CONTENT)
 
         source = video_part.source
