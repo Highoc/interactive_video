@@ -133,7 +133,9 @@ class MenuRight extends Component {
         <br />
         <Link to="/">Home</Link>
         <br />
-        <Link to="/channel/:ch_id/create">Create Video </Link>
+        <Link to="/channel/1/create">Create Video </Link>
+        <br />
+        <Link to="/channel/create">Create Channel </Link>
       </div>
     );
   }
