@@ -1,7 +1,7 @@
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 
-from channel.models import Channel
+from channel.models import Playlist
 import uuid
 
 
@@ -184,19 +184,26 @@ class Video(models.Model):
         verbose_name='Дата создания'
     )
 
-    PUBLISHED = 0
+    PUBLIC = 0
     HIDDEN  = 1
     DELETED = 2
     STATUS_CHOICES = (
-        (PUBLISHED, 'Published to channel'),
+        (PUBLIC, 'Published to channel'),
         (HIDDEN, 'Hidden by user'),
         (DELETED, 'Deleted'),
     )
 
     status = models.IntegerField(
-        default=PUBLISHED,
+        default=PUBLIC,
         choices=STATUS_CHOICES,
-        verbose_name='Статус источника'
+        verbose_name='Статус видео'
+    )
+
+    playlist = models.ForeignKey(
+        Playlist,
+        verbose_name='Плейлист интерактивного видео',
+        related_name='video',
+        on_delete=models.CASCADE
     )
 
     class Meta:

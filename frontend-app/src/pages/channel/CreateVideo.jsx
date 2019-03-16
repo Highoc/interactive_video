@@ -68,7 +68,7 @@ class CreateVideo extends Component {
   }
 
   componentDidMount() {
-    const url = 'http://192.168.1.205:8000/video/source/list/';
+    const url = 'http://localhost:8000/video/source/list/';
 
     const config = {
       headers: {
@@ -239,7 +239,7 @@ class CreateVideo extends Component {
 
   uploadVideo() {
     axios.post(
-      'http://100.100.150.128:8000/video/upload/', this.getVideoData(),
+      'http://localhost:8000/video/upload/', this.getVideoData(),
       {
         headers: {
           Authorization: `JWT ${localStorage.getItem('jwt-token')}`,

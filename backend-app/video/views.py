@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from rest_framework import status, permissions
+from rest_framework import status
 
 from application import settings
 
@@ -119,21 +119,25 @@ class VideoUploadView(APIView):
             except Exception as e:
                 return Response("Video parts are incorrect", status=status.HTTP_400_BAD_REQUEST)
 
-            print(video_parts)
-            print(request.data)
+            #print(video_parts)
+            #print(request.data)
 
-            #video.save()
+            video.save()
 
             for part in video_parts: 
-                print(part.__dict__)
-            #   part.main_video = video
-            #   part.save()
+                if part.parent_ref is None:
+                    part.parent = None
+                else:
+                    part.parent = part.parent_ref
+
+                part.main_video = video
+                part.save()
             
-            #head = video_parts[0]
-            #video.key = get_short_key(video.id)
-            #video.head_video_part = head
-            #video.codec = head.source.codec
-            #video.save()
+            head = video_parts[0]
+            video.key = get_short_key(video.id)
+            video.head_video_part = head
+            video.codec = head.source.codec
+            video.save()
 
             '''
             for all sources
@@ -182,7 +186,7 @@ class VideoView(APIView):
 
         video = video_list[0]
 
-        responce = {
+        response = {
             'name': video.name,
             'description': video.description,
             'head_video_part': video.head_video_part.key.hex,
@@ -190,7 +194,7 @@ class VideoView(APIView):
             'created': video.created,
         }
 
-        return Response(responce, status.HTTP_200_OK)
+        return Response(response, status.HTTP_200_OK)
 
 
 class VideoPartView(APIView):
@@ -212,7 +216,7 @@ class VideoPartView(APIView):
             source.key.hex
         )
 
-        responce = {
+        response = {
             'key': key,
             'content_url': url,
             'time': source.time,
@@ -220,19 +224,4 @@ class VideoPartView(APIView):
             'children': [ child.key.hex for child in video_part.children.all() ],
         }
 
-        return Response(responce, status.HTTP_200_OK)
-
-
-class VideoListView(APIView):
-    def get(self, request):
-        video_list = Video.objects.filter(owner=request.user, status=Video.PUBLISHED)
-
-        responce = [{
-            'name': video.name,
-            'description': video.description,
-            'head_video_part': video.head_video_part.key.hex,
-            'codec': video.codec,
-            'created': video.created,
-        } for video in video_list]
-
-        return Response(responce, status.HTTP_200_OK)
+        return Response(response, status.HTTP_200_OK)
