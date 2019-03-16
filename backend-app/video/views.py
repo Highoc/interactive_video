@@ -186,7 +186,7 @@ class VideoView(APIView):
 
         video = video_list[0]
 
-        responce = {
+        response = {
             'name': video.name,
             'description': video.description,
             'head_video_part': video.head_video_part.key.hex,
@@ -194,7 +194,7 @@ class VideoView(APIView):
             'created': video.created,
         }
 
-        return Response(responce, status.HTTP_200_OK)
+        return Response(response, status.HTTP_200_OK)
 
 
 class VideoPartView(APIView):
@@ -216,7 +216,7 @@ class VideoPartView(APIView):
             source.key.hex
         )
 
-        responce = {
+        response = {
             'key': key,
             'content_url': url,
             'time': source.time,
@@ -224,19 +224,4 @@ class VideoPartView(APIView):
             'children': [ child.key.hex for child in video_part.children.all() ],
         }
 
-        return Response(responce, status.HTTP_200_OK)
-
-
-class VideoListView(APIView):
-    def get(self, request):
-        video_list = Video.objects.filter(owner=request.user, status=Video.PUBLISHED)
-
-        responce = [{
-            'name': video.name,
-            'description': video.description,
-            'head_video_part': video.head_video_part.key.hex,
-            'codec': video.codec,
-            'created': video.created,
-        } for video in video_list]
-
-        return Response(responce, status.HTTP_200_OK)
+        return Response(response, status.HTTP_200_OK)
