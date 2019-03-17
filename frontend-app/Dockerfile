@@ -1,11 +1,12 @@
-FROM node:carbon
+FROM node:8.12.0
 
-ADD . /app
-
-RUN apt-get update
 WORKDIR /app
 
-RUN npm install
+COPY package.json ./
+COPY package-lock.json ./
+
+RUN npm install -qy
+
+COPY . .
 
 EXPOSE 3000
-USER nobody
