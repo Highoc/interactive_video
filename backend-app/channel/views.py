@@ -43,6 +43,7 @@ class ChannelUpdateView(APIView):
         return Response(forms, status=status.HTTP_200_OK)
 
     def post(self, request):
+        return Response("nope", status=status.HTTP_400_BAD_REQUEST)
         serializer = ChannelSerializer(request.data)
         if serializer.is_valid():
             channel = Channel.objects.filter(owner=request.user)
