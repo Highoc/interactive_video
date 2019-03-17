@@ -26,7 +26,6 @@ SECRET_KEY = '8lvp&489^c(f3f^6fog80nyac0bf8)+z6^zjlt54zl4m^e)5-v'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '172.18.0.3',
     '192.168.1.205',
     'backend',
     'localhost',
@@ -79,7 +78,7 @@ JWT_AUTH = {
 
 CORS_ORIGIN_WHITELIST = (
     '192.168.1.187',
-    'frontend:3000',
+    'frontend',
     'localhost:3000',
 )
 
