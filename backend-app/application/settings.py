@@ -26,10 +26,9 @@ SECRET_KEY = '8lvp&489^c(f3f^6fog80nyac0bf8)+z6^zjlt54zl4m^e)5-v'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    '172.18.0.3',
     '192.168.1.205',
-    '192.168.0.112',
-    '100.100.150.128',
-    '172.20.10.6',
+    'backend',
     'localhost',
 ]
 
@@ -79,6 +78,8 @@ JWT_AUTH = {
 }
 
 CORS_ORIGIN_WHITELIST = (
+    '192.168.1.187',
+    'frontend:3000',
     'localhost:3000',
 )
 
@@ -109,10 +110,10 @@ WSGI_APPLICATION = 'application.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.mysql',
-        'NAME': 'interactive_video',
-        'USER': 'django',
-        'PASSWORD': '2346785Das_',
-        'HOST': 'localhost'
+        'NAME':     os.environ.get('DB_NAME'),
+        'USER':     os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST':     os.environ.get('DB_HOST')
     }
 }
 
@@ -159,7 +160,7 @@ STATIC_URL = '/static/'
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-AWS_S3_ENDPOINT_URL     = 'http://hb.bizmrg.com'
-AWS_STORAGE_BUCKET_NAME = 'interactive_video'
-AWS_ACCESS_KEY_ID       = 'quZTPp3V28P7V1SGJRXxvs'
-AWS_SECRET_ACCESS_KEY   = '7arUgwahLMmhHpreUJh9RTkHB7LdD5UNcTjA5VLSP59G'
+AWS_S3_ENDPOINT_URL     = os.environ.get('AWS_S3_ENDPOINT_URL')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_ACCESS_KEY_ID       = os.environ.get('AWS_ACCESS_KEY')
+AWS_SECRET_ACCESS_KEY   = os.environ.get('AWS_SECRET_KEY')
