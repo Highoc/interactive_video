@@ -69,7 +69,7 @@ export class InteractivePlayer extends Component {
     const { videoQueue, timeResolver } = this.state;
     this.setState({ url: videoQueue.addMediaSource(mimeCodec) });
 
-    const url = `http://localhost:8000/video/part/get/${main}/`;
+    const url = `http://192.168.1.205:8000/video/part/get/${main}/`;
     const config = {
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
@@ -142,7 +142,7 @@ export class InteractivePlayer extends Component {
       videoQueue.pushKey(childKey);
       timeResolver.pushTimeKey(childKey);
 
-      const url = `http://localhost:8000/video/part/get/${childKey}/`;
+      const url = `http://192.168.1.205:8000/video/part/get/${childKey}/`;
       axios.get(url, config).then(
         (response) => {
           console.log(response.data);

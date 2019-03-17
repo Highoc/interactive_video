@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -23,54 +23,54 @@ const styles = theme => ({
   },
 });
 
+function checkValidity(value, rules) {
 
-/*
-state={
-  controls: {
-    name: {
-      elementType: 'input',
-      elementConfig: {
-        type: 'name',
-        placeholder: 'Имя канала',
-      },
-      value: '',
-      validation: {
-        required: true,
-      },
-      valid: false,
-      touched: false,
-    },
-    description: {
-      elementType: 'textarea',
-      elementConfig: {
-        type: 'text',
-        placeholder: 'Описание канала',
-      },
-      value: '',
-      validation: {
-        required: true,
-        maxLength: 4096,
-      },
-      valid: false,
-      touched: false,
-    },
-  },
-*/
+  let isValid = true;
 
+  if (rules.required) {
+    isValid = value.trim() !== '' && isValid;
+  }
+
+  if (rules.minLength) {
+
+    isValid = value.length >= rules.minLength && isValid;
+  }
+
+  if (rules.max_length) {
+
+    isValid = value.length <= rules.max_length && isValid;
+  }
+
+  return isValid;
+}
 
 class Input extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: this.props.value,
-      rules: this.props.rules,
+      value: props.value,
+      rules: props.rules,
+      isValid: checkValidity(props.value, props.rules),
+      isTouched: false,
+      name: props.name,
     };
+  }
+
+  inputChangedHandler(event) {
+    const isValid = checkValidity(event.target.value, this.state.rules);
+    this.setState({isValid, value: event.target.value, isTouched: true });
+  };
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    this.props.callback(this.state);
   }
 
   render() {
     let inputElement = null;
     let labelValue = 'Not-required';
-    if (this.props.rules.required) {
+    const { rules, value, isValid, isTouched } = this.state;
+    const isCorrect = !isTouched || isValid;
+    if (rules.required) {
       labelValue = 'Required';
     }
 
@@ -78,12 +78,12 @@ class Input extends Component {
       case ('text'):
         inputElement = (
           <TextField
-            error={!this.props.valid}
-            required={this.props.rules.required}
-            onChange={this.props.changed}
+            error={!isCorrect}
+            required={rules.required}
+            onChange={event => this.inputChangedHandler(event)}
             label={labelValue}
             fullWidth
-            value={this.props.value}
+            value={value}
             placeholder={this.props.description}
             className={classes.textField}
             name={this.props.name}
@@ -96,14 +96,14 @@ class Input extends Component {
       case ('textarea'):
         inputElement = (
           <TextField
-            error={!this.props.valid}
+            error={!isCorrect}
             multiline
             fullWidth
             rows="6"
-            required={this.props.rules.required}
-            onChange={this.props.changed}
+            required={rules.required}
+            onChange={event => this.inputChangedHandler(event)}
             label={labelValue}
-            value={this.props.value}
+            value={value}
             placeholder={this.props.description}
             className={classes.textField}
             name={this.props.name}
@@ -115,11 +115,11 @@ class Input extends Component {
       default:
         inputElement = (
           <TextField
-            required={this.props.rules.required}
-            onChange={this.props.changed}
+            required={rules.required}
+            onChange={event => this.inputChangedHandler(event)}
             label={labelValue}
             fullWidth
-            value={this.props.value}
+            value={value}
             placeholder={this.props.description}
             className={classes.textField}
             name={this.props.name}

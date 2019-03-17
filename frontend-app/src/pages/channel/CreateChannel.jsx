@@ -69,7 +69,7 @@ class CreateChannel extends Component {
             max_length: 64,
             required: true,
           },
-          valid: true,
+          isValid: false,
         },
         {
           type: 'textarea',
@@ -80,8 +80,9 @@ class CreateChannel extends Component {
             max_length: 4096,
             required: false,
           },
-          valid: true,
+          isValid: false,
         }],
+      response: {},
     };
   }
 
@@ -104,17 +105,6 @@ class CreateChannel extends Component {
     });*/
   }
 
-  inputChangedHandler = (event, key) => {
-    const updatedInputs = {
-      ...this.state.inputs,
-      [key]: {
-        ...this.state.inputs[key],
-        value: event.target.value,
-      },
-    };
-
-    this.setState({ inputs: updatedInputs });
-  };
 
   submitHandler(event) {
     const { inputs } = this.state;
@@ -136,30 +126,9 @@ class CreateChannel extends Component {
     event.preventDefault();
   };
 
-  checkValidity(value, rules) {
-    let isValid = true;
-    if (rules.required) {
-      if (value === undefined) {
-        return false;
-      }
-      isValid = value.trim() !== '' && isValid;
-    }
-
-    if (rules.minLength) {
-      if (value === undefined) {
-        return false;
-      }
-      isValid = value.length >= rules.minLength && isValid;
-    }
-
-    if (rules.max_length) {
-      if (value === undefined) {
-        return true;
-      }
-      isValid = value.length <= rules.max_length && isValid;
-    }
-
-    return isValid;
+  callbackInput(state){
+    console.log(state.name);
+    console.log(state.value);
   }
 
   render() {
@@ -179,8 +148,7 @@ class CreateChannel extends Component {
           description={inputElement.description}
           value={inputElement.value}
           rules={inputElement.rules}
-          changed={event => this.inputChangedHandler(event, key)}
-          valid={inputElement.valid}
+          callback={state => this.callbackInput(state)}
         />
       );
     });

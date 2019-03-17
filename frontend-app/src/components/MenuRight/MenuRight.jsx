@@ -127,13 +127,11 @@ class MenuRight extends Component {
           <VideoCamera fontSize="large"/>
         </IconButton>
         <br />
-        <Link to="/channel/1/watch/12deadbeef21"> Watch me 1 ! </Link>
-        <br />
-        <Link to="/channel/1/watch/21deadbeef12"> Watch me 2 ! </Link>
-        <br />
         <Link to="/">Home</Link>
         <br />
-        <Link to="/channel/1/create">Create Video </Link>
+        <Link to="/channel/:ch_id/create">Create Video </Link>
+        <br />
+        <Link to="/channel/adminadmin00">My channel</Link>
         <br />
         <Link to="/channel/create">Create Channel </Link>
       </div>

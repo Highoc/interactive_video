@@ -71,6 +71,17 @@ class Playlist(models.Model):
         verbose_name='Описание плeйлиста'
     )
 
+    key = models.CharField(
+        max_length=12,
+        verbose_name='Ключ плейлиста'
+    )
+
+    preview_picture = models.ImageField(
+        upload_to='preview_playlist',
+        null=True,
+        verbose_name='Превью плейлиста'
+    )
+
     PUBLIC = 0
     UPLOADED = 1
     HIDDEN = 2

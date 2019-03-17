@@ -19,8 +19,8 @@ export class WatchVideo extends Component {
   }
 
   componentDidMount() {
-    const { key } = this.props.match.params;
-    const url = `http://localhost:8000/video/get/${key}`;
+    const { videoKey } = this.props.match.params;
+    const url = `http://192.168.1.205:8000/video/get/${videoKey}`;
 
     const config = {
       headers: {
