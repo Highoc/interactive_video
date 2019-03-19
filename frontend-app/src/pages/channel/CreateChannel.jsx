@@ -6,38 +6,7 @@ import classNames from 'classnames';
 import Fab from '@material-ui/core/Fab';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import Input from '../../components/Input/Input';
-/*
-state={
-  controls: {
-    name: {
-      elementType: 'input',
-      elementConfig: {
-        type: 'name',
-        placeholder: 'Имя канала',
-      },
-      value: '',
-      validation: {
-        required: true,
-      },
-      valid: false,
-      touched: false,
-    },
-    description: {
-      elementType: 'textarea',
-      elementConfig: {
-        type: 'text',
-        placeholder: 'Описание канала',
-      },
-      value: '',
-      validation: {
-        required: true,
-        maxLength: 4096,
-      },
-      valid: false,
-      touched: false,
-    },
-  },
-*/
+
 
 
 const styles = theme => ({
@@ -47,9 +16,6 @@ const styles = theme => ({
   extendedIcon: {
     marginRight: theme.spacing.unit,
   },
-  button: {
-
-  }
 });
 
 
@@ -69,7 +35,6 @@ class CreateChannel extends Component {
             max_length: 64,
             required: true,
           },
-          isValid: false,
         },
         {
           type: 'textarea',
@@ -80,9 +45,7 @@ class CreateChannel extends Component {
             max_length: 4096,
             required: false,
           },
-          isValid: false,
         }],
-      response: {},
     };
   }
 
@@ -108,17 +71,13 @@ class CreateChannel extends Component {
 
   submitHandler(event) {
     const { inputs } = this.state;
-    let checkValid = true;
-    for (const key in inputs)
-    {
-      console.log(event);
-      inputs[key].valid = this.checkValidity(event.target.value, inputs[key].rules);
-      checkValid = checkValid && inputs[key].valid;
+    let isValid = true;
+    for (const key in inputs) {
+      isValid = isValid && inputs[key].isValid;
     }
-    console.log(checkValid);
 
-    if (checkValid) {
-      console.log(inputs);
+    if (isValid) {
+      console.log('Отправить можно');
     }
     else {
       console.log('Invalid input');
@@ -126,9 +85,12 @@ class CreateChannel extends Component {
     event.preventDefault();
   };
 
-  callbackInput(state){
-    console.log(state.name);
-    console.log(state.value);
+  callbackInput(state) {
+    const { inputs } = this.state;
+    const input = inputs.find(elem => elem.name === state.name);
+    input.value = state.value;
+    input.isValid = state.isValid;
+    this.setState({ inputs });
   }
 
   render() {
@@ -158,12 +120,13 @@ class CreateChannel extends Component {
         <form>
           <h2>Создание канала</h2>
           {Inputs}
-          <Fab variant="extended"
-               color="primary"
-               aria-label="Add"
-               className={classes.margin}
-               style={styles.button}
-               onClick={event => this.submitHandler(event)}
+          <Fab
+            variant="extended"
+            color="primary"
+            aria-label="Add"
+            className={classes.margin}
+            style={styles.button}
+            onClick={event => this.submitHandler(event)}
           >
             <NavigationIcon className={classes.extendedIcon} />
             Создать
@@ -181,43 +144,4 @@ CreateChannel.propTypes = {
 
 export default withStyles(styles)(CreateChannel);
 
-/*
-const response = [
-  {
-    type: 'input',
-    name: 'name',
-    value: '',
-    description: 'Название канала',
-    rules: [],
-  },
-  {
-    type: 'textarea',
-    name: 'description',
-    value: '',
-    description: 'Описание канала',
-    rules: [],
-  },
-];
-*/
 
-
-/*
-
-    inputChangedHandler = (event, key) => {
-    const updatedInputs = {
-      ...this.state.inputs,
-      [key]: {
-        ...this.state.inputs[key],
-        value: event.target.value,
-        valid: this.checkValidity(event.target.value, this.state.controls[key].validation),
-        touched: true,
-      },
-    };
-
-
-
-
-
-
-
- */

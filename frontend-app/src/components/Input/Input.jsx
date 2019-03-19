@@ -32,12 +32,10 @@ function checkValidity(value, rules) {
   }
 
   if (rules.minLength) {
-
     isValid = value.length >= rules.minLength && isValid;
   }
 
   if (rules.max_length) {
-
     isValid = value.length <= rules.max_length && isValid;
   }
 
@@ -56,13 +54,22 @@ class Input extends Component {
     };
   }
 
+  componentDidMount() {
+    const { callback } = this.props;
+    callback(this.state);
+  }
+
   inputChangedHandler(event) {
     const isValid = checkValidity(event.target.value, this.state.rules);
-    this.setState({isValid, value: event.target.value, isTouched: true });
+    this.setState({ isValid, value: event.target.value, isTouched: true });
   };
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    this.props.callback(this.state);
+    const { value } = this.state;
+    const { callback } = this.props;
+    if (prevState.value !== value) {
+      callback(this.state);
+    }
   }
 
   render() {
