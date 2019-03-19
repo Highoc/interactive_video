@@ -3,11 +3,9 @@ import React, { Component } from 'react';
 export class Main extends Component {
   render() {
     const styles = {
-      padding: '5px',
       width: '65%',
       maxWidth: 1203,
-      height: '660px',
-      margin: '1.5% 1.5% 0 1.5%',
+      margin: '0% 1.5% 0 1.5%',
       overflow: 'hidden',
     };
 
