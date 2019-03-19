@@ -49,8 +49,6 @@ services:
       - /app/node_modules
     ports:
       - 3000:3000
-    links:
-      - backend-app
 
   nginx:
     depends_on: [ backend-app, frontend-app ]
