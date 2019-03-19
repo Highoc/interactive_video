@@ -15,6 +15,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import path from '../../Backend';
 
 const styles = {
   width: '65%',
@@ -68,7 +69,7 @@ class CreateVideo extends Component {
   }
 
   componentDidMount() {
-    const url = 'http://localhost:8000/video/source/list/';
+    const url = `http://${path}/video/source/list/`;
 
     const config = {
       headers: {
@@ -239,7 +240,7 @@ class CreateVideo extends Component {
 
   uploadVideo() {
     axios.post(
-      'http://localhost:8000/video/upload/', this.getVideoData(),
+      `http://${path}/video/upload/`, this.getVideoData(),
       {
         headers: {
           Authorization: `JWT ${localStorage.getItem('jwt-token')}`,

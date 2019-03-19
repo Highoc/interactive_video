@@ -14,11 +14,12 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import { withStyles } from '@material-ui/core/styles';
-
+import Button from '@material-ui/core/Button';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import { logout, login } from '../../actions/authorization';
+import {Link} from "react-router-dom";
 
 const styles = theme => ({
   root: {
@@ -127,6 +128,8 @@ class Header extends Component {
       </Menu>
     );
 
+    const MyLink = props => <Link to="/" {...props} />;
+
     return (
       <div className={classes.root}>
         <AppBar position="static">
@@ -148,13 +151,12 @@ class Header extends Component {
                 }}
               />
             </div>
-            <Typography className={classes.title} variant="h6" color="inherit" noWrap>
-              {
-                isAuthorized ? <a onClick={onLogout}>  Выйти  </a> : <a onClick={onLogin}>  Войти </a>
-              }
-            </Typography>
+
             <div className={classes.grow} />
             <div className={classes.sectionDesktop}>
+              {
+                isAuthorized ? <Button onClick={(event) => { onLogout(event); }} component={MyLink} color="inherit">Выйти</Button> : <Button onClick={(event) => { onLogin(event); }} component={MyLink} color="inherit">Войти</Button>
+              }
               <IconButton
                 aria-owns={isMenuOpen ? 'material-appbar' : undefined}
                 aria-haspopup="true"

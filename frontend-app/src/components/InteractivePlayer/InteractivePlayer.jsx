@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import 'video-react/dist/video-react.css';
 import PropTypes from 'prop-types';
+import path from '../../Backend';
 
 import {
   Player,
@@ -22,7 +23,6 @@ const propTypes = {
 const videoStyles = {
   position: 'relative',
   maxhight: '560',
-  paddingBottom: '56.25%',
   overflow: 'hidden',
 };
 const buttonStyles = {
@@ -69,7 +69,7 @@ export class InteractivePlayer extends Component {
     const { videoQueue, timeResolver } = this.state;
     this.setState({ url: videoQueue.addMediaSource(mimeCodec) });
 
-    const url = `http://localhost:8000/video/part/get/${main}/`;
+    const url = `http://${path}/video/part/get/${main}/`;
     const config = {
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
@@ -142,7 +142,7 @@ export class InteractivePlayer extends Component {
       videoQueue.pushKey(childKey);
       timeResolver.pushTimeKey(childKey);
 
-      const url = `http://localhost:8000/video/part/get/${childKey}/`;
+      const url = `http://${path}/video/part/get/${childKey}/`;
       axios.get(url, config).then(
         (response) => {
           console.log(response.data);
@@ -215,7 +215,7 @@ export class InteractivePlayer extends Component {
     return (
       <div style={videoStyles}>
         {buttons}
-        <Player ref="player" src={url} fluid={false}>
+        <Player ref="player" src={url} fluid={true}>
           <BigPlayButton position="center" />
           <ControlBar autoHide>
             <ReplayControl seconds={10} order={1.1} />
