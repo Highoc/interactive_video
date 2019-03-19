@@ -2,11 +2,11 @@ import React from 'react';
 
 import { Switch, Route } from 'react-router-dom';
 
-import { ChannelView } from './ChannelView';
+import ChannelView from './ChannelView';
 import CreateVideo from './CreateVideo';
-import { WatchVideo } from './WatchVideo';
+import WatchVideo from './WatchVideo';
 import { PlaylistAll } from './PlaylistAll';
-import { Playlist } from './Playlist';
+import Playlist from './Playlist';
 
 export const Channel = () => (
   <div>
