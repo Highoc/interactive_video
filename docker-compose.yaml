@@ -38,16 +38,29 @@ services:
       AWS_SECRET_KEY: 7arUgwahLMmhHpreUJh9RTkHB7LdD5UNcTjA5VLSP59G
 
   frontend-app:
-    depends_on: [ backend-app ]
     container_name: frontend
+    depends_on: [ backend-app ]
     build:
       context: ./frontend-app
       dockerfile: Dockerfile
     command: npm start
     volumes:
       - ./frontend-app:/app
+      - /app/node_modules
     ports:
       - 3000:3000
+
+  nginx:
+    depends_on: [ backend-app, frontend-app ]
+    image: nginx
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+    - 80:80
+    expose:
+    - 80
     links:
-      - backend-app
+    - backend-app
+    - frontend-app
 
