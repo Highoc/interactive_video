@@ -56,8 +56,9 @@ class CommentCreateView(APIView):
         channels = Channel.objects.filter(key=channel_key, status=Channel.AVAILABLE)
         if not channels:
             return Response("Wrong channel key.", status=status.HTTP_400_BAD_REQUEST)
+        channel = channels[0]
 
-        video = channels[0].video.filter(key=video_key, status=Video.PUBLIC)
+        video = Video.objects.filter(key=video_key, status=Video.PUBLIC, owner=channel.owner)
         if not video:
             return Response("Wrong video key.", status=status.HTTP_400_BAD_REQUEST)
 
@@ -65,14 +66,19 @@ class CommentCreateView(APIView):
 
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
-            parents = video.comments.filter(id=request.data['parent_id'])
-            if not parents:
-                return Response("Wrong parent comment id.", status=status.HTTP_400_BAD_REQUEST)
+            if 'parent_id' not in request.data:
+                parent = None
+            else:
+                parents = video.comments.filter(id=request.data['parent_id'])
+                if not parents:
+                    return Response("Wrong comments id.", status=status.HTTP_400_BAD_REQUEST)
+
+                parent = parents[0]
 
             comment = serializer.create()
             comment.video = video
             comment.author = request.user
-            comment.parent = parents[0]
+            comment.parent = parent
             comment.save()
 
             return Response({ 'key': comment.id }, status=status.HTTP_201_CREATED)
