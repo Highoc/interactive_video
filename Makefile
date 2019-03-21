@@ -1,10 +1,13 @@
 up:
 	docker-compose up
+makemigrations:
+	docker exec -it backend python manage.py makemigrations
+	docker exec -it backend python manage.py migrate
 migrate:
 	docker exec -it backend python manage.py migrate
 	docker exec -it backend python manage.py loaddata fixtures/data.json
 build:
-	sudo docker-compose up --no-start --remove-orphans --build
+	docker-compose up --no-start --remove-orphans --build
 start:
 	docker-compose start
 stop:
