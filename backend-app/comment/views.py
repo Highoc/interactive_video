@@ -63,7 +63,6 @@ class CommentCreateView(APIView):
             return Response("Wrong video key.", status=status.HTTP_400_BAD_REQUEST)
 
         video = video[0]
-
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
             if 'parent_id' not in request.data:

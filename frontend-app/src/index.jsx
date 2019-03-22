@@ -12,6 +12,7 @@ import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 
 import authorizationReducer from './reducers/authorization';
+import centrifugoReducer from './reducers/centrifugo';
 
 import './index.css';
 import App from './App';
@@ -19,6 +20,7 @@ import * as serviceWorker from './serviceWorker';
 
 const rootReducer = combineReducers({
   authorization: authorizationReducer,
+  centrifugo: centrifugoReducer,
 });
 
 /* eslint-disable no-underscore-dangle */

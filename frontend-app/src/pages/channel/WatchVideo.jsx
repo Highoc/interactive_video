@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { InteractivePlayer } from '../../components/InteractivePlayer';
+import { connect } from 'react-redux';
 
+import { InteractivePlayer } from '../../components/InteractivePlayer';
 import { Comment } from '../../components/Comment/Comment';
 
 import PropTypes from 'prop-types';
@@ -10,6 +11,8 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import path from '../../Backend';
+
+import { subscribeToChannel, unsubscribeFromChannel } from '../../actions/centrifugo';
 
 
 const textStyles = {
@@ -52,6 +55,7 @@ class WatchVideo extends Component {
   }
 
   componentDidMount() {
+    const { subcribeToChannel } = this.props;
     const { videoKey } = this.props.match.params;
     const url = `http://${path}/video/get/${videoKey}/`;
 
@@ -64,13 +68,18 @@ class WatchVideo extends Component {
     axios.get(url, config).then(
       (result) => {
         console.log(result.data);
-
         this.setState({ status: statuses.LOADED, video: result.data });
+        subscribeToChannel('vasa', data => console.log(data));
       },
     ).catch((error) => {
       console.log(error);
       this.setState({ status: statuses.ERROR });
     });
+  }
+
+  componentWillUnmount() {
+    const { unsubcribeFromChannel } = this.props;
+    unsubcribeFromChannel('vasa');
   }
 
   render() {
@@ -93,7 +102,6 @@ class WatchVideo extends Component {
             </CardContent>
           </Card>
           <InteractivePlayer main={video.head_video_part} codec={video.codec} />
-
           Комментарии: <ul>{ video.head_comments.map(commentId => <Comment commentId={commentId} />)}</ul>
         </div>
       );
@@ -111,4 +119,9 @@ WatchVideo.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(WatchVideo);
+const mapDispatchToProps = dispatch => ({
+  subscribeToChannel: (channel, callback) => dispatch(subscribeToChannel(channel, callback)),
+  unsubscribeFromChannel: channel => dispatch(unsubscribeFromChannel(channel)),
+});
+
+export default withStyles(styles)(connect(mapDispatchToProps)(WatchVideo));

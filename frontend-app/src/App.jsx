@@ -15,6 +15,7 @@ import { Channel } from './pages/channel';
 
 // import { VideoPlayer } from './pages/test';
 import { Test } from './pages/test';
+import { Centrifugo } from './components/Centrifugo';
 
 class App extends Component {
   render() {
@@ -31,6 +32,7 @@ class App extends Component {
             <Route path="/channel" component={Channel} />
             <Route path="/test" component={Test} />
           </Switch>
+          <Centrifugo />
         </Main>
       </div>
     );
