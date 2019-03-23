@@ -72,7 +72,9 @@ REST_FRAMEWORK = {
     ),
 }
 
+import datetime
 JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=14),
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'application.utils.my_jwt_response_handler'
 }
 

@@ -1,9 +1,8 @@
 import * as actionTypes from '../actions/actionTypes';
 
 const initialState = {
-  token: localStorage.getItem('jwt-token'),
+  token: null,
   username: 'Guest',
-  id: -1,
 
   loading: false,
   error: null,
@@ -21,7 +20,6 @@ const loginSuccess = (state, action) => ({
   ...state,
   token: action.payload.token,
   username: action.payload.username,
-  id: action.payload.id,
 
   loading: false,
   error: null,
@@ -40,8 +38,8 @@ const logout = (state, action) => ({
 
   token: null,
   username: 'Guest',
-  id: -1,
 });
+
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {

@@ -23,7 +23,7 @@ class Centrifugo extends Component {
 
   async componentDidMount() {
     try {
-      const url = `http://${backend}/core/centrifugo/token`;
+      const url = `http://${backend}/core/centrifugo/token/`;
       const config = {
         headers: {
           Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
