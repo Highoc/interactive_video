@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import jwt from 'jsonwebtoken';
 import Centrifuge from 'centrifuge';
 
-import { activateSubscription, deleteSubscription } from '../../actions/centrifugo';
+import { centrifugoInit, activateSubscription, deleteSubscription } from '../../actions/centrifugo';
 
 const SECRET = '09a3bbb7-8b2b-445b-b1f4-7913287a3ea5';
 
@@ -20,11 +20,13 @@ class Centrifugo extends Component {
 
   componentDidMount() {
     const { userId, centrifuge } = this.state;
+    const { centrifugoInit } = this.props;
     const token = jwt.sign({ sub: '1' }, SECRET, { expiresIn: 86400 });
 
     centrifuge.setToken(token);
     centrifuge.on('connect', () => {
-      console.log('[Centrifuge] Connection success');
+      centrifugoInit();
+      console.log('[Centrifuge] Was initialized');
     });
 
     centrifuge.connect();
@@ -38,19 +40,19 @@ class Centrifugo extends Component {
         subscription.unsubscribe();
         subscription.removeAllListeners();
         nextProps.deleteSubscription(channel);
-        break;
+        console.log(`[Centrifuge] Delete subscription to '${channel}'`);
       } else if (!elem.isActive) {
         const { channel, callback } = elem;
         const subscription = this.subscribeToChannel(channel, callback);
         nextProps.activateSubscription(channel, subscription);
-        break;
+        console.log(`[Centrifuge] Activate subscription to '${channel}'`);
       }
     }
   }
 
   subscribeToChannel(channel, handlePublish) {
     const { centrifuge } = this.state;
-    centrifuge.subscribe(channel, (message) => {
+    return centrifuge.subscribe(channel, (message) => {
       handlePublish(message.data);
     });
   }
@@ -65,6 +67,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
+  centrifugoInit: () => dispatch(centrifugoInit()),
   activateSubscription: (channel, subscription) => dispatch(activateSubscription(channel, subscription)),
   deleteSubscription: channel => dispatch(deleteSubscription(channel)),
 });

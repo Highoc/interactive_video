@@ -29,7 +29,7 @@ export class Comment extends Component {
 
     axios.get(url, config).then(
       (result) => {
-        console.log(result.data);
+        // console.log(result.data);
         this.setState({ isLoaded: true, comment: result.data });
       },
     ).catch(error => console.log(error));

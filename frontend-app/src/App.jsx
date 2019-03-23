@@ -15,7 +15,7 @@ import { Channel } from './pages/channel';
 
 // import { VideoPlayer } from './pages/test';
 import { Test } from './pages/test';
-import { Centrifugo } from './components/Centrifugo';
+import Centrifugo from './components/Centrifugo/Centrifugo';
 
 class App extends Component {
   render() {

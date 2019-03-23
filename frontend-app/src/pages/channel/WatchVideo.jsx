@@ -55,7 +55,7 @@ class WatchVideo extends Component {
   }
 
   componentDidMount() {
-    const { subcribeToChannel } = this.props;
+    const { subscribeToChannel } = this.props;
     const { videoKey } = this.props.match.params;
     const url = `http://${path}/video/get/${videoKey}/`;
 
@@ -69,19 +69,26 @@ class WatchVideo extends Component {
       (result) => {
         console.log(result.data);
         this.setState({ status: statuses.LOADED, video: result.data });
-        subscribeToChannel('vasa', data => console.log(data));
       },
     ).catch((error) => {
       console.log(error);
       this.setState({ status: statuses.ERROR });
     });
+
+
+    subscribeToChannel('vasa', data => console.log(data));
+    subscribeToChannel('vasa1', data => console.log(data));
+    subscribeToChannel('vasa2', data => console.log(data));
   }
 
   componentWillUnmount() {
-    const { unsubcribeFromChannel } = this.props;
-    unsubcribeFromChannel('vasa');
+    const { unsubscribeFromChannel } = this.props;
+    unsubscribeFromChannel('vasa');
+    unsubscribeFromChannel('vasa1');
+    unsubscribeFromChannel('vasa2');
   }
 
+  // Комментарии: <ul>{ video.head_comments.map(commentId => <Comment commentId={commentId} />)}</ul>
   render() {
     const { status, video } = this.state;
     const { classes } = this.props;
@@ -102,7 +109,6 @@ class WatchVideo extends Component {
             </CardContent>
           </Card>
           <InteractivePlayer main={video.head_video_part} codec={video.codec} />
-          Комментарии: <ul>{ video.head_comments.map(commentId => <Comment commentId={commentId} />)}</ul>
         </div>
       );
     } else if (status === statuses.NOT_LOADED) {
@@ -119,9 +125,13 @@ WatchVideo.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
+const mapStateToProps = state => ({
+  isInitialised: state.centrifugo.isInitialised,
+});
+
 const mapDispatchToProps = dispatch => ({
   subscribeToChannel: (channel, callback) => dispatch(subscribeToChannel(channel, callback)),
   unsubscribeFromChannel: channel => dispatch(unsubscribeFromChannel(channel)),
 });
 
-export default withStyles(styles)(connect(mapDispatchToProps)(WatchVideo));
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(WatchVideo));
