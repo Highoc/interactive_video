@@ -8,6 +8,11 @@ from .models import Comment
 
 from .serializers import CommentSerializer
 
+from cent import Client
+
+CENTRIFUGO_URL = "http://centrifugo:9000"
+CENTRIFUGO_API_KEY = "1erj444h-9fhj-pasd-oas4-988f33d33d21"
+
 class CommentView(APIView):
     def get(self, request, comment_id):
 
@@ -79,6 +84,17 @@ class CommentCreateView(APIView):
             comment.author = request.user
             comment.parent = parent
             comment.save()
+
+            client = Client(CENTRIFUGO_URL, api_key=CENTRIFUGO_API_KEY, timeout=1)
+            channel = f"video/{video_key}/comments"
+            data = {
+                'author': comment.author.username,
+                'text': comment.text,
+                'created': comment.created,
+                'children': []
+            }
+
+            client.publish(channel, data)
 
             return Response({ 'key': comment.id }, status=status.HTTP_201_CREATED)
         else:

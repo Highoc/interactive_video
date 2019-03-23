@@ -47,7 +47,9 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'video.apps.VideoConfig',
     'channel.apps.ChannelConfig',
-    'comment.apps.CommentConfig'
+    'comment.apps.CommentConfig',
+    'rating.apps.RatingConfig',
+    'views.apps.ViewsConfig'
 ]
 
 MIDDLEWARE = [

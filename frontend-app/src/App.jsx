@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import './App.css';
-
-import { Switch, Route, Redirect } from 'react-router-dom';
+import {
+  BrowserRouter as Router, Switch, Route, Redirect
+} from 'react-router-dom';
 
 import Header from './components/Header';
 import MenuLeft from './components/MenuLeft';
@@ -33,10 +33,10 @@ class App extends Component {
   render() {
     let routes = (
       <Switch>
-        <Route path="/" exact component={Guest} />
+        <Route path="/guest" exact component={Guest} />
         <Route path="/login" exact component={Patch} />
         <Route path="/register" exact component={Patch} />
-        <Redirect to="/" />
+        <Redirect to="/guest" />
       </Switch>
     );
 
@@ -46,7 +46,7 @@ class App extends Component {
     if (isAuthorized) {
       routes = (
         <Switch>
-          <Route exact path="/" component={Homepage} />
+          <Route path="/" exact component={Homepage} />
           <Route path="/account" component={Account} />
           <Route path="/channel" component={Channel} />
           <Route path="/test" component={Test} />
@@ -64,13 +64,15 @@ class App extends Component {
     }
 
     return (
-      <div>
-        <Header />
-        { components }
-        <Main>
-          {routes}
-        </Main>
-      </div>
+      <Router>
+        <div>
+          <Header />
+          {components}
+          <Main>
+            {routes}
+          </Main>
+        </div>
+      </Router>
     );
   }
 }

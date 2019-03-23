@@ -10,6 +10,8 @@ urlpatterns = [
     url(r'^video/', include('video.urls')),
     url(r'^channel/', include('channel.urls')),
     url(r'^comment/', include('comment.urls')),
+    url(r'^views/', include('views.urls')),
+    url(r'^rating/', include('rating.urls')),
 
     url(r'^auth/login/$', obtain_jwt_token),
 ]
