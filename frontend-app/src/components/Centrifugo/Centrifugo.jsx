@@ -1,51 +1,73 @@
 import React, { Component } from 'react';
-
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
-import jwt from 'jsonwebtoken';
+import axios from 'axios';
 import Centrifuge from 'centrifuge';
 
-import { centrifugoInit, activateSubscription, deleteSubscription } from '../../actions/centrifugo';
+import {
+  centrifugoInit as init,
+  activateSubscription as activate,
+  deleteSubscription as remove,
+} from '../../actions/centrifugo';
 
-const SECRET = '09a3bbb7-8b2b-445b-b1f4-7913287a3ea5';
+import { centrifugo, backend } from '../../urls';
 
 class Centrifugo extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userId: 1,
-      centrifuge: new Centrifuge('ws://localhost:80/centrifugo/connection/websocket'),
+      centrifuge: new Centrifuge(`ws://${centrifugo}/connection/websocket`),
     };
   }
 
-  componentDidMount() {
-    const { userId, centrifuge } = this.state;
-    const { centrifugoInit } = this.props;
-    const token = jwt.sign({ sub: '1' }, SECRET, { expiresIn: 86400 });
+  async componentDidMount() {
+    try {
+      const url = `http://${backend}/core/centrifugo/token`;
+      const config = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+        },
+      };
 
-    centrifuge.setToken(token);
-    centrifuge.on('connect', () => {
-      centrifugoInit();
-      console.log('[Centrifuge] Was initialized');
-    });
+      const response = await axios.get(url, config);
+      const token = response.data;
 
-    centrifuge.connect();
+      const { centrifugoInit } = this.props;
+      const { centrifuge } = this.state;
+
+      centrifuge.setToken(token);
+      centrifuge.on('connect', () => {
+        centrifugoInit();
+        console.log('[Centrifugo] Was initialized');
+        this.checkSubscriptions();
+      });
+
+      centrifuge.connect();
+    } catch (error) {
+      console.log(`[Centrifugo] ${error}`);
+    }
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { subscriptions } = nextProps;
-    for (const elem of subscriptions) {
-      if (!elem.isNeeded) {
-        const { channel, subscription } = elem;
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    this.checkSubscriptions();
+  }
+
+  checkSubscriptions() {
+    const { subscriptions, deleteSubscription, activateSubscription } = this.props;
+
+    for (const current of subscriptions) {
+      if (!current.isNeeded) {
+        const { channel, subscription } = current;
         subscription.unsubscribe();
         subscription.removeAllListeners();
-        nextProps.deleteSubscription(channel);
-        console.log(`[Centrifuge] Delete subscription to '${channel}'`);
-      } else if (!elem.isActive) {
-        const { channel, callback } = elem;
+        deleteSubscription(channel);
+        console.log(`[Centrifugo] Delete subscription to '${channel}'`);
+      } else if (!current.isActive) {
+        const { channel, callback } = current;
         const subscription = this.subscribeToChannel(channel, callback);
-        nextProps.activateSubscription(channel, subscription);
-        console.log(`[Centrifuge] Activate subscription to '${channel}'`);
+        activateSubscription(channel, subscription);
+        console.log(`[Centrifugo] Activate subscription to '${channel}'`);
       }
     }
   }
@@ -67,10 +89,17 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  centrifugoInit: () => dispatch(centrifugoInit()),
-  activateSubscription: (channel, subscription) => dispatch(activateSubscription(channel, subscription)),
-  deleteSubscription: channel => dispatch(deleteSubscription(channel)),
+  centrifugoInit: () => dispatch(init()),
+  activateSubscription: (channel, subscription) => dispatch(activate(channel, subscription)),
+  deleteSubscription: channel => dispatch(remove(channel)),
 });
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(Centrifugo);
+
+Centrifugo.propTypes = {
+  subscriptions: PropTypes.array.isRequired,
+  centrifugoInit: PropTypes.func.isRequired,
+  activateSubscription: PropTypes.func.isRequired,
+  deleteSubscription: PropTypes.func.isRequired,
+};

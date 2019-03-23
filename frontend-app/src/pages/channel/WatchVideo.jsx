@@ -10,7 +10,8 @@ import { withStyles } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import path from '../../Backend';
+import { backend as path } from '../../urls';
+
 
 import { subscribeToChannel, unsubscribeFromChannel } from '../../actions/centrifugo';
 

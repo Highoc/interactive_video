@@ -78,7 +78,6 @@ JWT_AUTH = {
 
 CORS_ORIGIN_WHITELIST = (
     '192.168.1.187',
-    'frontend-app',
     'localhost:3000'
 )
 

@@ -1,5 +1,6 @@
 import axios from 'axios';
-import path from '../Backend';
+import { backend as path } from '../urls';
+
 import * as actionTypes from './actionTypes';
 
 
@@ -7,9 +8,9 @@ export const loginStart = () => ({
   type: actionTypes.LOGIN_START,
 });
 
-export const loginSuccess = (token, username) => ({
+export const loginSuccess = (token, id, username) => ({
   type: actionTypes.LOGIN_SUCCESS,
-  payload: { token, username },
+  payload: { token, username, id },
 });
 
 export const loginFailed = error => ({
@@ -30,9 +31,8 @@ export const login = (username, password) => (dispatch) => {
   axios.post(`http://${path}/token-auth/`, { username, password })
     .then((result) => {
       const { token, user } = result.data;
-      console.log(result);
       localStorage.setItem('jwt-token', token);
-      dispatch(loginSuccess(token, user.username));
+      dispatch(loginSuccess(token, user.id, user.username));
     })
     .catch((error) => {
       console.log(error);

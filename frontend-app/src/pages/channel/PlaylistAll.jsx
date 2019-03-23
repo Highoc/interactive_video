@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ChannelPlaylistView from '../../components/ChannelPlaylistView';
-import path from '../../Backend';
+import { backend as path } from '../../urls';
+
 import axios from 'axios';
 
 const styles = {
