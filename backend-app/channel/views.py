@@ -281,3 +281,51 @@ class ChannelListView(APIView):
         } for channel in channels]
 
         return Response(response, status.HTTP_200_OK)
+
+
+class ChannelSubscribersListView(APIView):
+    def get(self, request, channel_key):
+        channels = Channel.objects.filter(key=channel_key, status=Channel.AVAILABLE)
+        if not channels:
+            return Response('Channel doesn\'t exist.', status=status.HTTP_404_NOT_FOUND)
+
+        channel = channels[0]
+
+        subscribers = {
+            'count': channel.subscribers.count(),
+        }
+
+        if channel.owner == request.user:
+            subscribers['list'] = [{
+                'username': subscriber.username,
+            } for subscriber in channel.subscribers.all()]
+
+        return Response(subscribers, status=status.HTTP_200_OK)
+
+
+class ChannelSubscribeView(APIView):
+    def post(self, request, channel_key):
+        channels = Channel.objects.filter(key=channel_key, status=Channel.AVAILABLE)
+        if not channels:
+            return Response('Channel doesn\'t exist.', status=status.HTTP_404_NOT_FOUND)
+
+        channel = channels[0]
+
+        if not channel.subscribers.filter(id=request.user.id):
+            channel.subscribers.add(request.user)
+
+        return Response({ 'status': 'subscription is activated' }, status=status.HTTP_200_OK)
+
+
+class ChannelUnsubscribeView(APIView):
+    def post(self, request, channel_key):
+        channels = Channel.objects.filter(key=channel_key, status=Channel.AVAILABLE)
+        if not channels:
+            return Response('Channel doesn\'t exist.', status=status.HTTP_404_NOT_FOUND)
+
+        channel = channels[0]
+
+        if channel.subscribers.filter(id=request.user.id):
+            channel.subscribers.remove(request.user)
+
+        return Response({'status': 'subscription is deactivated'}, status=status.HTTP_200_OK)

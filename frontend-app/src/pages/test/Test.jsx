@@ -7,34 +7,27 @@ export class Test extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleSubmit() {
-    const data = {
-      name: 'Azazaza',
-      description: 'Zazazaza',
-      main: {
-        text: '1',
-        source_key: '8e29fd3593194b479eed083fc994dfa0',
-        children: [{
-          text: '2',
-          source_key: '8e29fd3593194b479eed083fc994dfa0',
-          children: [{
-            text: '4',
-            source_key: '8e29fd3593194b479eed083fc994dfa0',
-          }, {
-            text: '5',
-            source_key: '8e29fd3593194b479eed083fc994dfa0',
-          }],
-        }, {
-          text: '3',
-          source_key: '8e29fd3593194b479eed083fc994dfa0',
-        }],
-      },
-    };
+  handleSubmit(event) {
 
-    console.log(data);
+    const form = document.forms.test;
+    const formData = new FormData(form);
 
     axios.post(
-      'http://localhost:8000/video/upload/', data,
+      'http://localhost:8000/core/user/sign_up/', formData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+      .then(result => console.log(result.data))
+      .catch(error => console.log(JSON.stringify(error)));
+    event.preventDefault();
+  }
+
+  handleSubmit1() {
+    axios.post(
+      'http://localhost:8000/channel/adminadmin00/subscribe/', {},
       {
         headers: {
           Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
@@ -43,14 +36,34 @@ export class Test extends Component {
       },
     )
       .then(result => console.log(result.data))
-      .catch(error => console.log(error));
+      .catch(error => console.log(JSON.stringify(error)));
   }
 
+  handleSubmit2() {
+    axios.post(
+      'http://localhost:8000/channel/adminadmin00/unsubscribe/', {},
+      {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+      .then(result => console.log(result.data))
+      .catch(error => console.log(JSON.stringify(error)));
+  }
 
   render() {
     return (
       <div>
-        <button onClick={this.handleSubmit}>ШЛИ!</button>
+        <form name="test">
+          <input name="username" type="text" />
+          <input name="password1" type="password" />
+          <input name="password2" type="password" />
+          <button onClick={this.handleSubmit}>ШЛИ!</button>
+        </form>
+        <button onClick={() => this.handleSubmit1()}>Activate</button>
+        <button onClick={() => this.handleSubmit2()}>Deactivate</button>
       </div>
     );
   }

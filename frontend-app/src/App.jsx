@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import {
-  BrowserRouter as Router, Switch, Route, Redirect
+  BrowserRouter as Router, Switch, Route, Redirect, Link,
 } from 'react-router-dom';
 
 import Header from './components/Header';
@@ -36,6 +36,7 @@ class App extends Component {
         <Route path="/guest" exact component={Guest} />
         <Route path="/login" exact component={Patch} />
         <Route path="/register" exact component={Patch} />
+        <Route path="/test" component={Test} />
         <Redirect to="/guest" />
       </Switch>
     );
@@ -71,6 +72,7 @@ class App extends Component {
           <Main>
             {routes}
           </Main>
+          <Link to="/test">Test</Link>
         </div>
       </Router>
     );

@@ -9,6 +9,9 @@ from .serializers import SourceSerializer, VideoPartSerializer, VideoSerializer
 from .models import Source, VideoPart, Video
 from .helpers.video import is_supported_mime_type, get_file_url, get_mime_type, get_codec, get_duration, get_short_key
 
+from rating.models import Rating
+from views.models import Views
+
 import io, tempfile
 
 class SourceUploadView(APIView):
@@ -139,6 +142,9 @@ class VideoUploadView(APIView):
             video.head_video_part = head
             video.codec = head.source.codec
             video.save()
+
+            Views(video=video).save()
+            Rating(video=video).save()
 
             '''
             for all sources

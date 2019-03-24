@@ -2,6 +2,10 @@ from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 from django.contrib.auth.models import User
 
+from .models import Profile
+
+import re
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,9 +14,23 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserSerializerWithToken(serializers.ModelSerializer):
-
     token = serializers.SerializerMethodField()
-    password = serializers.CharField(write_only=True)
+    password1 = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
+
+    def validate_username(self, value):
+        if not re.search(r'^\w+$', value):
+            raise serializers.ValidationError('Username can only contain alphanumeric characters and the underscore.')
+        if User.objects.filter(username=value):
+            raise serializers.ValidationError('Username is already taken.')
+        return value
+
+    def validate(self, data):
+        password1 = data.get('password1')
+        password2 = data.get('password2')
+        if password1 != password2:
+            raise serializers.ValidationError('Passwords do not match.')
+        return data
 
     def get_token(self, obj):
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -23,13 +41,20 @@ class UserSerializerWithToken(serializers.ModelSerializer):
         return token
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None)
+        password1 = validated_data.pop('password1', None)
+        validated_data.pop('password2', None)
         instance = self.Meta.model(**validated_data)
-        if password is not None:
-            instance.set_password(password)
+        if password1 is not None:
+            instance.set_password(password1)
         instance.save()
         return instance
 
     class Meta:
         model = User
-        fields = ('token', 'username', 'password')
+        fields = ('token', 'username', 'password1', 'password2')
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = Profile
+        fields = ('avatar', )
