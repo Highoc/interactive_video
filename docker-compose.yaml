@@ -1,0 +1,66 @@
+version: '3.3'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - .db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: dev_root_pass
+      MYSQL_DATABASE: interactive_video
+      MYSQL_USER: django
+      MYSQL_PASSWORD: 2346785Das_
+
+  backend-app:
+    depends_on: [ db ]
+    container_name: backend
+    build:
+      context: ./backend-app
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    restart: always
+    volumes:
+      - ./backend-app:/app
+    ports:
+      - 8000:8000
+    environment:
+      DB_NAME: interactive_video
+      DB_HOST: db
+      DB_USER: django
+      DB_PASSWORD: 2346785Das_
+
+      AWS_S3_ENDPOINT_URL: http://hb.bizmrg.com/
+      AWS_STORAGE_BUCKET_NAME: interactive_video
+      AWS_ACCESS_KEY: quZTPp3V28P7V1SGJRXxvs
+      AWS_SECRET_KEY: 7arUgwahLMmhHpreUJh9RTkHB7LdD5UNcTjA5VLSP59G
+
+  frontend-app:
+    container_name: frontend
+    depends_on: [ backend-app ]
+    build:
+      context: ./frontend-app
+      dockerfile: Dockerfile
+    command: npm start
+    volumes:
+      - ./frontend-app:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+
+  nginx:
+    depends_on: [ backend-app, frontend-app ]
+    image: nginx
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+    - 80:80
+    expose:
+    - 80
+    links:
+    - backend-app
+    - frontend-app
+

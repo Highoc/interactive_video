@@ -1,9 +1,30 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-
 import axios from 'axios';
+import PropTypes from "prop-types";
+import {withStyles} from "@material-ui/core";
+import ChannelPlaylist from '../../components/ChannelPlaylist';
 
-export class ChannelView extends Component {
+import ChannelHead from '../../components/ChannelHead';
+import path from '../../Backend';
+
+const styles = theme => ({
+  root: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    overflow: 'hidden',
+    backgroundColor: theme.palette.background.paper,
+  },
+  gridList: {
+    width: '100%',
+    height: '100%',
+    // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
+    transform: 'translateZ(0)',
+  },
+});
+
+
+class ChannelView extends Component {
   constructor(props) {
     super(props);
 
@@ -18,8 +39,8 @@ export class ChannelView extends Component {
 
   componentDidMount() {
     const { channelKey } = this.state;
-    console.log(channelKey);
-    const url = `http://192.168.1.205:8000/channel/get/${channelKey}/`;
+
+    const url = `http://${path}/channel/get/${channelKey}/`;
     const config = {
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
@@ -36,6 +57,7 @@ export class ChannelView extends Component {
 
   render() {
     const { isLoaded } = this.state;
+    const { classes } = this.props;
     if (!isLoaded) {
       return <div> Еще не загружено </div>;
     }
@@ -44,23 +66,16 @@ export class ChannelView extends Component {
     * */
     const { channel, channelKey } = this.state;
     return (
-      <div>
-        <h4> Название канала: { channel.name } </h4>
-        <h4> Описание канала: { channel.description } </h4>
-        <h4> Автор канала: { channel.owner.username } </h4>
-        <h4> Канал создан: { channel.created } </h4>
-        <h4><Link to={`${channelKey}/playlist/all`}> Посмотреть все плейлисты </Link></h4>
-        <hr />
-        <h4> Загруженные видео: </h4>
-        { channel.uploaded_playlist.video.map(video => (
-          <div key={video.key}>
-            <h4> Название видео: { video.name } </h4>
-            <Link to={`/channel/${channelKey}/watch/${video.key}`}>
-              <img style={{ height: '150px' }} src={video.preview_url} />
-            </Link>
-          </div>
-        )) }
+      <div className={classes.root}>
+        <ChannelHead channel={channel} channelKey={channelKey} />
+        <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
       </div>
     );
   }
 }
+
+ChannelView.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(ChannelView);

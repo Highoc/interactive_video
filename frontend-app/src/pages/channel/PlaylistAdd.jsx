@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
 import Fab from '@material-ui/core/Fab';
 import NavigationIcon from '@material-ui/icons/Navigation';
+import { Redirect } from 'react-router-dom';
 import Input from '../../components/Input/Input';
 import path from '../../Backend';
 
@@ -19,58 +20,46 @@ const styles = theme => ({
 });
 
 
-class CreateChannel extends Component {
+class PlaylistAdd extends Component {
   constructor(props) {
     super(props);
+    const { channelKey } = props.match.params;
     this.state = {
-      isLoaded: false,
       isValid: false,
-      inputs: [
-        {
-          type: 'text',
-          name: 'name',
-          value: '',
-          description: 'Название канала',
-          rules: {
-            max_length: 64,
-            required: true,
-          },
-        },
-        {
-          type: 'textarea',
-          name: 'description',
-          value: '',
-          description: 'Описание канала',
-          rules: {
-            max_length: 4096,
-            required: false,
-          },
-        }],
+      inputs: [],
+      channelKey,
+      isSent: false,
     };
   }
 
-  componentDidMount() {
-    const url = `http://${path}/channel/update/`;
-    /*
+  async componentDidMount() {
+    const { channelKey } = this.state;
+
+    const url = `http://${path}/channel/${channelKey}/playlist/create/`;
     const config = {
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
       },
     };
 
-    axios.get(url, config).then(
-      (result) => {
-        console.log(result.data);
-        this.setState({ inputs: result.data, isLoaded: true });
-      },
-    ).catch((error) => {
+    try {
+      const result = await axios.get(url, config);
+      console.log(result.data);
+      this.setState({ inputs: result.data, isLoaded: true });
+    } catch (error) {
       console.log(error);
-    });*/
+    }
   }
 
-
-  submitHandler(event) {
+  getData() {
     const { inputs } = this.state;
+    const result = {};
+    inputs.map((input) => { result[input.name] = input.value; return 0; });
+    return result;
+  }
+
+  async submitHandler() {
+    const { inputs, channelKey } = this.state;
     let isValid = true;
     for (const key in inputs) {
       isValid = isValid && inputs[key].isValid;
@@ -78,12 +67,27 @@ class CreateChannel extends Component {
 
     if (isValid) {
       console.log('Отправить можно');
-    }
-    else {
+      try {
+        const url = `http://${path}/channel/${channelKey}/playlist/create/`;
+        const data = this.getData();
+        const configs = {
+          headers: {
+            Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+            'Content-Type': 'application/json',
+          },
+        };
+
+        const result = await axios.post(url, data, configs);
+
+        console.log(result);
+        this.setState({ isSent: true });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
       console.log('Invalid input');
     }
-    event.preventDefault();
-  };
+  }
 
   callbackInput(state) {
     const { inputs } = this.state;
@@ -94,12 +98,15 @@ class CreateChannel extends Component {
   }
 
   render() {
-    const { inputs, isLoaded } = this.state;
+    const { inputs, isSent, channelKey } = this.state;
     const { classes } = this.props;
-    let status = <div>Загружается</div>;
-    if (isLoaded) {
-      status = <div>Загрузилось</div>;
+
+    const status = <div>Не отправлено</div>;
+
+    if (isSent) {
+      return <Redirect to={`/channel/${channelKey}/playlist/all`} />;
     }
+
     const Inputs = Object.keys(inputs).map((key) => {
       const inputElement = inputs[key];
       return (
@@ -118,7 +125,7 @@ class CreateChannel extends Component {
     return (
       <div>
         <form>
-          <h2>Создание канала</h2>
+          <h2>Создание плейлиста</h2>
           {Inputs}
           <Fab
             variant="extended"
@@ -126,7 +133,7 @@ class CreateChannel extends Component {
             aria-label="Add"
             className={classes.margin}
             style={styles.button}
-            onClick={event => this.submitHandler(event)}
+            onClick={(event) => { event.preventDefault(); this.submitHandler(); }}
           >
             <NavigationIcon className={classes.extendedIcon} />
             Создать
@@ -138,10 +145,8 @@ class CreateChannel extends Component {
   }
 }
 
-CreateChannel.propTypes = {
+PlaylistAdd.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(CreateChannel);
-
-
+export default withStyles(styles)(PlaylistAdd);

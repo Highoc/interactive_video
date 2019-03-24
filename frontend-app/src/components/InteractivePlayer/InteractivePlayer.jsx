@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import 'video-react/dist/video-react.css';
 import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import ButtonBase from '@material-ui/core/ButtonBase';
+import Typography from '@material-ui/core/Typography';
 
 import {
   Player,
@@ -13,6 +16,8 @@ import {
   TimeDivider,
   BigPlayButton,
 } from 'video-react';
+import path from '../../Backend';
+
 
 const propTypes = {
   player: PropTypes.object,
@@ -22,13 +27,22 @@ const propTypes = {
 const videoStyles = {
   position: 'relative',
   maxhight: '560',
-  paddingBottom: '56.25%',
   overflow: 'hidden',
 };
 const buttonStyles = {
   position: 'absolute',
-  bottom: '25%',
-  left: '40%',
+  zIndex: '10',
+  top: '70%',
+  width: '100%',
+  height: '20%',
+  marginRight: '10%',
+};
+const oneBlock = {
+  width: '40%',
+  height: '100%',
+  float: 'left',
+  backgroundImage: 'url(https://ak8.picdn.net/shutterstock/videos/871678/thumb/1.jpg)',
+  marginLeft: '5%',
 };
 
 const styles = theme => ({
@@ -39,10 +53,13 @@ const styles = theme => ({
   input: {
     display: 'none',
   },
-
+  focusVisible: {},
+  textContainer: {
+    justifyContent: 'center',
+  },
 });
 
-export class InteractivePlayer extends Component {
+class InteractivePlayer extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -69,7 +86,7 @@ export class InteractivePlayer extends Component {
     const { videoQueue, timeResolver } = this.state;
     this.setState({ url: videoQueue.addMediaSource(mimeCodec) });
 
-    const url = `http://192.168.1.205:8000/video/part/get/${main}/`;
+    const url = `http://${path}/video/part/get/${main}/`;
     const config = {
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
@@ -87,6 +104,7 @@ export class InteractivePlayer extends Component {
           responseType: 'arraybuffer',
         }).then(
           (responseSource) => {
+            console.log(responseSource.data);
             videoQueue.pushSource(main, responseSource.data, response.data.time);
             timeResolver.pushTimeSource(main, response.data.time);
 
@@ -142,10 +160,9 @@ export class InteractivePlayer extends Component {
       videoQueue.pushKey(childKey);
       timeResolver.pushTimeKey(childKey);
 
-      const url = `http://192.168.1.205:8000/video/part/get/${childKey}/`;
+      const url = `http://${path}/video/part/get/${childKey}/`;
       axios.get(url, config).then(
         (response) => {
-          console.log(response.data);
 
           const { questions } = this.state;
           const { key, text } = response.data;
@@ -197,16 +214,30 @@ export class InteractivePlayer extends Component {
     const {
       url, currentTime, timeFrame, questions,
     } = this.state;
+    const { classes } = this.props;
 
     let buttons = <div />;
     const d = timeFrame.end - currentTime;
     if (d > 0 && d < 5) {
       buttons = (
-        <div>
+        <div style={buttonStyles}>
           {questions.map(elem => (
-            <button type="submit" key={elem.key} onClick={() => this.handleAnswer(elem.key)}>
-              {elem.text}
-            </button>
+            <ButtonBase
+              focusRipple
+              focusVisibleClassName={classes.focusVisible}
+              key={elem.key}
+              onClick={() => this.handleAnswer(elem.key)}
+              style={oneBlock}
+            >
+              <Typography
+                component="span"
+                variant="subtitle1"
+                color="primary"
+                className={classes.textContainer}
+              >
+                {elem.text}
+              </Typography>
+            </ButtonBase>
           ))}
         </div>
       );
@@ -215,7 +246,7 @@ export class InteractivePlayer extends Component {
     return (
       <div style={videoStyles}>
         {buttons}
-        <Player ref="player" src={url} fluid={false}>
+        <Player ref="player" src={url} fluid={true}>
           <BigPlayButton position="center" />
           <ControlBar autoHide>
             <ReplayControl seconds={10} order={1.1} />
@@ -229,6 +260,12 @@ export class InteractivePlayer extends Component {
     );
   }
 }
+
+InteractivePlayer.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(InteractivePlayer);
 
 class AppendQueue {
   constructor() {

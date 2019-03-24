@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import 'react-tree-graph/dist/style.css';
 
 import Tree from 'react-d3-tree';
-import axios from "axios";
+import axios from 'axios';
 
 import clone from 'clone';
-
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
@@ -15,11 +14,28 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Input from '../../components/Input/Input';
+import path from '../../Backend';
+import Fab from '@material-ui/core/Fab';
+import NavigationIcon from '@material-ui/icons/Navigation';
+import PropTypes from "prop-types";
+import { withStyles } from '@material-ui/core/styles';
+import classNames from 'classnames';
 
-const styles = {
-  width: '65%',
-  height: '700px',
-};
+
+const styles = theme => ({
+  margin: {
+    margin: theme.spacing.unit,
+  },
+  extendedIcon: {
+    marginRight: theme.spacing.unit,
+  },
+  container: {
+    width: '65%',
+    height: '700px',
+  },
+});
+
 
 const activeSvgShape = {
   shape: 'circle',
@@ -27,7 +43,7 @@ const activeSvgShape = {
     r: 10,
     fill: 'green',
   },
-  transitionDuration: 500,
+  transitionDuration: 0,
 };
 
 const deactiveSvgShape = {
@@ -42,10 +58,9 @@ const deactiveSvgShape = {
 class NodeImage extends Component {
   render() {
     const { nodeData } = this.props;
-    console.log(this.props);
     return (
       <div>
-        <img src="https://www.fraud-magazine.com/uploadedImages/Fraud_Magazine/Content/Contact/joseph-dervaes-50x50.jpg" alt="error" />
+
         <div>
           {nodeData.name}
         </div>
@@ -58,25 +73,46 @@ class CreateVideo extends Component {
   constructor(props) {
     super(props);
 
-
     this.state = {
       sources: [],
       tree: new TreeData(),
       nodeChosen: null,
       dialogOpen: false,
+      uploadStatus: false,
+      videoKey: '',
       inputData: {
         text: '',
         sourceKey: '',
       },
-      uploadStatus: false,
-      videoKey: 'creating',
+      isValid: false,
+      inputs: [
+        {
+          type: 'text',
+          name: 'name',
+          value: '',
+          description: 'Название видео',
+          rules: {
+            max_length: 64,
+            required: true,
+          },
+        },
+        {
+          type: 'textarea',
+          name: 'description',
+          value: '',
+          description: 'Описание видео',
+          rules: {
+            max_length: 4096,
+            required: false,
+          },
+        }],
     };
 
     this.uploadVideo = this.uploadVideo.bind(this);
   }
 
   componentDidMount() {
-    const url = 'http://192.168.1.205:8000/video/source/list/';
+    const url = `http://${path}/video/source/list/`;
 
     const config = {
       headers: {
@@ -130,8 +166,8 @@ class CreateVideo extends Component {
 
   getVideoData() {
     return {
-      name: document.getElementById('name').value,
-      description: document.getElementById('description').value,
+      name: this.state.inputs.find(elem => elem.name === 'name'),
+      description: this.state.inputs.find(elem => elem.name === 'description'),
       main: this.getVideoPart(this.state.tree),
     };
   }
@@ -154,36 +190,73 @@ class CreateVideo extends Component {
     return obj;
   }
 
-  uploadVideo() {
-    axios.post(
-      'http://192.168.1.205:8000/video/upload/', this.getVideoData(),
-      {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-          'Content-Type': 'application/json',
+  callbackInput(state) {
+    const { inputs } = this.state;
+    const input = inputs.find(elem => elem.name === state.name);
+    input.value = state.value;
+    input.isValid = state.isValid;
+    this.setState({ inputs });
+  }
+
+  uploadVideo(event) {
+    const { inputs } = this.state;
+    let isValid = true;
+    for (const key in inputs) {
+      isValid = isValid && inputs[key].isValid;
+    }
+
+    if (isValid) {
+      console.log('Отправить можно');
+      axios.post(
+        `http://${path}/video/upload/`, this.getVideoData(),
+        {
+          headers: {
+            Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+            'Content-Type': 'application/json',
+          },
         },
-      },
-    )
-      .then((result) => {
-        this.setState({ videoKey: result.data.key });
-      })
-      .catch((error) => {
-        this.setState({ videoKey: 'error' });
-      });
+      )
+        .then((result) => {
+          this.setState({ videoKey: result.data.key });
+        })
+        .catch((error) => {
+          this.setState({ videoKey: 'error' });
+        });
+    } else {
+      console.log('Invalid input');
+    }
+    event.preventDefault();
   }
 
   render() {
     const {
-      sources, tree, dialogOpen, inputData, nodeChosen,
+      sources, tree, dialogOpen, inputData, nodeChosen, inputs, isLoaded,
     } = this.state;
+    const { classes } = this.props;
+    const Inputs = Object.keys(inputs).map((key) => {
+      const inputElement = inputs[key];
+      return (
+        <Input
+          key={key}
+          type={inputElement.type}
+          name={inputElement.name}
+          description={inputElement.description}
+          value={inputElement.value}
+          rules={inputElement.rules}
+          callback={state => this.callbackInput(state)}
+        />
+      );
+    });
+
     return (
-      <div styles={styles}>
+      <div styles={styles.container}>
         <div id="treeWrapper" style={{ width: '1000px', height: '500px' }}>
 
           <Tree
             data={tree.getTreeData()}
             translate={{ x: 20, y: 225 }}
-            zoomable
+            collapsible={false}
+            zoomable={false}
             allowForeignObjects
             nodeSvgShape={deactiveSvgShape}
             nodeLabelComponent={{
@@ -193,17 +266,16 @@ class CreateVideo extends Component {
                 x: -25,
               },
             }}
-            collapsible={false}
             onClick={(nodeData, event) => this.handleClick(nodeData.key)}
           />
 
         </div>
-        <button onClick={() => { tree.addChildNode(nodeChosen); this.setState({ nodeChosen }); }}>Add Child</button>
-        <button onClick={() => { tree.removeNode(nodeChosen); this.setState({ nodeChosen: null }); }}>Remove Node</button>
-        <span>
-          {' '}
-          {this.state.videoKey}
-        </span>
+        <Button variant="contained" color="primary" className={classes.button} onClick={() => { tree.addChildNode(nodeChosen); this.setState({ nodeChosen }); }}>
+          Add Child
+        </Button>
+        <Button variant="contained" color="primary" className={classes.button} onClick={() => { tree.removeNode(nodeChosen); this.setState({ nodeChosen: null }); }}>
+          Remove Child
+        </Button>
         <Dialog
           onClose={this.handleClose}
           open={dialogOpen}
@@ -244,31 +316,31 @@ class CreateVideo extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        <TextField
-          autoFocus
-          label="Название видео"
-          margin="dense"
-          id="name"
-          type="text"
-          fullWidth
-        />
-        <TextField
-          autoFocus
-          label="Описание к видео"
-          margin="dense"
-          id="description"
-          type="text"
-          fullWidth
-        />
-        <button onClick={this.uploadVideo}>Сохранить</button>
+
+        <h2>Создание видео {' '} {this.state.videoKey}</h2>
+        {Inputs}
+
+        <Fab
+          variant="extended"
+          color="primary"
+          aria-label="Add"
+          className={classes.margin}
+          style={styles.button}
+          onClick={event => this.uploadVideo(event)}
+        >
+          <NavigationIcon className={classes.extendedIcon} />
+          Отправить
+        </Fab>
       </div>
     );
   }
 }
 
+CreateVideo.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
 
-export default CreateVideo;
-
+export default withStyles(styles)(CreateVideo);
 
 class TreeData {
   constructor() {

@@ -9,12 +9,12 @@ import MenuRight from './components/MenuRight';
 import { Main } from './components/Main';
 
 import { Guest } from './pages/guest';
-import { Homepage } from './pages/homepage';
+import Homepage from './pages/homepage/Homepage';
 import { Account } from './pages/account';
 import { Channel } from './pages/channel';
 
 // import { VideoPlayer } from './pages/test';
-import { Test } from './pages/test';
+import Login from './pages/login/SignIn';
 
 class App extends Component {
   render() {
@@ -29,7 +29,7 @@ class App extends Component {
             <Route exact path="/guest" component={Guest} />
             <Route path="/account" component={Account} />
             <Route path="/channel" component={Channel} />
-            <Route path="/test" component={Test} />
+            <Route path="/login" component={Login} />
           </Switch>
         </Main>
       </div>

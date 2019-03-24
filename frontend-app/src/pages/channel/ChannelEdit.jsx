@@ -19,7 +19,7 @@ const styles = theme => ({
 });
 
 
-class CreateChannel extends Component {
+class ChannelEdit extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -29,7 +29,7 @@ class CreateChannel extends Component {
         {
           type: 'text',
           name: 'name',
-          value: '',
+          value: 'something',
           description: 'Название канала',
           rules: {
             max_length: 64,
@@ -39,7 +39,7 @@ class CreateChannel extends Component {
         {
           type: 'textarea',
           name: 'description',
-          value: '',
+          value: 'something',
           description: 'Описание канала',
           rules: {
             max_length: 4096,
@@ -69,7 +69,7 @@ class CreateChannel extends Component {
   }
 
 
-  submitHandler(event) {
+  submitHandlerChange(event) {
     const { inputs } = this.state;
     let isValid = true;
     for (const key in inputs) {
@@ -82,6 +82,11 @@ class CreateChannel extends Component {
     else {
       console.log('Invalid input');
     }
+    event.preventDefault();
+  };
+
+  submitHandlerDelete(event) {
+    console.log('Удаляю');
     event.preventDefault();
   };
 
@@ -118,7 +123,7 @@ class CreateChannel extends Component {
     return (
       <div>
         <form>
-          <h2>Создание канала</h2>
+          <h2>Настройки канала</h2>
           {Inputs}
           <Fab
             variant="extended"
@@ -126,10 +131,21 @@ class CreateChannel extends Component {
             aria-label="Add"
             className={classes.margin}
             style={styles.button}
-            onClick={event => this.submitHandler(event)}
+            onClick={event => this.submitHandlerChange(event)}
           >
             <NavigationIcon className={classes.extendedIcon} />
-            Создать
+            Изменить
+          </Fab>
+          <Fab
+            variant="extended"
+            color="primary"
+            aria-label="Add"
+            className={classes.margin}
+            style={styles.button}
+            onClick={event => this.submitHandlerDelete(event)}
+          >
+            <NavigationIcon className={classes.extendedIcon} />
+            Удалить канал
           </Fab>
         </form>
         {status}
@@ -138,10 +154,10 @@ class CreateChannel extends Component {
   }
 }
 
-CreateChannel.propTypes = {
+ChannelEdit.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(CreateChannel);
+export default withStyles(styles)(ChannelEdit);
 
 
