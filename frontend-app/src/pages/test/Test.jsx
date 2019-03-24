@@ -7,51 +7,33 @@ export class Test extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleSubmit() {
-    const data = {
-      name: 'Azazaza',
-      description: 'Zazazaza',
-      main: {
-        text: '1',
-        source_key: '8e29fd3593194b479eed083fc994dfa0',
-        children: [{
-          text: '2',
-          source_key: '8e29fd3593194b479eed083fc994dfa0',
-          children: [{
-            text: '4',
-            source_key: '8e29fd3593194b479eed083fc994dfa0',
-          }, {
-            text: '5',
-            source_key: '8e29fd3593194b479eed083fc994dfa0',
-          }],
-        }, {
-          text: '3',
-          source_key: '8e29fd3593194b479eed083fc994dfa0',
-        }],
-      },
-    };
+  handleSubmit(event) {
 
-    console.log(data);
+    const form = document.forms.test;
+    const formData = new FormData(form);
 
     axios.post(
-      'http://localhost:8000/video/upload/', data,
+      'http://localhost:8000/core/user/sign_up/', formData,
       {
         headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
           'Content-Type': 'application/json',
         },
       },
     )
       .then(result => console.log(result.data))
-      .catch(error => console.log(error));
+      .catch(error => console.log(JSON.stringify(error)));
+    event.preventDefault();
   }
 
 
   render() {
     return (
-      <div>
+      <form name="test">
+        <input name="username" type="text" />
+        <input name="password1" type="password" />
+        <input name="password2" type="password" />
         <button onClick={this.handleSubmit}>ШЛИ!</button>
-      </div>
+      </form>
     );
   }
 }

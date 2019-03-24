@@ -8,7 +8,7 @@ from .helpers import get_avatar_url
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
 
-    readonly_fields = [..., "preview_avatar"]
+    readonly_fields = ["preview_avatar"]
 
     def preview_avatar(self, obj):
         return mark_safe('<img src="{url}" width="{width}" height={height} />'.format(
@@ -16,4 +16,4 @@ class ProfileAdmin(admin.ModelAdmin):
             width=obj.avatar.width,
             height=obj.avatar.height,
             )
-    )
+        )

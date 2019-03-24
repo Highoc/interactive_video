@@ -7,6 +7,9 @@ def convert_to_byte_length(MB=0, KB=0):
 
 
 def get_avatar_url(key):
+    if key is None:
+        return ''
+
     session = boto3.session.Session()
     s3_client = session.client(
         service_name='s3',
@@ -19,8 +22,21 @@ def get_avatar_url(key):
         'get_object',
         Params={
             'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
-            'Key': f'profile_avatars/{key}',
+            'Key': f'profile_avatars/{key.hex}',
         }
     )
 
     return url
+
+
+def check_avatar_size(size):
+    return size <= convert_to_byte_length(MB=10)
+
+
+SUPPORTED_MIME_TYPES = [
+    'image/png'
+]
+
+
+def check_avatar_mime_type(mime_type):
+    return mime_type in SUPPORTED_MIME_TYPES

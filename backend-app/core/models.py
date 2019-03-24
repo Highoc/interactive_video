@@ -1,7 +1,5 @@
 from django.db import models
 
-from .helpers import convert_to_byte_length
-
 import uuid
 
 
@@ -25,13 +23,13 @@ class Profile(models.Model):
         upload_to='profile_avatars',
         null=True,
         verbose_name='Аватар пользователя',
-        max_length=convert_to_byte_length(MB=10)
+        max_length=64
     )
 
     class Meta:
         verbose_name = 'Профиль пользователя'
         verbose_name_plural = 'Профили пользователей'
-        ordering = ('user', )
+        ordering = ('id', )
 
     def __unicode__(self):
         return self.user.username
