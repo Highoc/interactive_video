@@ -7,7 +7,8 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import ChannelPlaylist from '../../components/ChannelPlaylist';
-import path from '../../Backend';
+import { backend as path } from '../../urls';
+
 
 const styles = theme => ({
   titleBar: {

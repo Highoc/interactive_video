@@ -2,10 +2,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import ChannelSerializer
+from .serializers import ChannelSerializer, PlaylistSerializer
 from .models import Channel, Playlist
 
 from video.helpers.video import get_short_key
+
 
 class ChannelUpdateView(APIView):
 
@@ -144,6 +145,98 @@ class PlaylistAllView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 
+def get_playlist_form(playlist=None):
+    name = ""
+    description = ""
+
+    if playlist:
+        name = playlist.name
+        description = playlist.description
+
+    forms = [{
+        'type': 'text',
+        'name': 'name',
+        'value': f'{name}',
+        'description': 'Название плейлиста',
+        'rules': {
+            'max_length': 32,
+            'required': True
+        },
+    }, {
+        'type': 'textarea',
+        'name': 'description',
+        'value': f'{description}',
+        'description': 'Описание плейлиста',
+        'rules': {
+            'max_length': 1024,
+            'required': False
+        },
+    }]
+
+    return forms
+
+
+class PlaylistCreateView(APIView):
+    def get(self, request, channel_key):
+        if request.user.channel.key != channel_key:
+            return Response("Wrong channel key.", status=status.HTTP_400_BAD_REQUEST)
+
+        forms = get_playlist_form()
+        return Response(forms, status=status.HTTP_200_OK)
+
+    def post(self, request, channel_key):
+        if request.user.channel.key != channel_key:
+            return Response("Wrong channel key.", status=status.HTTP_400_BAD_REQUEST)
+        serializer = PlaylistSerializer(data=request.data)
+        if serializer.is_valid():
+            playlist = serializer.create()
+            playlist.channel=request.user.channel
+            playlist.save()
+
+            playlist.key=get_short_key(playlist.id)
+            playlist.save()
+
+            return Response({'key': playlist.key}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PlaylistUpdateView(APIView):
+    def get(self, request, channel_key, playlist_key):
+        if request.user.channel.key != channel_key:
+            return Response("Wrong channel key.", status=status.HTTP_400_BAD_REQUEST)
+
+        playlists = request.user.channel.playlists.filter(key=playlist_key)
+        if not playlists:
+            return Response("Wrong playlist key.", status=status.HTTP_400_BAD_REQUEST)
+
+        forms = get_playlist_form(playlists[0])
+        return Response(forms, status=status.HTTP_200_OK)
+
+    def post(self, request, channel_key, playlist_key):
+        if request.user.channel.key != channel_key:
+            return Response("Wrong channel key.", status=status.HTTP_400_BAD_REQUEST)
+
+        playlists = request.user.channel.playlists.filter(key=playlist_key)
+        if not playlists:
+            return Response("Wrong playlist key.", status=status.HTTP_400_BAD_REQUEST)
+
+        playlist = playlists[0]
+
+        serializer = PlaylistSerializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.validated_data
+
+            playlist.name = data['name']
+            playlist.description = data['description']
+            playlist.save()
+
+            return Response({'key': playlist.key}, status=status.HTTP_200_OK)
+
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class PlaylistGetView(APIView):
     def get(self, request, channel_key, playlist_key):
 
@@ -176,6 +269,7 @@ class PlaylistGetView(APIView):
         }
 
         return Response(response, status=status.HTTP_200_OK)
+
 
 class ChannelListView(APIView):
     def get(self, request):

@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import 'video-react/dist/video-react.css';
 import PropTypes from 'prop-types';
-import path from '../../Backend';
+import { backend as path } from '../../urls';
+
 
 import {
   Player,

@@ -1,6 +1,8 @@
 from django.conf.urls import url
 
-from .views import ChannelUpdateView, ChannelView, PlaylistAllView, PlaylistGetView, ChannelListView
+from .views import ChannelUpdateView, ChannelView, ChannelListView
+from .views import PlaylistAllView, PlaylistGetView, PlaylistUpdateView, PlaylistCreateView
+from comment.views import CommentCreateView
 
 urlpatterns = [
     url(r'^list/$', ChannelListView.as_view()),
@@ -8,5 +10,8 @@ urlpatterns = [
     url(r'^get/(?P<channel_key>[0-9a-z]{12})/$', ChannelView.as_view()),
 
     url(r'^(?P<channel_key>[0-9a-z]{12})/playlist/all/$', PlaylistAllView.as_view()),
+    url(r'^(?P<channel_key>[0-9a-z]{12})/playlist/create/$', PlaylistCreateView.as_view()),
     url(r'^(?P<channel_key>[0-9a-z]{12})/playlist/(?P<playlist_key>[0-9a-z]{12})/$', PlaylistGetView.as_view()),
+    url(r'^(?P<channel_key>[0-9a-z]{12})/playlist/(?P<playlist_key>[0-9a-z]{12})/update/$', PlaylistUpdateView.as_view()),
+    url(r'^(?P<channel_key>[0-9a-z]{12})/video/(?P<video_key>[0-9a-z]{12})/comment/add/$', CommentCreateView.as_view()),
 ]

@@ -67,7 +67,8 @@ class Playlist(models.Model):
 
     description = models.TextField(
         max_length=1024,
-        default="",
+        blank=True,
+        default='',
         verbose_name='Описание плeйлиста'
     )
 

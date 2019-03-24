@@ -47,7 +47,9 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'video.apps.VideoConfig',
     'channel.apps.ChannelConfig',
-    'comment.apps.CommentConfig'
+    'comment.apps.CommentConfig',
+    'rating.apps.RatingConfig',
+    'views.apps.ViewsConfig'
 ]
 
 MIDDLEWARE = [
@@ -72,13 +74,14 @@ REST_FRAMEWORK = {
     ),
 }
 
+import datetime
 JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=14),
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'application.utils.my_jwt_response_handler'
 }
 
 CORS_ORIGIN_WHITELIST = (
     '192.168.1.187',
-    'frontend-app',
     'localhost:3000'
 )
 

@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { BrowserRouter } from 'react-router-dom';
-
 import {
   createStore, compose, applyMiddleware, combineReducers,
 } from 'redux';
@@ -12,6 +10,7 @@ import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 
 import authorizationReducer from './reducers/authorization';
+import centrifugoReducer from './reducers/centrifugo';
 
 import './index.css';
 import App from './App';
@@ -19,6 +18,7 @@ import * as serviceWorker from './serviceWorker';
 
 const rootReducer = combineReducers({
   authorization: authorizationReducer,
+  centrifugo: centrifugoReducer,
 });
 
 /* eslint-disable no-underscore-dangle */
@@ -32,9 +32,7 @@ const store = createStore(
 
 ReactDOM.render((
   <Provider store={store}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <App />
   </Provider>
 ), document.getElementById('root'));
 

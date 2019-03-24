@@ -34,13 +34,14 @@ class MenuRight extends Component {
         <div style={buttonContainer}>
           <Button variant="contained" color="primary" className={classes.button} component={MyChannel}>
             My channel
-            <HomeIcon fontSize="large"/>
+            <HomeIcon fontSize="large" />
           </Button>
         </div>
+
         <div style={buttonContainer}>
           <Button variant="contained" color="primary" className={classes.button} component={CreateVideo}>
             Create Video
-            <VideoCamera fontSize="large"/>
+            <VideoCamera fontSize="large" />
           </Button>
         </div>
 

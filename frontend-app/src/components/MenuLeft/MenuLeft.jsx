@@ -13,7 +13,7 @@ import ChannelList from '../ChannelList';
 import Drawer from '@material-ui/core/Drawer';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import path from '../../Backend';
+import { backend as path } from '../../urls';
 
 const drawerWidth = 240;
 
