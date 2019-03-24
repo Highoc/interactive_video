@@ -11,6 +11,7 @@ class Views(models.Model):
     )
 
     counter = models.PositiveIntegerField(
+        default=0,
         verbose_name='Счетчик просмотров'
     )
 

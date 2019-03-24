@@ -1,6 +1,5 @@
 from application import settings
 
-
 import short_url
 
 def get_short_key(id):
