@@ -30,6 +30,14 @@ class UserSignUpView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class UserSubscriptionsList(APIView):
+    def get(self, request):
+        subscriptions = [{
+            'channel_key': channel.key,
+        } for channel in request.user.subscriptions.all()]
+        return Response(subscriptions, status=status.HTTP_200_OK)
+
+
 class CentrifugoTokenView(APIView):
     def get(self, request):
         claims = {

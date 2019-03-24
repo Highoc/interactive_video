@@ -25,15 +25,46 @@ export class Test extends Component {
     event.preventDefault();
   }
 
+  handleSubmit1() {
+    axios.post(
+      'http://localhost:8000/channel/adminadmin00/subscribe/', {},
+      {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+      .then(result => console.log(result.data))
+      .catch(error => console.log(JSON.stringify(error)));
+  }
+
+  handleSubmit2() {
+    axios.post(
+      'http://localhost:8000/channel/adminadmin00/unsubscribe/', {},
+      {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+      .then(result => console.log(result.data))
+      .catch(error => console.log(JSON.stringify(error)));
+  }
 
   render() {
     return (
-      <form name="test">
-        <input name="username" type="text" />
-        <input name="password1" type="password" />
-        <input name="password2" type="password" />
-        <button onClick={this.handleSubmit}>ШЛИ!</button>
-      </form>
+      <div>
+        <form name="test">
+          <input name="username" type="text" />
+          <input name="password1" type="password" />
+          <input name="password2" type="password" />
+          <button onClick={this.handleSubmit}>ШЛИ!</button>
+        </form>
+        <button onClick={() => this.handleSubmit1()}>Activate</button>
+        <button onClick={() => this.handleSubmit2()}>Deactivate</button>
+      </div>
     );
   }
 }

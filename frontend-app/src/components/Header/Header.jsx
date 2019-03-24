@@ -186,7 +186,7 @@ const mapDispatchToProps = dispatch => ({
   },
   onLogin: (event) => {
     event.preventDefault();
-    dispatch(login('Highoc', 'Ssdawz5566'));
+    dispatch(login('jokerety', '2346785das'));
   },
 });
 
