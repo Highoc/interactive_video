@@ -129,6 +129,7 @@ class Header extends Component {
     );
 
     const HomePage = props => <Link to="/" {...props} />;
+    const LoginPage = props => <Link to="/login" {...props} />;
 
     return (
       <div className={classes.root}>
@@ -155,7 +156,7 @@ class Header extends Component {
             <div className={classes.grow} />
             <div className={classes.sectionDesktop}>
               {
-                isAuthorized ? <Button onClick={(event) => { onLogout(event); }} component={HomePage} color="inherit">Выйти</Button> : <Button onClick={(event) => { onLogin(event); }} component={HomePage} color="inherit">Войти</Button>
+                isAuthorized ? <Button onClick={(event) => { onLogout(event); }} component={HomePage} color="inherit">Выйти</Button> : <Button component={LoginPage} color="inherit">Войти</Button>
               }
               <IconButton
                 aria-owns={isMenuOpen ? 'material-appbar' : undefined}
@@ -182,10 +183,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   onLogout: (event) => {
     dispatch(logout());
-  },
-  onLogin: (event) => {
-    event.preventDefault();
-    dispatch(login('jokerety', '2346785das'));
   },
 });
 

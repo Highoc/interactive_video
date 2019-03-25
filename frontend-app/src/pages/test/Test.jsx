@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import clone from 'clone';
 import Tree from 'react-d3-tree';
+import axios from 'axios';
 
 export class Test extends Component {
   constructor(props) {

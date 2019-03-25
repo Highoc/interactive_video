@@ -7,7 +7,7 @@ export class Main extends Component {
       maxWidth: 1203,
       margin: '0% 1.5% 0 1.5%',
       overflow: 'hidden',
-    };
+  };
 
     const { children } = this.props;
 

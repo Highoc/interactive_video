@@ -9,8 +9,8 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Input from '../../components/Input/Input';
 import withStyles from '@material-ui/core/styles/withStyles';
-import {login} from "../../actions/authorization";
-import {connect} from "react-redux";
+import { login } from '../../actions/authorization';
+import { connect } from 'react-redux';
 
 const styles = theme => ({
   main: {
@@ -53,7 +53,7 @@ class SignIn extends Component {
       inputs: [
         {
           type: 'text',
-          name: 'name',
+          name: 'login',
           value: '',
           description: 'Логин',
           rules: {
@@ -75,21 +75,22 @@ class SignIn extends Component {
   }
 
   submitHandler(event) {
+    event.preventDefault();
     const { inputs } = this.state;
     const { onLogin } = this.props;
     let isValid = true;
     for (const key in inputs) {
       isValid = isValid && inputs[key].isValid;
     }
-
     if (isValid) {
       console.log('Отправить можно');
-      onLogin(event);
+      const passwordInput = inputs.find(elem => elem.name === "password");
+      const loginInput = inputs.find(elem => elem.name === "login");
+      onLogin(event, loginInput.value, passwordInput.value);
     }
     else {
       console.log('Invalid input');
     }
-    event.preventDefault();
   };
 
   callbackInput(state) {
@@ -127,7 +128,7 @@ class SignIn extends Component {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Вход
           </Typography>
           <form className={classes.form}>
             <FormControl margin="normal" required fullWidth>
@@ -141,7 +142,7 @@ class SignIn extends Component {
               className={classes.submit}
               onClick={event => this.submitHandler(event)}
             >
-              Sign in
+              Войти
             </Button>
           </form>
         </Paper>
@@ -150,11 +151,16 @@ class SignIn extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  isAuthorized: state.authorization.token !== null,
+  username: state.authorization.username,
+});
 
 const mapDispatchToProps = dispatch => ({
 
-  onLogin: (event) => {
-    dispatch(login('admin', 'Ssdawz5566'));
+  onLogin: (event, loginVal, passwordVal) => {
+    event.preventDefault();
+    dispatch(login(loginVal, passwordVal));
   },
 });
 
@@ -163,6 +169,6 @@ SignIn.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(connect(mapDispatchToProps)(SignIn));
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(SignIn));
 
 

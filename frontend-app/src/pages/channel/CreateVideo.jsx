@@ -362,7 +362,6 @@ class TreeData {
   }
 
   getTreeData() {
-    this.updated = false;
     return clone(this.tree);
   }
 
@@ -428,7 +427,6 @@ class TreeData {
     };
 
     node.children.push(newNode);
-    this.updated = true;
   }
 
   generateKey() {
@@ -443,6 +441,5 @@ class TreeData {
 
     const parentNode = this.findParentNodeByKey(this.tree, key);
     parentNode.children = parentNode.children.filter(child => child.key !== key);
-    this.updated = true;
   }
 }
