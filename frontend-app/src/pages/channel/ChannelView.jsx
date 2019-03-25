@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core";
-
 import ChannelPlaylist from '../../components/ChannelPlaylist';
 
 import ChannelHead from '../../components/ChannelHead';
-
+import { backend as path } from '../../urls';
 
 const styles = theme => ({
   root: {
@@ -41,7 +40,7 @@ class ChannelView extends Component {
   componentDidMount() {
     const { channelKey } = this.state;
 
-    const url = `http://192.168.1.205:8000/channel/get/${channelKey}/`;
+    const url = `http://${path}/channel/get/${channelKey}/`;
     const config = {
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,

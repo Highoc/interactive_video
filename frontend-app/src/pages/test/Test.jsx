@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import clone from 'clone';
+import Tree from 'react-d3-tree';
 
 export class Test extends Component {
   constructor(props) {
@@ -28,12 +29,6 @@ export class Test extends Component {
   handleSubmit1() {
     axios.post(
       'http://localhost:8000/channel/adminadmin00/subscribe/', {},
-      {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-          'Content-Type': 'application/json',
-        },
-      },
     )
       .then(result => console.log(result.data))
       .catch(error => console.log(JSON.stringify(error)));

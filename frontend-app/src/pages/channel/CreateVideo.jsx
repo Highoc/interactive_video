@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import 'react-tree-graph/dist/style.css';
 
 import Tree from 'react-d3-tree';
-import axios from "axios";
+import axios from 'axios';
 
 import clone from 'clone';
-
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
@@ -15,13 +14,29 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Input from '../../components/Input/Input';
+import Fab from '@material-ui/core/Fab';
+import NavigationIcon from '@material-ui/icons/Navigation';
+import PropTypes from "prop-types";
+import { withStyles } from '@material-ui/core/styles';
+import classNames from 'classnames';
 import { backend as path } from '../../urls';
 
 
-const styles = {
-  width: '65%',
-  height: '700px',
-};
+
+const styles = theme => ({
+  margin: {
+    margin: theme.spacing.unit,
+  },
+  extendedIcon: {
+    marginRight: theme.spacing.unit,
+  },
+  container: {
+    width: '65%',
+    height: '700px',
+  },
+});
+
 
 const activeSvgShape = {
   shape: 'circle',
@@ -29,6 +44,7 @@ const activeSvgShape = {
     r: 10,
     fill: 'green',
   },
+  transitionDuration: 0,
 };
 
 const deactiveSvgShape = {
@@ -37,35 +53,62 @@ const deactiveSvgShape = {
     r: 10,
     fill: 'blue',
   },
+  transitionDuration: 0,
 };
 
-class CreateVideo extends Component {
-  nodeCounter = 0;
+class NodeImage extends Component {
+  render() {
+    const { nodeData } = this.props;
+    return (
+      <div>
 
+        <div>
+          {nodeData.name}
+        </div>
+      </div>
+    );
+  }
+}
+
+class CreateVideo extends Component {
   constructor(props) {
     super(props);
 
-    const myTreeData = {
-      name: '',
-      key: 0,
-      isReady: false,
-    };
-
     this.state = {
       sources: [],
-      tree: myTreeData,
+      tree: new TreeData(),
       nodeChosen: null,
       dialogOpen: false,
+      uploadStatus: false,
+      videoKey: '',
       inputData: {
         text: '',
         sourceKey: '',
       },
-      uploadStatus: false,
-      videoKey: 'creating',
+      isValid: false,
+      inputs: [
+        {
+          type: 'text',
+          name: 'name',
+          value: '',
+          description: 'Название видео',
+          rules: {
+            max_length: 64,
+            required: true,
+          },
+        },
+        {
+          type: 'textarea',
+          name: 'description',
+          value: '',
+          description: 'Описание видео',
+          rules: {
+            max_length: 4096,
+            required: false,
+          },
+        }],
     };
 
-    this.addChildNode = this.addChildNode.bind(this);
-    this.removeNode = this.removeNode.bind(this);
     this.uploadVideo = this.uploadVideo.bind(this);
   }
 
@@ -93,57 +136,17 @@ class CreateVideo extends Component {
   handleClose = () => {
     const { inputData } = this.state;
     inputData.text = document.getElementById('text').value;
-    this.setState({ dialogOpen: false });
-
+    console.log(inputData);
     const { tree, nodeChosen } = this.state;
-    const node = this.findNodeByKey(tree, nodeChosen);
-    node.name = `${inputData.text}`;
+    const node = tree.findNodeByKey(nodeChosen);
+    console.log(nodeChosen);
+    console.log(node);
+    node.name = inputData.text;
     node.sourceKey = inputData.sourceKey;
     node.text = inputData.text;
     node.isReady = true;
-
-    const newTree = clone(tree);
-    this.setState({ tree: newTree });
+    this.setState({ dialogOpen: false });
   };
-
-  addChildNode() {
-    const { tree, nodeChosen } = this.state;
-
-    if (nodeChosen === null) {
-      return;
-    }
-
-    const node = this.findNodeByKey(tree, nodeChosen);
-
-    const newNode = {
-      name: '',
-      key: this.generateKey(),
-      isReady: false,
-    };
-
-    if (node.children !== undefined) {
-      node.children.push(newNode);
-    } else {
-      node.children = [newNode];
-    }
-
-    const newTree = clone(tree);
-    this.setState({ tree: newTree });
-  }
-
-  removeNode() {
-    const { tree, nodeChosen } = this.state;
-    if (tree.key === nodeChosen || nodeChosen === null) {
-      return;
-    }
-
-    const parentNode = this.findParentNodeByKey(tree, nodeChosen);
-
-    parentNode.children = parentNode.children.filter(child => child.key !== nodeChosen);
-
-    const newTree = clone(tree);
-    this.setState({ tree: newTree, nodeChosen: null });
-  }
 
   handleChange = (event) => {
     const { inputData } = this.state;
@@ -152,71 +155,20 @@ class CreateVideo extends Component {
   };
 
   handleClick(key) {
-    const { nodeChosen } = this.state;
+    const { nodeChosen, tree } = this.state;
     if (nodeChosen === key) {
       this.handleOpen();
     } else {
-      this.activateNode(key);
+      tree.activateNode(key);
+      tree.deactivateNode(nodeChosen);
+      this.setState({ nodeChosen: key });
     }
-  }
-
-  activateNode(key) {
-    const { tree, nodeChosen } = this.state;
-
-    const newNode = this.findNodeByKey(tree, key);
-    newNode.nodeSvgShape = activeSvgShape;
-
-    if (nodeChosen !== null) {
-      const oldNode = this.findNodeByKey(tree, nodeChosen);
-      oldNode.nodeSvgShape = deactiveSvgShape;
-    }
-
-    const newTree = clone(tree);
-    this.setState({ tree: newTree, nodeChosen: key });
-  }
-
-  findNodeByKey(root, key) {
-    if (root.key === key) {
-      return root;
-    }
-
-    if (root.children !== undefined) {
-      for (const child of root.children) {
-        const node = this.findNodeByKey(child, key);
-        if (node !== null) {
-          return node;
-        }
-      }
-    }
-
-    return null;
-  }
-
-  findParentNodeByKey(root, key) {
-    if (root.children !== undefined) {
-      for (const child of root.children) {
-        if (child.key === key) {
-          return root;
-        }
-        const node = this.findParentNodeByKey(child, key);
-        if (node !== null) {
-          return node;
-        }
-      }
-    }
-
-    return null;
-  }
-
-  generateKey() {
-    this.nodeCounter += 1;
-    return this.nodeCounter;
   }
 
   getVideoData() {
     return {
-      name: document.getElementById('name').value,
-      description: document.getElementById('description').value,
+      name: this.state.inputs.find(elem => elem.name === 'name'),
+      description: this.state.inputs.find(elem => elem.name === 'description'),
       main: this.getVideoPart(this.state.tree),
     };
   }
@@ -239,43 +191,99 @@ class CreateVideo extends Component {
     return obj;
   }
 
-  uploadVideo() {
-    axios.post(
-      `http://${path}/video/upload/`, this.getVideoData(),
-      {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-          'Content-Type': 'application/json',
+  callbackInput(state) {
+    const { inputs } = this.state;
+    const input = inputs.find(elem => elem.name === state.name);
+    input.value = state.value;
+    input.isValid = state.isValid;
+    this.setState({ inputs });
+  }
+
+  uploadVideo(event) {
+    const { inputs } = this.state;
+    let isValid = true;
+    for (const key in inputs) {
+      isValid = isValid && inputs[key].isValid;
+    }
+
+    if (isValid) {
+      console.log('Отправить можно');
+      axios.post(
+        `http://${path}/video/upload/`, this.getVideoData(),
+        {
+          headers: {
+            Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+            'Content-Type': 'application/json',
+          },
         },
-      },
-    )
-      .then((result) => {
-        this.setState({ videoKey: result.data.key });
-      })
-      .catch((error) => {
-        this.setState({ videoKey: 'error' });
-      });
+      )
+        .then((result) => {
+          this.setState({ videoKey: result.data.key });
+        })
+        .catch((error) => {
+          this.setState({ videoKey: 'error' });
+        });
+    } else {
+      console.log('Invalid input');
+    }
+    event.preventDefault();
+  }
+
+
+  onUpdateTree() {
+    const { tree } = this.state;
+    tree.tree = tree.getTreeData();
+    this.setState({ tree });
   }
 
   render() {
-    const { sources, tree, dialogOpen, selectOpen, inputData } = this.state;
+    const {
+      sources, tree, dialogOpen, inputData, nodeChosen, inputs, isLoaded,
+    } = this.state;
+    const { classes } = this.props;
+    const Inputs = Object.keys(inputs).map((key) => {
+      const inputElement = inputs[key];
+      return (
+        <Input
+          key={key}
+          type={inputElement.type}
+          name={inputElement.name}
+          description={inputElement.description}
+          value={inputElement.value}
+          rules={inputElement.rules}
+          callback={state => this.callbackInput(state)}
+        />
+      );
+    });
+
     return (
-      <div styles={styles}>
+      <div styles={styles.container}>
         <div id="treeWrapper" style={{ width: '1000px', height: '500px' }}>
 
           <Tree
-            data={tree}
+            data={tree.tree}
             translate={{ x: 20, y: 225 }}
-            zoomable={false}
-            nodeSvgShape={deactiveSvgShape}
             collapsible={false}
-            onClick={(nodeData, event) => this.handleClick(nodeData.key)}
+            zoomable={false}
+            allowForeignObjects
+            nodeSvgShape={deactiveSvgShape}
+            nodeLabelComponent={{
+              render: <NodeImage nodeData={tree} />,
+              foreignObjectWrapper: {
+                y: -25,
+                x: -25,
+              },
+            }}
+            onClick={(nodeData, event) => { this.handleClick(nodeData.key); this.onUpdateTree(); }}
           />
 
         </div>
-        <button onClick={this.addChildNode}>Add Child</button>
-        <button onClick={this.removeNode}>Remove Node</button>
-        <span> {this.state.videoKey}</span>
+        <Button variant="contained" color="primary" className={classes.button} onClick={() => { tree.addChildNode(nodeChosen); this.setState({ nodeChosen }); this.onUpdateTree() }}>
+          Add Child
+        </Button>
+        <Button variant="contained" color="primary" className={classes.button} onClick={() => { tree.removeNode(nodeChosen); this.setState({ nodeChosen: null }); this.onUpdateTree() }}>
+          Remove Child
+        </Button>
         <Dialog
           onClose={this.handleClose}
           open={dialogOpen}
@@ -316,26 +324,125 @@ class CreateVideo extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        <TextField
-          autoFocus
-          label="Название видео"
-          margin="dense"
-          id="name"
-          type="text"
-          fullWidth
-        />
-        <TextField
-          autoFocus
-          label="Описание к видео"
-          margin="dense"
-          id="description"
-          type="text"
-          fullWidth
-        />
-        <button onClick={this.uploadVideo}>Сохранить</button>
+
+        <h2>Создание видео {' '} {this.state.videoKey}</h2>
+        {Inputs}
+
+        <Fab
+          variant="extended"
+          color="primary"
+          aria-label="Add"
+          className={classes.margin}
+          style={styles.button}
+          onClick={event => this.uploadVideo(event)}
+        >
+          <NavigationIcon className={classes.extendedIcon} />
+          Отправить
+        </Fab>
       </div>
     );
   }
 }
 
-export default CreateVideo;
+CreateVideo.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(CreateVideo);
+
+class TreeData {
+  constructor() {
+    this.tree = {
+      name: '',
+      key: 0,
+      children: [],
+      isReady: false,
+    };
+    this.nodeCounter = 0;
+  }
+
+  getTreeData() {
+    this.updated = false;
+    return clone(this.tree);
+  }
+
+  findNodeByKey(key, root = this.tree) {
+    if (root.key === key) {
+      return root;
+    }
+
+    if (root.children !== undefined) {
+      for (const child of root.children) {
+        const node = this.findNodeByKey(key, child);
+        if (node !== null) {
+          return node;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  findParentNodeByKey(root, key) {
+    if (root.children !== undefined) {
+      for (const child of root.children) {
+        if (child.key === key) {
+          return root;
+        }
+        const node = this.findParentNodeByKey(child, key);
+        if (node !== null) {
+          return node;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  activateNode(key) {
+    if (key !== null) {
+      const node = this.findNodeByKey(key);
+      node.nodeSvgShape = activeSvgShape;
+    }
+  }
+
+  deactivateNode(key) {
+    if (key !== null) {
+      const node = this.findNodeByKey(key);
+      node.nodeSvgShape = deactiveSvgShape;
+    }
+  }
+
+  addChildNode(key) {
+    if (key === null) {
+      return;
+    }
+
+    const node = this.findNodeByKey(key);
+
+    const newNode = {
+      name: '',
+      key: this.generateKey(),
+      children: [],
+      isReady: false,
+    };
+
+    node.children.push(newNode);
+    this.updated = true;
+  }
+
+  generateKey() {
+    this.nodeCounter += 1;
+    return this.nodeCounter;
+  }
+
+  removeNode(key) {
+    if (this.tree.key === key || key === null) {
+      return;
+    }
+
+    const parentNode = this.findParentNodeByKey(this.tree, key);
+    parentNode.children = parentNode.children.filter(child => child.key !== key);
+    this.updated = true;
+  }
+}

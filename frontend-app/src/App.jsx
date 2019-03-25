@@ -9,9 +9,10 @@ import {
 import Header from './components/Header';
 import MenuLeft from './components/MenuLeft';
 import MenuRight from './components/MenuRight';
+import ConstructPanelLeft from './components/ConstructPanelLeft';
+import ConstructPanelRight from './components/ConctructPanelRight';
 import { Main } from './components/Main';
-
-import { Homepage } from './pages/homepage';
+import Homepage from './pages/homepage/Homepage';
 import { Account } from './pages/account';
 import { Channel } from './pages/channel';
 
@@ -56,12 +57,32 @@ class App extends Component {
       );
 
       components = (
-        <div>
-          <MenuLeft />
-          <MenuRight />
-          <Centrifugo />
-        </div>
+        <Switch>
+          <Route
+            path="/channel/:channelKey/create"
+            exact
+            render={props => (
+              <div>
+                <ConstructPanelLeft />
+                <ConstructPanelRight />
+              </div>
+            )}
+          />
+
+          <Route
+            path="/"
+            render={props => (
+              <div>
+                <MenuLeft />
+                <MenuRight />
+                <Centrifugo />
+              </div>
+            )}
+          />
+
+        </Switch>
       );
+      console.log(components);
     }
 
     return (

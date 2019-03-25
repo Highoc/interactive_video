@@ -5,22 +5,32 @@ import axios from 'axios';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
 
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
+import { backend as path } from '../../urls';
+import Button from '@material-ui/core/Button';
 
+const styles = {
+  container: {
+    marginLeft: '800px',
+  },
+};
 
 export class Comment extends Component {
   constructor(props) {
     super(props);
-    this.state = { commentId: props.commentId, isLoaded: false };
+    this.state = {
+      commentId: props.commentId,
+      isLoaded: false,
+    };
   }
 
   componentDidMount() {
     const { commentId } = this.state;
 
-    const url = `http://localhost:8000/comment/get/${commentId}/`;
+
+    const url = `http://${path}/comment/get/${commentId}/`;
     const config = {
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
@@ -33,7 +43,15 @@ export class Comment extends Component {
         this.setState({ isLoaded: true, comment: result.data });
       },
     ).catch(error => console.log(error));
+
   }
+
+  onReply(event) {
+    const { callback } = this.props;
+    callback(this.state);
+    event.preventDefault();
+  }
+
 
   render() {
     const { isLoaded } = this.state;
@@ -50,22 +68,32 @@ export class Comment extends Component {
     };
 
     const { comment } = this.state;
+
+
     return (
-      <Card>
-        <CardHeader
-          title={comment.author}
-          subheader={new Date(comment.created).toLocaleDateString('en-EN', dateOptions)}
-          avatar={
-            <Avatar src="https://hb.bizmrg.com/interactive_video/public_pic/1.jpg" />
-          }
-        />
-        <CardContent>
-          <Typography component="p">
-            {comment.text}
-          </Typography>
-          {comment.children.map(childId => <Comment commentId={childId} />)}
-        </CardContent>
-      </Card>
+      <div>
+        <Card>
+          <CardHeader
+            title={comment.author}
+            subheader={new Date(comment.created).toLocaleDateString('en-EN', dateOptions)}
+            avatar={
+              <Avatar src="https://hb.bizmrg.com/interactive_video/public_pic/1.jpg" />
+            }
+          />
+          <CardContent>
+            <Typography component="p">
+              {comment.text}
+              <div style={styles.container}>
+                <Button onClick={(event) => this.onReply(event)} color="primary">
+                  Ответить
+                </Button>
+              </div>
+            </Typography>
+            {comment.children.map(childId => <Comment commentId={childId} callback={this.props.callback} />)}
+          </CardContent>
+        </Card>
+      </div>
+
     );
   }
 }

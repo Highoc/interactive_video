@@ -2,20 +2,32 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux';
 
-import { InteractivePlayer } from '../../components/InteractivePlayer';
-import { Comment } from '../../components/Comment/Comment';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@material-ui/core/Button';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
+import { Comment } from '../../components/Comment/Comment';
+import InteractivePlayer from '../../components/InteractivePlayer/InteractivePlayer';
+import ExpansionPanelVideo from '../../components/ExpansionPanel';
+import Input from '../../components/Input/Input';
 import { backend as path } from '../../urls';
 
 
 import {
   subscribeToChannel as subscribe,
-  unsubscribeFromChannel as unsubscribe
+  unsubscribeFromChannel as unsubscribe,
 } from '../../actions/centrifugo';
 
 
@@ -41,6 +53,13 @@ const styles = theme => ({
   media: {
     height: 150,
   },
+  root: {
+    width: '100%',
+  },
+  heading: {
+    fontSize: theme.typography.pxToRem(15),
+    fontWeight: theme.typography.fontWeightRegular,
+  },
 });
 
 const statuses = {
@@ -52,17 +71,23 @@ const statuses = {
 class WatchVideo extends Component {
   constructor(props) {
     super(props);
+    const { videoKey, channelKey } = props.match.params;
     this.state = {
       status: statuses.NOT_LOADED,
       video: null,
-      videoKey: props.match.params.videoKey,
+      author: 'admin',
+      videoKey,
       viewsCounter: 0,
+      dialogOpen: false,
+      channelKey,
+      inputs: [],
+      isLoaded: false,
     };
   }
 
   async componentDidMount() {
     try {
-      const { videoKey } = this.state;
+      const { videoKey, channelKey } = this.state;
 
       const config = {
         headers: {
@@ -91,6 +116,16 @@ class WatchVideo extends Component {
       subscribeToChannel(`video/${videoKey}/comments`, data => console.log(data));
       subscribeToChannel(`video/${videoKey}/rating`, data => this.updateRatingCounter(data));
       subscribeToChannel(`video/${videoKey}/views`, data => this.updateViewsCounter(data));
+
+      const urlInput = `http://${path}/channel/${channelKey}/video/${videoKey}/comment/add/`;
+      const configInput = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+        },
+      };
+      const result = await axios.get(urlInput, configInput);
+      console.log(result.data);
+      this.setState({ inputs: result.data, isLoaded: true });
     } catch (error) {
       this.setState({ status: statuses.ERROR });
       console.log(`[WatchVideo] ${error} ${JSON.stringify(error.response.data)}`);
@@ -129,11 +164,92 @@ class WatchVideo extends Component {
     axios.post(url, { value: choice }, config);
   }
 
+  async submitHandler() {
+    const { inputs, channelKey, videoKey } = this.state;
+    let isValid = true;
+    console.log(inputs);
+    for (const key in inputs) {
+      isValid = isValid && inputs[key].isValid;
+    }
+
+    if (isValid) {
+      console.log('Отправить можно');
+      this.setState({ dialogOpen: false });
+      try {
+        const url = `http://${path}/channel/${channelKey}/video/${videoKey}/comment/add/`;
+        const data = this.getData();
+        const configs = {
+          headers: {
+            Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+            'Content-Type': 'application/json',
+          },
+        };
+
+        const result = await axios.post(url, data, configs);
+
+        console.log(result);
+        this.setState({ isSent: true });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      console.log('Invalid input');
+    }
+  }
+
+  getData() {
+    const { inputs, parentId } = this.state;
+    const result = {};
+    inputs.map((input) => {
+      result[input.name] = input.value;
+      result.parent_id = parentId;
+      return 0;
+    });
+    console.log(result);
+    return result;
+  }
+
+
+  callbackInput(state) {
+    const { inputs } = this.state;
+    const input = inputs.find(elem => elem.name === state.name);
+    input.value = state.value;
+    input.isValid = state.isValid;
+    this.setState({ inputs });
+  }
+
+
+  callbackComment(state) {
+    this.setState({ dialogOpen: true, parentId: state.commentId });
+  }
+
+  handleClose = () => {
+    this.setState({ dialogOpen: false });
+  };
+
+
   render() {
-    const { status, video, viewsCounter, ratingCounter, yourChoice } = this.state;
+    const {
+      status, video, viewsCounter, ratingCounter, yourChoice,
+      isLoaded, dialogOpen, channelKey, videoKey, inputs, author,
+    } = this.state;
+    const Inputs = Object.keys(inputs).map((key) => {
+      const inputElement = inputs[key];
+      return (
+        <Input
+          key={key}
+          type={inputElement.type}
+          name={inputElement.name}
+          description={inputElement.description}
+          value={inputElement.value}
+          rules={inputElement.rules}
+          callback={state => this.callbackInput(state)}
+        />
+      );
+    });
     const { classes } = this.props;
     let result = null;
-    if (status === statuses.LOADED) {
+    if (status === statuses.LOADED && isLoaded) {
       result = (
         <div style={textStyles}>
           <Card className={classes.card}>
@@ -143,20 +259,48 @@ class WatchVideo extends Component {
                 {' '}
                 {video.name}
               </Typography>
-              <Typography component="p" align="center">
-                {video.description}
-              </Typography>
             </CardContent>
           </Card>
           <InteractivePlayer main={video.head_video_part} codec={video.codec} />
-          <div>Просмотров: { viewsCounter }</div>
-          <div>Рейтинг: { ratingCounter }. Твой выбор { yourChoice }.</div>
-          <div>
-            <button onClick={() => this.handleRatingChoice(1)}>UP</button>
-            <button onClick={() => this.handleRatingChoice(0)}>ZERO</button>
-            <button onClick={() => this.handleRatingChoice(-1)}>DOWN</button>
-          </div>
-          <div>Комментарии: { video.head_comments.map(commentId => <Comment commentId={commentId} />)}</div>
+          <ExpansionPanelVideo
+            created={video.created}
+            author={author}
+            description={video.description}
+            keyVideo={videoKey}
+            keyChannel={channelKey}
+            views={viewsCounter}
+            rating={ratingCounter}
+            choice={yourChoice}
+            inputs={inputs}
+            callback={choice => this.handleRatingChoice(choice)}
+          />
+          <ExpansionPanel>
+            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography className={classes.heading}>Ко всем комментариям:</Typography>
+            </ExpansionPanelSummary>
+            { video.head_comments.map(commentId => <Comment commentId={commentId} callback={state => this.callbackComment(state)} />)}
+          </ExpansionPanel>
+          <Dialog
+            onClose={this.handleClose}
+            open={dialogOpen}
+            fullWidth
+            maxWidth="md"
+          >
+            <DialogTitle onClose={this.handleClose}>
+              Добавление комментария
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Ваш комментарий:
+              </DialogContentText>
+              {Inputs}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={(event) => { event.preventDefault(); this.submitHandler(); }} color="primary">
+                Добавить комментарий
+              </Button>
+            </DialogActions>
+          </Dialog>
         </div>
       );
     } else if (status === statuses.NOT_LOADED) {

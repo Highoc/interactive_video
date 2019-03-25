@@ -8,8 +8,8 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
-
-
+import Button from '@material-ui/core/Button';
+import CardActions from '@material-ui/core/CardActions';
 
 const styles = theme => ({
   titleBar: {
@@ -26,6 +26,10 @@ const styles = theme => ({
   media: {
     height: 150,
   },
+  content: {
+    height: '80%',
+    width: '90%',
+  },
 });
 
 class ChannelPlaylistView extends Component {
@@ -39,29 +43,31 @@ class ChannelPlaylistView extends Component {
 
   render() {
     const { classes } = this.props;
-    const {playlist, channelKey} = this.state;
-
-    const MyLink = props => <Link to={`/channel/${channelKey}/playlist/${playlist.key}`} {...props} />;
+    const { playlist, channelKey } = this.state;
+    const Edit = props => <Link to={`/channel/${channelKey}/playlist/${playlist.key}/update`} {...props} />;
+    const chosenPlaylist = props => <Link to={`/channel/${channelKey}/playlist/${playlist.key}`} {...props} />;
 
     return (
       <Card className={classes.card}>
         <CardActionArea>
           <CardMedia
-            component={MyLink}
+            component={chosenPlaylist}
             className={classes.media}
             image={playlist.preview_url}
             title={playlist.name}
           />
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="h2" align="center">
+          <CardContent className={classes.content}>
+            <Typography gutterBottom variant="h6" component="h2" align="center">
               Плейлист:
               {' '}
               {playlist.name}
             </Typography>
-            <Typography component="p" align="center">
-              {playlist.description}
-            </Typography>
           </CardContent>
+          <CardActions>
+            <Button size="small" color="primary" component={Edit}>
+              Изменить
+            </Button>
+          </CardActions>
         </CardActionArea>
 
       </Card>

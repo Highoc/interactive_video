@@ -50,7 +50,7 @@ export const loginCheckState = () => (dispatch) => {
         Authorization: `JWT ${token}`,
       },
     };
-    axios.get(url, config)
+    axios.post(url, config)
       .then((result) => {
         const { username } = result.data;
         dispatch(loginSuccess(token, username));

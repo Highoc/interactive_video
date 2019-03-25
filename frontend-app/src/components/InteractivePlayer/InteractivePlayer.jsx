@@ -4,6 +4,9 @@ import 'video-react/dist/video-react.css';
 import PropTypes from 'prop-types';
 import { backend as path } from '../../urls';
 
+import { withStyles } from '@material-ui/core/styles';
+import ButtonBase from '@material-ui/core/ButtonBase';
+import Typography from '@material-ui/core/Typography';
 
 import {
   Player,
@@ -28,8 +31,18 @@ const videoStyles = {
 };
 const buttonStyles = {
   position: 'absolute',
-  bottom: '25%',
-  left: '40%',
+  zIndex: '10',
+  top: '70%',
+  width: '100%',
+  height: '20%',
+  marginRight: '10%',
+};
+const oneBlock = {
+  width: '40%',
+  height: '100%',
+  float: 'left',
+  backgroundImage: 'url(https://ak8.picdn.net/shutterstock/videos/871678/thumb/1.jpg)',
+  marginLeft: '5%',
 };
 
 const styles = theme => ({
@@ -40,10 +53,13 @@ const styles = theme => ({
   input: {
     display: 'none',
   },
-
+  focusVisible: {},
+  textContainer: {
+    justifyContent: 'center',
+  },
 });
 
-export class InteractivePlayer extends Component {
+class InteractivePlayer extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -146,7 +162,6 @@ export class InteractivePlayer extends Component {
       const url = `http://${path}/video/part/get/${childKey}/`;
       axios.get(url, config).then(
         (response) => {
-          console.log(response.data);
 
           const { questions } = this.state;
           const { key, text } = response.data;
@@ -198,16 +213,30 @@ export class InteractivePlayer extends Component {
     const {
       url, currentTime, timeFrame, questions,
     } = this.state;
+    const { classes } = this.props;
 
     let buttons = <div />;
     const d = timeFrame.end - currentTime;
     if (d > 0 && d < 5) {
       buttons = (
-        <div>
+        <div style={buttonStyles}>
           {questions.map(elem => (
-            <button type="submit" key={elem.key} onClick={() => this.handleAnswer(elem.key)}>
-              {elem.text}
-            </button>
+            <ButtonBase
+              focusRipple
+              focusVisibleClassName={classes.focusVisible}
+              key={elem.key}
+              onClick={() => this.handleAnswer(elem.key)}
+              style={oneBlock}
+            >
+              <Typography
+                component="span"
+                variant="subtitle1"
+                color="primary"
+                className={classes.textContainer}
+              >
+                {elem.text}
+              </Typography>
+            </ButtonBase>
           ))}
         </div>
       );
@@ -230,6 +259,12 @@ export class InteractivePlayer extends Component {
     );
   }
 }
+
+InteractivePlayer.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(InteractivePlayer);
 
 class AppendQueue {
   constructor() {

@@ -42,6 +42,7 @@ class ChannelHead extends Component {
     const { classes } = this.props;
     const { channel, channelKey } = this.state;
     const MyLink = props => <Link to={`${channelKey}/playlist/all`} {...props} />;
+    const Settings = props => <Link to={`${channelKey}/edit`} {...props} />;
 
     return (
       <Card className={classes.card}>
@@ -70,6 +71,9 @@ class ChannelHead extends Component {
         <CardActions>
           <Button size="small" color="primary" component={MyLink}>
             Посмотреть все плейлисты
+          </Button>
+          <Button size="small" color="primary" component={Settings}>
+            Настройки канала
           </Button>
         </CardActions>
       </Card>

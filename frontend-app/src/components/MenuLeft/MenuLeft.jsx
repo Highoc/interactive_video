@@ -4,9 +4,8 @@ import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
 import IconButton from '@material-ui/core/IconButton';
-import ListItemText from '@material-ui/core/ListItemText';
+
 
 import axios from 'axios';
 import ChannelList from '../ChannelList';
@@ -14,8 +13,10 @@ import Drawer from '@material-ui/core/Drawer';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { backend as path } from '../../urls';
+import Typography from '@material-ui/core/Typography';
 
 const drawerWidth = 240;
+
 
 const styles = theme => ({
   root: {
@@ -64,6 +65,10 @@ const styles = theme => ({
   menuButtonHidden: {
     display: 'none',
   },
+  textDense: {},
+  Header: {
+    marginRight: '40px',
+  },
 });
 
 class MenuLeft extends Component {
@@ -102,7 +107,6 @@ class MenuLeft extends Component {
   render() {
     const { classes } = this.props;
     const { channels } = this.state;
-
     return (
       <div className={classes.root}>
         <Drawer
@@ -113,6 +117,11 @@ class MenuLeft extends Component {
           open={this.state.open}
         >
           <div className={classes.toolbarIcon}>
+            <div className={classes.Header}>
+              <Typography variant="h6" align="left">
+                Каналы
+              </Typography>
+            </div>
             <IconButton
               onClick={this.handleDrawerOpen}
               className={this.state.open && classes.menuButtonHidden}
@@ -126,15 +135,6 @@ class MenuLeft extends Component {
           <Divider />
           <List disablePadding>
             <React.Fragment key="Subscriptions">
-              <ListItem className={classes.categoryHeader}>
-                <ListItemText
-                  classes={{
-                    primary: classes.categoryHeaderPrimary,
-                  }}
-                >
-                  {'Subscriptions'}
-                </ListItemText>
-              </ListItem>
               {channels.map(({ name, key }) => (
                 <ChannelList name={name} keyVideo={key} key={key} />
               ))}

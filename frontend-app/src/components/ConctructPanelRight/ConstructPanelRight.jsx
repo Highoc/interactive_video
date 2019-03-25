@@ -8,7 +8,6 @@ import Button from '@material-ui/core/Button';
 import Drawer from '@material-ui/core/Drawer';
 import VideoCamera from '@material-ui/icons/Videocam';
 
-
 const drawerWidth = 240;
 
 const buttonContainer = {
@@ -59,7 +58,7 @@ const styles = theme => ({
 
 });
 
-class MenuRight extends Component {
+export class ConstructPanelRight extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -67,13 +66,8 @@ class MenuRight extends Component {
     };
   }
 
-
   render() {
     const { classes, ...other } = this.props;
-    const CreateVideo = props => <Link to="/channel/adminadmin00/create" {...props} />;
-    const MyChannel = props => <Link to="/channel/adminadmin00" {...props} />;
-    const Home = props => <Link to="/" {...props} />;
-
 
     return (
       <div className={classes.root}>
@@ -87,21 +81,19 @@ class MenuRight extends Component {
         >
 
           <div style={buttonContainer}>
-            <Button variant="contained" color="primary" className={classes.button} component={MyChannel}>
-            My channel
-              <HomeIcon fontSize="large" />
+            <Button variant="contained" color="primary" className={classes.button} size="large">
+              Добавить узел
             </Button>
           </div>
           <div style={buttonContainer}>
-            <Button variant="contained" color="primary" className={classes.button} component={CreateVideo}>
-            Create Video
+            <Button variant="contained" color="primary" className={classes.button} size="large">
+              Удалить узел
+            </Button>
+          </div>
+          <div style={buttonContainer}>
+            <Button variant="contained" color="primary" className={classes.button}>
+              Создать видео
               <VideoCamera fontSize="large" />
-            </Button>
-          </div>
-
-          <div style={buttonContainer}>
-            <Button variant="contained" color="primary" className={classes.button} component={Home} size="large">
-            На главную
             </Button>
           </div>
         </Drawer>
@@ -110,8 +102,13 @@ class MenuRight extends Component {
   }
 }
 
-MenuRight.propTypes = {
+ConstructPanelRight.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(MenuRight);
+
+export default withStyles(styles)(ConstructPanelRight);
+
+
+
+

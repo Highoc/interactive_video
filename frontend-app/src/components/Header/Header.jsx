@@ -19,7 +19,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import { logout, login } from '../../actions/authorization';
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const styles = theme => ({
   root: {
@@ -128,7 +128,7 @@ class Header extends Component {
       </Menu>
     );
 
-    const MyLink = props => <Link to="/" {...props} />;
+    const HomePage = props => <Link to="/" {...props} />;
 
     return (
       <div className={classes.root}>
@@ -155,7 +155,7 @@ class Header extends Component {
             <div className={classes.grow} />
             <div className={classes.sectionDesktop}>
               {
-                isAuthorized ? <Button onClick={(event) => { onLogout(event); }} component={MyLink} color="inherit">Выйти</Button> : <Button onClick={(event) => { onLogin(event); }} component={MyLink} color="inherit">Войти</Button>
+                isAuthorized ? <Button onClick={(event) => { onLogout(event); }} component={HomePage} color="inherit">Выйти</Button> : <Button onClick={(event) => { onLogin(event); }} component={HomePage} color="inherit">Войти</Button>
               }
               <IconButton
                 aria-owns={isMenuOpen ? 'material-appbar' : undefined}
@@ -181,7 +181,6 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   onLogout: (event) => {
-    event.preventDefault();
     dispatch(logout());
   },
   onLogin: (event) => {
