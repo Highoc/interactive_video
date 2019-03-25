@@ -5,7 +5,7 @@ import {withStyles} from "@material-ui/core";
 import ChannelPlaylist from '../../components/ChannelPlaylist';
 
 import ChannelHead from '../../components/ChannelHead';
-import path from '../../Backend';
+import { backend as path } from '../../urls';
 
 const styles = theme => ({
   root: {

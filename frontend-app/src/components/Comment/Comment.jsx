@@ -8,7 +8,7 @@ import CardContent from '@material-ui/core/CardContent';
 
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
-import path from '../../Backend';
+import { backend as path } from '../../urls';
 import Button from '@material-ui/core/Button';
 
 const styles = {
@@ -39,7 +39,7 @@ export class Comment extends Component {
 
     axios.get(url, config).then(
       (result) => {
-        console.log(result.data);
+        // console.log(result.data);
         this.setState({ isLoaded: true, comment: result.data });
       },
     ).catch(error => console.log(error));
@@ -72,26 +72,26 @@ export class Comment extends Component {
 
     return (
       <div>
-      <Card>
-        <CardHeader
-          title={comment.author}
-          subheader={new Date(comment.created).toLocaleDateString('en-EN', dateOptions)}
-          avatar={
-            <Avatar src="https://hb.bizmrg.com/interactive_video/public_pic/1.jpg" />
-          }
-        />
-        <CardContent>
-          <Typography component="p">
-            {comment.text}
-            <div style={styles.container}>
-              <Button onClick={(event) => this.onReply(event)} color="primary">
-                Ответить
-              </Button>
-            </div>
-          </Typography>
-          {comment.children.map(childId => <Comment commentId={childId} callback={this.props.callback} />)}
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader
+            title={comment.author}
+            subheader={new Date(comment.created).toLocaleDateString('en-EN', dateOptions)}
+            avatar={
+              <Avatar src="https://hb.bizmrg.com/interactive_video/public_pic/1.jpg" />
+            }
+          />
+          <CardContent>
+            <Typography component="p">
+              {comment.text}
+              <div style={styles.container}>
+                <Button onClick={(event) => this.onReply(event)} color="primary">
+                  Ответить
+                </Button>
+              </div>
+            </Typography>
+            {comment.children.map(childId => <Comment commentId={childId} callback={this.props.callback} />)}
+          </CardContent>
+        </Card>
       </div>
 
     );

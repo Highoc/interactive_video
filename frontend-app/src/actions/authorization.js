@@ -1,5 +1,6 @@
 import axios from 'axios';
-import path from '../Backend';
+import { backend as path } from '../urls';
+
 import * as actionTypes from './actionTypes';
 
 
@@ -27,10 +28,9 @@ export const logout = () => {
 export const login = (username, password) => (dispatch) => {
   dispatch(loginStart());
 
-  axios.post(`http://${path}/token-auth/`, { username, password })
+  axios.post(`http://${path}/auth/login/`, { username, password })
     .then((result) => {
       const { token, user } = result.data;
-      console.log(result);
       localStorage.setItem('jwt-token', token);
       dispatch(loginSuccess(token, user.username));
     })
@@ -40,14 +40,24 @@ export const login = (username, password) => (dispatch) => {
     });
 };
 
-/*
-export const loginCheckState = () => {
-  return (dispatch) => {
-    const token = localStorage.getItem('token');
-    const userId = localStorage.getItem('userId');
-    if (token && userId) {
-      dispatch(loginSuccess(token, userId));
-    }
-  };
+export const loginCheckState = () => (dispatch) => {
+  dispatch(loginStart());
+  const token = localStorage.getItem('jwt-token');
+  if (token) {
+    const url = `http://${path}/core/user/current/`;
+    const config = {
+      headers: {
+        Authorization: `JWT ${token}`,
+      },
+    };
+    axios.post(url, config)
+      .then((result) => {
+        const { username } = result.data;
+        dispatch(loginSuccess(token, username));
+      })
+      .catch((error) => {
+        console.log(error);
+        dispatch(loginFailed(error));
+      });
+  }
 };
-*/

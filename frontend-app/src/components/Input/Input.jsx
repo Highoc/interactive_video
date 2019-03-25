@@ -1,10 +1,7 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import { withStyles } from '@material-ui/core/styles';
-import MenuItem from '@material-ui/core/MenuItem';
+import React, { Component, useEffect, useState } from 'react';
 import TextField from '@material-ui/core/TextField';
 import classes from './Input.module.css';
+
 
 const styles = theme => ({
   container: {
@@ -45,6 +42,9 @@ function checkValidity(value, rules) {
 class Input extends Component {
   constructor(props) {
     super(props);
+    this.onDrop = (files) => {
+      this.setState({files})
+    };
     this.state = {
       value: props.value,
       rules: props.rules,
@@ -63,6 +63,7 @@ class Input extends Component {
     const isValid = checkValidity(event.target.value, this.state.rules);
     this.setState({ isValid, value: event.target.value, isTouched: true });
   };
+
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     const { value } = this.state;
@@ -148,3 +149,4 @@ class Input extends Component {
 
 
 export default Input;
+

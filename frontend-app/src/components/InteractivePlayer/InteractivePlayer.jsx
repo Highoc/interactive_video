@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import 'video-react/dist/video-react.css';
 import PropTypes from 'prop-types';
+import { backend as path } from '../../urls';
+
 import { withStyles } from '@material-ui/core/styles';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Typography from '@material-ui/core/Typography';
@@ -16,8 +18,6 @@ import {
   TimeDivider,
   BigPlayButton,
 } from 'video-react';
-import path from '../../Backend';
-
 
 const propTypes = {
   player: PropTypes.object,
@@ -104,7 +104,6 @@ class InteractivePlayer extends Component {
           responseType: 'arraybuffer',
         }).then(
           (responseSource) => {
-            console.log(responseSource.data);
             videoQueue.pushSource(main, responseSource.data, response.data.time);
             timeResolver.pushTimeSource(main, response.data.time);
 

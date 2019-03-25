@@ -15,12 +15,13 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Input from '../../components/Input/Input';
-import path from '../../Backend';
 import Fab from '@material-ui/core/Fab';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import PropTypes from "prop-types";
 import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
+import { backend as path } from '../../urls';
+
 
 
 const styles = theme => ({
@@ -228,6 +229,13 @@ class CreateVideo extends Component {
     event.preventDefault();
   }
 
+
+  onUpdateTree() {
+    const { tree } = this.state;
+    tree.tree = tree.getTreeData();
+    this.setState({ tree });
+  }
+
   render() {
     const {
       sources, tree, dialogOpen, inputData, nodeChosen, inputs, isLoaded,
@@ -253,7 +261,7 @@ class CreateVideo extends Component {
         <div id="treeWrapper" style={{ width: '1000px', height: '500px' }}>
 
           <Tree
-            data={tree.getTreeData()}
+            data={tree.tree}
             translate={{ x: 20, y: 225 }}
             collapsible={false}
             zoomable={false}
@@ -266,14 +274,14 @@ class CreateVideo extends Component {
                 x: -25,
               },
             }}
-            onClick={(nodeData, event) => this.handleClick(nodeData.key)}
+            onClick={(nodeData, event) => { this.handleClick(nodeData.key); this.onUpdateTree(); }}
           />
 
         </div>
-        <Button variant="contained" color="primary" className={classes.button} onClick={() => { tree.addChildNode(nodeChosen); this.setState({ nodeChosen }); }}>
+        <Button variant="contained" color="primary" className={classes.button} onClick={() => { tree.addChildNode(nodeChosen); this.setState({ nodeChosen }); this.onUpdateTree() }}>
           Add Child
         </Button>
-        <Button variant="contained" color="primary" className={classes.button} onClick={() => { tree.removeNode(nodeChosen); this.setState({ nodeChosen: null }); }}>
+        <Button variant="contained" color="primary" className={classes.button} onClick={() => { tree.removeNode(nodeChosen); this.setState({ nodeChosen: null }); this.onUpdateTree() }}>
           Remove Child
         </Button>
         <Dialog
@@ -350,11 +358,11 @@ class TreeData {
       children: [],
       isReady: false,
     };
-
     this.nodeCounter = 0;
   }
 
   getTreeData() {
+    this.updated = false;
     return clone(this.tree);
   }
 
@@ -420,6 +428,7 @@ class TreeData {
     };
 
     node.children.push(newNode);
+    this.updated = true;
   }
 
   generateKey() {
@@ -434,5 +443,6 @@ class TreeData {
 
     const parentNode = this.findParentNodeByKey(this.tree, key);
     parentNode.children = parentNode.children.filter(child => child.key !== key);
+    this.updated = true;
   }
 }

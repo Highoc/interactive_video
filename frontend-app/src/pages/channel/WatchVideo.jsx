@@ -1,25 +1,35 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import InteractivePlayer from '../../components/InteractivePlayer/InteractivePlayer';
-import ExpansionPanelVideo from '../../components/ExpansionPanel';
-import { Comment } from '../../components/Comment/Comment';
+import { connect } from 'react-redux';
+
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@material-ui/core/Button';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import path from '../../Backend';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import { Comment } from '../../components/Comment/Comment';
+import InteractivePlayer from '../../components/InteractivePlayer/InteractivePlayer';
+import ExpansionPanelVideo from '../../components/ExpansionPanel';
 import Input from '../../components/Input/Input';
-import Button from '@material-ui/core/Button';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { backend as path } from '../../urls';
+
+
+import {
+  subscribeToChannel as subscribe,
+  unsubscribeFromChannel as unsubscribe,
+} from '../../actions/centrifugo';
+
 
 const textStyles = {
   position: 'relative',
@@ -61,24 +71,88 @@ const statuses = {
 class WatchVideo extends Component {
   constructor(props) {
     super(props);
-    const { channelKey, videoKey } = props.match.params;
+    const { videoKey, channelKey } = props.match.params;
     this.state = {
       status: statuses.NOT_LOADED,
       video: null,
       author: 'admin',
-      views: 400,
-      rating: 200,
+      videoKey,
+      viewsCounter: 0,
       dialogOpen: false,
-      channelKey: channelKey,
-      videoKey: videoKey,
+      channelKey,
       inputs: [],
       isLoaded: false,
     };
   }
 
   async componentDidMount() {
-    const { videoKey, channelKey } = this.state;
-    const url = `http://${path}/video/get/${videoKey}/`;
+    try {
+      const { videoKey, channelKey } = this.state;
+
+      const config = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+        },
+      };
+
+      let url = `http://${path}/video/get/${videoKey}/`;
+      let response = await axios.get(url, config);
+      this.setState({ video: response.data });
+      console.log(`[WatchVideo] ${JSON.stringify(response.data)}`);
+
+      url = `http://${path}/views/add/${videoKey}/`;
+      response = await axios.post(url, {}, config);
+      this.setState({ viewsCounter: response.data.counter });
+      console.log(`[WatchVideo] ${JSON.stringify(response.data)}`);
+
+      url = `http://${path}/rating/get/${videoKey}/`;
+      response = await axios.get(url, config);
+      this.setState({ ratingCounter: response.data.counter, yourChoice: response.data.value });
+      console.log(`[WatchVideo] ${JSON.stringify(response.data)}`);
+
+      this.setState({ status: statuses.LOADED });
+
+      const { subscribeToChannel } = this.props;
+      subscribeToChannel(`video/${videoKey}/comments`, data => console.log(data));
+      subscribeToChannel(`video/${videoKey}/rating`, data => this.updateRatingCounter(data));
+      subscribeToChannel(`video/${videoKey}/views`, data => this.updateViewsCounter(data));
+
+      const urlInput = `http://${path}/channel/${channelKey}/video/${videoKey}/comment/add/`;
+      const configInput = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+        },
+      };
+      const result = await axios.get(urlInput, configInput);
+      console.log(result.data);
+      this.setState({ inputs: result.data, isLoaded: true });
+    } catch (error) {
+      this.setState({ status: statuses.ERROR });
+      console.log(`[WatchVideo] ${error} ${JSON.stringify(error.response.data)}`);
+    }
+  }
+
+  componentWillUnmount() {
+    const { unsubscribeFromChannel } = this.props;
+    const { videoKey } = this.state;
+    unsubscribeFromChannel(`video/${videoKey}/comments`);
+    unsubscribeFromChannel(`video/${videoKey}/rating`);
+    unsubscribeFromChannel(`video/${videoKey}/views`);
+  }
+
+  updateViewsCounter(views) {
+    this.setState({ viewsCounter: views.counter });
+    console.log(`[WatchVideo] Centrifugo > ${JSON.stringify(views)}`);
+  }
+
+  updateRatingCounter(rating) {
+    this.setState({ ratingCounter: rating.counter });
+    console.log(`[WatchVideo] Centrifugo > ${JSON.stringify(rating)}`);
+  }
+
+  handleRatingChoice(choice) {
+    this.setState({ yourChoice: choice });
+    const { videoKey } = this.state;
 
     const config = {
       headers: {
@@ -86,45 +160,12 @@ class WatchVideo extends Component {
       },
     };
 
-    try {
-      const result = await axios.get(url, config);
-      console.log(result.data);
-      this.setState({ status: statuses.LOADED, video: result.data, isLoaded: true  });
-    } catch (error) {
-      console.log(error);
-      this.setState({ status: statuses.ERROR });
-    }
-    /*
-    const urlInput = `http://${path}/channel/${channelKey}/video/${videoKey}/comment/add/`;
-    const configInput = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
-
-    try {
-      const result = await axios.get(urlInput, configInput);
-      console.log(result.data);
-      this.setState({ inputs: result.data, isLoaded: true });
-    } catch (error) {
-      console.log(error);
-    }*/
-  }
-
-  getData() {
-    const { inputs, parentId } = this.state;
-    const result = {};
-    inputs.map((input) => {
-      result[input.name] = input.value;
-      result.parent_id = parentId;
-      return 0;
-    });
-    console.log(result);
-    return result;
+    const url = `http://${path}/rating/update/${videoKey}/`;
+    axios.post(url, { value: choice }, config);
   }
 
   async submitHandler() {
-    const { inputs, channelKey, videoKey, parentId } = this.state;
+    const { inputs, channelKey, videoKey } = this.state;
     let isValid = true;
     console.log(inputs);
     for (const key in inputs) {
@@ -134,7 +175,6 @@ class WatchVideo extends Component {
     if (isValid) {
       console.log('Отправить можно');
       this.setState({ dialogOpen: false });
-      /*
       try {
         const url = `http://${path}/channel/${channelKey}/video/${videoKey}/comment/add/`;
         const data = this.getData();
@@ -151,11 +191,24 @@ class WatchVideo extends Component {
         this.setState({ isSent: true });
       } catch (error) {
         console.log(error);
-      }*/
+      }
     } else {
       console.log('Invalid input');
     }
   }
+
+  getData() {
+    const { inputs, parentId } = this.state;
+    const result = {};
+    inputs.map((input) => {
+      result[input.name] = input.value;
+      result.parent_id = parentId;
+      return 0;
+    });
+    console.log(result);
+    return result;
+  }
+
 
   callbackInput(state) {
     const { inputs } = this.state;
@@ -174,10 +227,12 @@ class WatchVideo extends Component {
     this.setState({ dialogOpen: false });
   };
 
-  render() {
-    const { status, video, channelKey, videoKey, inputs, isLoaded, dialogOpen, author, views, rating } = this.state;
-    console.log(video);
 
+  render() {
+    const {
+      status, video, viewsCounter, ratingCounter, yourChoice,
+      isLoaded, dialogOpen, channelKey, videoKey, inputs, author,
+    } = this.state;
     const Inputs = Object.keys(inputs).map((key) => {
       const inputElement = inputs[key];
       return (
@@ -192,7 +247,6 @@ class WatchVideo extends Component {
         />
       );
     });
-
     const { classes } = this.props;
     let result = null;
     if (status === statuses.LOADED && isLoaded) {
@@ -208,24 +262,24 @@ class WatchVideo extends Component {
             </CardContent>
           </Card>
           <InteractivePlayer main={video.head_video_part} codec={video.codec} />
-
           <ExpansionPanelVideo
             created={video.created}
             author={author}
-            views={views}
-            rating={rating}
             description={video.description}
             keyVideo={videoKey}
             keyChannel={channelKey}
+            views={viewsCounter}
+            rating={ratingCounter}
+            choice={yourChoice}
             inputs={inputs}
+            callback={choice => this.handleRatingChoice(choice)}
           />
           <ExpansionPanel>
             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography className={classes.heading}>Комментарии</Typography>
+              <Typography className={classes.heading}>Ко всем комментариям:</Typography>
             </ExpansionPanelSummary>
             { video.head_comments.map(commentId => <Comment commentId={commentId} callback={state => this.callbackComment(state)} />)}
           </ExpansionPanel>
-
           <Dialog
             onClose={this.handleClose}
             open={dialogOpen}
@@ -261,7 +315,17 @@ class WatchVideo extends Component {
 
 WatchVideo.propTypes = {
   classes: PropTypes.object.isRequired,
+  subscribeToChannel: PropTypes.func.isRequired,
+  unsubscribeFromChannel: PropTypes.func.isRequired,
 };
 
-export default withStyles(styles)(WatchVideo);
+const mapStateToProps = state => ({
+  isReady: state.centrifugo.isInitialised,
+});
 
+const mapDispatchToProps = dispatch => ({
+  subscribeToChannel: (channel, callback) => dispatch(subscribe(channel, callback)),
+  unsubscribeFromChannel: channel => dispatch(unsubscribe(channel)),
+});
+
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(WatchVideo));

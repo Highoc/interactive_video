@@ -8,11 +8,15 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import Input from '../Input/Input';
 import axios from 'axios';
-import path from '../../Backend';
+import { backend as path } from '../../urls';
+import ArrowDropDown from '@material-ui/icons/ArrowDropDown';
+import ArrowDropUp from '@material-ui/icons/ArrowDropUp';
+
 
 
 const styles = theme => ({
@@ -20,7 +24,7 @@ const styles = theme => ({
     width: '100%',
   },
   heading: {
-    fontSize: theme.typography.pxToRem(15),
+    fontSize: theme.typography.pxToRem(24),
   },
   secondaryHeading: {
     fontSize: theme.typography.pxToRem(15),
@@ -37,9 +41,15 @@ const styles = theme => ({
   column: {
     flexBasis: '33.33%',
   },
+  rightcolumn: {
+    flexBasis: '16.5%',
+  },
   columnButton: {
     marginLeft: '30%',
     marginRight: '30%',
+  },
+  buttonContainer: {
+    marginLeft: '60%',
   },
   helper: {
     borderLeft: `2px solid ${theme.palette.divider}`,
@@ -129,8 +139,14 @@ class ExpansionPanelVideo extends Component {
     }
   }
 
+  onReply(event, choice) {
+    const { callback } = this.props;
+    callback(choice);
+    event.preventDefault();
+  }
+
   render() {
-    const { classes, description, created, author, views, rating } = this.props;
+    const { classes, description, created, author, rating, views, choice } = this.props;
     const { inputs, isSent, expanded } = this.state;
 
     const Inputs = Object.keys(inputs).map((key) => {
@@ -166,16 +182,34 @@ class ExpansionPanelVideo extends Component {
             </div>
             <div className={classes.column}>
               <Button variant="contained" color="secondary" className={classes.columnButton} onClick={(event) => { event.preventDefault(); this.handleChange(expanded); }}>
-                Comments
+                Оставить свой комментарий
               </Button>
             </div>
-            <div className={classes.column}>
-              <Typography className={classes.secondaryHeading}>
-                Рейтинг: {rating}
+            <div className={classes.rightcolumn}>
+              <Typography className={classes.heading}>
+                Рейтинг:
+                {rating}
+                <div>
+                  <Typography className={classes.heading}>
+                    Просмотров:
+                    {views}
+                  </Typography>
+                </div>
               </Typography>
-              <Typography className={classes.secondaryHeading}>
-                Просмотров: {views}
-              </Typography>
+            </div>
+            <div className={classes.rightcolumn}>
+              <div className={classes.buttonContainer}>
+                <div>
+                  <IconButton color="secondary" className={classes.button} aria-label="Like" onClick={(event) => this.onReply(event, 1)}>
+                    <ArrowDropUp fontSize={"large"} />
+                  </IconButton>
+                </div>
+                <div>
+                  <IconButton color="secondary" className={classes.button} aria-label="Like" onClick={(event) => this.onReply(event, -1)}>
+                    <ArrowDropDown fontSize={"large"} />
+                  </IconButton>
+                </div>
+              </div>
             </div>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails className={classes.details}>

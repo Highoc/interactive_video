@@ -19,7 +19,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import { logout, login } from '../../actions/authorization';
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const styles = theme => ({
   root: {

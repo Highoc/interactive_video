@@ -3,7 +3,7 @@ import axios from 'axios';
 import PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core";
 import ChannelPlaylist from '../../components/ChannelPlaylist';
-import path from '../../Backend';
+import { backend as path } from '../../urls';
 import Typography from '@material-ui/core/Typography';
 
 

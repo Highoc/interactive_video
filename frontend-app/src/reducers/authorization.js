@@ -1,7 +1,7 @@
 import * as actionTypes from '../actions/actionTypes';
 
 const initialState = {
-  token: localStorage.getItem('jwt-token'),
+  token: null,
   username: 'Guest',
 
   loading: false,
@@ -39,6 +39,7 @@ const logout = (state, action) => ({
   token: null,
   username: 'Guest',
 });
+
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {

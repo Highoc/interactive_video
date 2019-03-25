@@ -7,7 +7,7 @@ import Fab from '@material-ui/core/Fab';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import { Redirect } from 'react-router-dom';
 import Input from '../../components/Input/Input';
-import path from '../../Backend';
+import { backend as path } from '../../urls';
 
 
 const styles = theme => ({
