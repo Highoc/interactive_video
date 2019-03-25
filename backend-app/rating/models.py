@@ -11,6 +11,7 @@ class Rating(models.Model):
     )
 
     counter = models.IntegerField(
+        default=0,
         verbose_name='Рейтинг интерактивного видео'
     )
 
