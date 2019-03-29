@@ -7,8 +7,7 @@ import Fab from '@material-ui/core/Fab';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import { Redirect } from 'react-router-dom';
 import Input from '../../components/Input/Input';
-import { backend as path } from '../../urls';
-
+import { RequestResolver, json } from '../../helpers/RequestResolver';
 
 const styles = theme => ({
   margin: {
@@ -30,21 +29,13 @@ class PlaylistAdd extends Component {
       channelKey,
       isSent: false,
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     const { channelKey } = this.state;
-
-    const url = `http://${path}/channel/${channelKey}/playlist/create/`;
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
-
     try {
-      const result = await axios.get(url, config);
-      console.log(result.data);
+      const result = await this.backend().get(`channel/${channelKey}/playlist/create/`);
       this.setState({ inputs: result.data, isLoaded: true });
     } catch (error) {
       console.log(error);
@@ -67,18 +58,8 @@ class PlaylistAdd extends Component {
 
     if (isValid) {
       try {
-        const url = `http://${path}/channel/${channelKey}/playlist/create/`;
         const data = this.getData();
-        const configs = {
-          headers: {
-            Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-            'Content-Type': 'application/json',
-          },
-        };
-
-        const result = await axios.post(url, data, configs);
-
-        console.log(result);
+        const result = await this.backend(json).post(`channel/${channelKey}/playlist/create/`, data);
         this.setState({ isSent: true });
       } catch (error) {
         console.log(error);

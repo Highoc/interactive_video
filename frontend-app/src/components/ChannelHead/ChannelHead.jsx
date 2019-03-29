@@ -9,9 +9,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import axios from 'axios';
-import { backend as path } from '../../urls';
-
+import { RequestResolver, json } from '../../helpers/RequestResolver';
 
 const styles = theme => ({
   titleBar: {
@@ -38,20 +36,14 @@ class ChannelHead extends Component {
       channelKey: props.channelKey,
       subStatus: false,
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   async handleSubscribe(event) {
     event.preventDefault();
     try {
       const { channelKey } = this.state;
-      const url = `http://${path}/channel/${channelKey}/subscribe/`;
-      const configs = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-          'Content-Type': 'application/json',
-        },
-      };
-      const result = await axios.post(url, {}, configs);
+      const result = await this.backend(json).post(`channel/${channelKey}/subscribe/`, {});
       this.setState({ subStatus: true });
     } catch (error) {
       console.log(JSON.stringify(error));
@@ -63,14 +55,7 @@ class ChannelHead extends Component {
     event.preventDefault();
     try {
       const { channelKey } = this.state;
-      const url = `http://${path}/channel/${channelKey}/unsubscribe/`;
-      const configs = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-          'Content-Type': 'application/json',
-        },
-      };
-      const result = await axios.post(url, {}, configs);
+      const result = await this.backend(json).post(`channel/${channelKey}/unsubscribe/`, {});
       this.setState({ subStatus: false });
     } catch (error) {
       console.log(JSON.stringify(error));

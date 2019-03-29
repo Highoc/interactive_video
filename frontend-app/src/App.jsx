@@ -21,20 +21,16 @@ import Centrifugo from './components/Centrifugo';
 
 import { loginCheckState } from './actions/authorization';
 
-
-
 const Guest = props => <div> Гостевая страница </div>;
 
 
 class App extends Component {
-
   componentDidMount() {
     const { onTryAutoLogin } = this.props;
     onTryAutoLogin();
   }
 
   render() {
-
     let components = (
       <Switch>
         <Route path="/guest" exact component={Guest} />

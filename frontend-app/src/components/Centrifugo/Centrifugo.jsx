@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import axios from 'axios';
 import Centrifuge from 'centrifuge';
 
 import {
@@ -11,26 +10,20 @@ import {
   deleteSubscription as remove,
 } from '../../actions/centrifugo';
 
-import { centrifugo, backend } from '../../urls';
+import { centrifuge as centrifugeURL, RequestResolver } from '../../helpers/RequestResolver';
 
 class Centrifugo extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      centrifuge: new Centrifuge(`ws://${centrifugo}/connection/websocket`),
+      centrifuge: new Centrifuge(`${centrifugeURL}/connection/websocket`),
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     try {
-      const url = `http://${backend}/core/centrifugo/token/`;
-      const config = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-        },
-      };
-
-      const response = await axios.get(url, config);
+      const response = await this.backend().get('core/centrifuge/token/');
       const token = response.data;
 
       const { centrifugoInit } = this.props;

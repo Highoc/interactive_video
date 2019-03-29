@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import { connect } from 'react-redux';
-
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -11,8 +9,6 @@ import Button from '@material-ui/core/Button';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-
-
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
@@ -22,8 +18,7 @@ import { Comment } from '../../components/Comment/Comment';
 import InteractivePlayer from '../../components/InteractivePlayer/InteractivePlayer';
 import ExpansionPanelVideo from '../../components/ExpansionPanel';
 import Input from '../../components/Input/Input';
-import { backend as path } from '../../urls';
-
+import { RequestResolver, json } from '../../helpers/RequestResolver';
 
 import {
   subscribeToChannel as subscribe,
@@ -83,28 +78,20 @@ class WatchVideo extends Component {
       inputs: [],
       isLoaded: false,
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     try {
       const { videoKey, channelKey } = this.state;
 
-      const config = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-        },
-      };
-
-      let url = `http://${path}/video/get/${videoKey}/`;
-      let response = await axios.get(url, config);
+      let response = await this.backend().get(`video/get/${videoKey}/`);
       this.setState({ video: response.data });
 
-      url = `http://${path}/views/add/${videoKey}/`;
-      response = await axios.post(url, {}, config);
+      response = await this.backend().post(`views/add/${videoKey}/`, {});
       this.setState({ viewsCounter: response.data.counter });
 
-      url = `http://${path}/rating/get/${videoKey}/`;
-      response = await axios.get(url, config);
+      response = await this.backend().get(`rating/get/${videoKey}/`);
       this.setState({ ratingCounter: response.data.counter, yourChoice: response.data.value });
 
       this.setState({ status: statuses.LOADED });
@@ -114,13 +101,7 @@ class WatchVideo extends Component {
       subscribeToChannel(`video/${videoKey}/rating`, data => this.updateRatingCounter(data));
       subscribeToChannel(`video/${videoKey}/views`, data => this.updateViewsCounter(data));
 
-      const urlInput = `http://${path}/channel/${channelKey}/video/${videoKey}/comment/add/`;
-      const configInput = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-        },
-      };
-      const result = await axios.get(urlInput, configInput);
+      const result = await this.backend().get(`channel/${channelKey}/video/${videoKey}/comment/add/`);
       this.setState({ inputs: result.data, isLoaded: true });
     } catch (error) {
       this.setState({ status: statuses.ERROR });
@@ -162,17 +143,8 @@ class WatchVideo extends Component {
     if (isValid) {
       this.setState({ dialogOpen: false });
       try {
-        const url = `http://${path}/channel/${channelKey}/video/${videoKey}/comment/add/`;
         const data = this.getData();
-        const configs = {
-          headers: {
-            Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-            'Content-Type': 'application/json',
-          },
-        };
-
-        const result = await axios.post(url, data, configs);
-
+        const result = await this.backend(json).post(`channel/${channelKey}/video/${videoKey}/comment/add/`, data);
         this.setState({ isSent: true });
       } catch (error) {
         console.log(error);

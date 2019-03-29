@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
-
 import { connect } from 'react-redux';
-
-
 import PropTypes from 'prop-types';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
@@ -16,10 +12,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-
 import MenuIcon from '@material-ui/icons/Menu';
-
-
 import { Link } from 'react-router-dom';
 import { logout } from '../../actions/authorization';
 import { openDrawer, closeDrawer } from '../../actions/buttonActions';
@@ -125,7 +118,6 @@ class Header extends Component {
     const LoginPage = props => <Link to="/login" {...props} />;
     const RegisterPage = props => <Link to="/register" {...props} />;
     const AccountPage = props => <Link to="/account" {...props} />;
-
     const renderMenu = (
       <Menu
         anchorEl={anchorEl}

@@ -8,8 +8,8 @@ import CardContent from '@material-ui/core/CardContent';
 
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
-import { backend as path } from '../../urls';
 import Button from '@material-ui/core/Button';
+import { RequestResolver } from '../../helpers/RequestResolver';
 
 const styles = {
   container: {
@@ -24,20 +24,13 @@ export class Comment extends Component {
       commentId: props.commentId,
       isLoaded: false,
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     try {
       const { commentId } = this.state;
-
-
-      const url = `http://${path}/comment/get/${commentId}/`;
-      const config = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-        },
-      };
-      const result = await axios.get(url,config);
+      const result = await this.backend().get(`comment/get/${commentId}/`);
       this.setState({ isLoaded: true, comment: result.data });
     } catch (error) {
       console.log(error);

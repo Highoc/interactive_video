@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core";
 import ChannelPlaylist from '../../components/ChannelPlaylist';
-
+import { RequestResolver } from '../../helpers/RequestResolver';
 import ChannelHead from '../../components/ChannelHead';
-import { backend as path } from '../../urls';
 
 const styles = theme => ({
   root: {
@@ -33,18 +31,13 @@ class ChannelView extends Component {
       channel: null,
       isLoaded: false,
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     try {
       const { channelKey } = this.state;
-      const url = `http://${path}/channel/get/${channelKey}/`;
-      const config = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-        },
-      };
-      const result = await axios.get(url, config);
+      const result = await this.backend().get(`channel/get/${channelKey}/`);
       this.setState({ isLoaded: true, channel: result.data });
     } catch (error) {
       console.log(error);
@@ -61,13 +54,7 @@ class ChannelView extends Component {
 
     if (nextProps.match.params.channelKey !== this.props.match.params.channelKey) {
       try {
-        const url = `http://${path}/channel/get/${nextProps.match.params.channelKey}/`;
-        const config = {
-          headers: {
-            Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-          },
-        };
-        const result = await axios.get(url, config);
+        const result = await this.backend().get(`channel/get/${nextProps.match.params.channelKey}/`);
         this.setState({ isLoaded: true, channel: result.data });
       } catch (error) {
         console.log(error);

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import 'video-react/dist/video-react.css';
 import PropTypes from 'prop-types';
 
@@ -19,7 +18,7 @@ import {
   DurationDisplay,
   ProgressControl,
 } from 'video-react';
-import { backend as path } from '../../urls';
+import { RequestResolver } from '../../helpers/RequestResolver';
 
 const propTypes = {
   player: PropTypes.object,
@@ -74,7 +73,8 @@ class InteractivePlayer extends Component {
         end: 0,
       },
     };
-
+    this.backend = RequestResolver.getBackend();
+    this.aws = RequestResolver.getAWS();
     this.handleEvents();
   }
 
@@ -87,22 +87,12 @@ class InteractivePlayer extends Component {
       const { videoQueue, timeResolver } = this.state;
       this.setState({ url: videoQueue.addMediaSource(mimeCodec) });
 
-      const url = `http://${path}/video/part/get/${main}/`;
-      const config = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-        },
-      };
-      const configSource = {
-        responseType: 'arraybuffer',
-      };
-
       videoQueue.pushKey(main);
       timeResolver.pushTimeKey(main);
 
-      const responseMain = await axios.get(url, config);
+      const responseMain = await this.backend().get(`video/part/get/${main}/`);
 
-      const responseSource = await axios.get(responseMain.data.content_url, configSource);
+      const responseSource = await this.aws().get(responseMain.data.content_url);
       videoQueue.pushSource(main, responseSource.data, responseMain.data.time);
       timeResolver.pushTimeSource(main, responseMain.data.time);
 
@@ -147,27 +137,18 @@ class InteractivePlayer extends Component {
 
     this.seek(timeFrame.begin);
 
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
-    const configSource = {
-      responseType: 'arraybuffer',
-    };
 
     for (const childKey of currentVideo.children) {
       videoQueue.pushKey(childKey);
       timeResolver.pushTimeKey(childKey);
       try {
-        const url = `http://${path}/video/part/get/${childKey}/`;
-        const response = await axios.get(url, config);
+        const response = await this.backend().get(`video/part/get/${childKey}/`);
         const { questions } = this.state;
         const { key, text } = response.data;
         this.setState({
           questions: [...questions, { key, text }],
         });
-        const responseSource = await axios.get(response.data.content_url, configSource);
+        const responseSource = await this.aws().get(response.data.content_url);
         videoQueue.pushSource(childKey, responseSource.data, response.data.time);
         timeResolver.pushTimeSource(childKey, response.data.time);
 
@@ -328,6 +309,7 @@ class AppendQueue {
     if (this.queue[0].isLoaded) {
       const currentPart = this.queue.shift();
       this.totalDuration += currentPart.time;
+      console.log(this.sourceBuffer);
       this.sourceBuffer.appendBuffer(currentPart.buf);
     }
   }

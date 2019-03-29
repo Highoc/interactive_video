@@ -1,7 +1,6 @@
-import axios from 'axios';
 import * as actionTypes from './actionTypes';
-import { backend as path } from '../urls';
 import { login } from './authorization';
+import { RequestResolver } from '../helpers/RequestResolver';
 
 export const registrationStart = () => {
   return {
@@ -25,9 +24,8 @@ export const registrationFailed = (error) => {
 export const registration = (data) => {
   return (dispatch) => {
     dispatch(registrationStart());
-    axios.post(`http://${path}/core/user/sign_up/`, data)
+    RequestResolver.getGuest()().post('core/user/sign_up/', data)
       .then((result) => {
-        console.log(result);
         const { username, password1 } = data;
         dispatch(registrationSuccess());
         dispatch(login(username, password1));

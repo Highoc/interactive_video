@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import ChannelPlaylistView from '../../components/ChannelPlaylistView';
-import { backend as path } from '../../urls';
-import axios from 'axios';
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core";
@@ -10,7 +8,7 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
-
+import { RequestResolver } from '../../helpers/RequestResolver';
 
 const styles = theme => ({
   titleBar: {
@@ -51,18 +49,13 @@ class PlaylistAll extends Component {
       isLoaded: false,
       playlists: null,
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     try {
       const { channelKey } = this.state;
-      const url = `http://${path}/channel/${channelKey}/playlist/all/`;
-      const config = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-        },
-      };
-      const result = await axios.get(url, config);
+      const result = await this.backend().get(`channel/${channelKey}/playlist/all/`);
       this.setState({ isLoaded: true, playlists: result.data });
     } catch (error) {
       console.log(error);

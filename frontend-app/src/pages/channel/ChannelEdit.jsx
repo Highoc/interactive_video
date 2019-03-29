@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
 import Fab from '@material-ui/core/Fab';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import Input from '../../components/Input/Input';
-import { backend as path } from '../../urls';
+import { RequestResolver } from '../../helpers/RequestResolver';
 
 
 const styles = theme => ({
@@ -27,24 +26,16 @@ class ChannelEdit extends Component {
       isValid: false,
       inputs: [],
     };
+    this.backend = RequestResolver.getBackend();
   }
 
-  componentDidMount() {
-    const url = `http://${path}/channel/update/`;
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
-
-    axios.get(url, config).then(
-      (result) => {
-        console.log(result.data);
-        this.setState({ inputs: result.data, isLoaded: true });
-      },
-    ).catch((error) => {
+  async componentDidMount() {
+    try {
+      const result = await this.backend().get('channel/update/');
+      this.setState({ inputs: result.data, isLoaded: true });
+    } catch (error) {
       console.log(error);
-    });
+    }
   }
 
 
@@ -138,5 +129,4 @@ ChannelEdit.propTypes = {
 };
 
 export default withStyles(styles)(ChannelEdit);
-
 

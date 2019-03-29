@@ -7,16 +7,13 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
 import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
-import axios from 'axios';
 import ArrowDropDown from '@material-ui/icons/ArrowDropDown';
 import ArrowDropUp from '@material-ui/icons/ArrowDropUp';
-import { backend as path } from '../../urls';
 import Input from '../Input/Input';
-
+import { RequestResolver, json } from '../../helpers/RequestResolver';
 
 const styles = theme => ({
   root: {
@@ -76,6 +73,7 @@ class ExpansionPanelVideo extends Component {
       expanded: false,
       choice: props.choice,
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   getData() {
@@ -94,16 +92,8 @@ class ExpansionPanelVideo extends Component {
 
     if (isValid) {
       try {
-        const url = `http://${path}/channel/${channelKey}/video/${videoKey}/comment/add/`;
         const data = this.getData();
-        const configs = {
-          headers: {
-            Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-            'Content-Type': 'application/json',
-          },
-        };
-
-        const result = await axios.post(url, data, configs);
+        const result = await this.backend(json).post(`channel/${channelKey}/video/${videoKey}/comment/add/`, data);
         this.setState({ isSent: true });
       } catch (error) {
         console.log(error);
@@ -144,7 +134,7 @@ class ExpansionPanelVideo extends Component {
     const {
       classes, description, created, author, rating, views
     } = this.props;
-    const { inputs, isSent, expanded, choice } = this.state;
+    const { inputs, expanded, choice } = this.state;
 
     const Inputs = Object.keys(inputs).map((key) => {
       const inputElement = inputs[key];

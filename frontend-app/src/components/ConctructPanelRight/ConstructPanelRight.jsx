@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { Link, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
-import HomeIcon from '@material-ui/icons/Home';
 import Button from '@material-ui/core/Button';
 import Drawer from '@material-ui/core/Drawer';
 import VideoCamera from '@material-ui/icons/Videocam';

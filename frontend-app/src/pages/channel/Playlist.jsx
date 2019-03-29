@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import ChannelPlaylist from '../../components/ChannelPlaylist';
-import { backend as path } from '../../urls';
-
+import { RequestResolver } from '../../helpers/RequestResolver';
 
 const styles = theme => ({
   titleBar: {
@@ -35,19 +32,13 @@ class Playlist extends Component {
       isLoaded: false,
       playlist: null,
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     try {
       const { channelKey, playlistKey } = this.state;
-
-      const url = `http://${path}/channel/${channelKey}/playlist/${playlistKey}/`;
-      const config = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-        },
-      };
-      const result = await axios.get(url, config);
+      const result = await this.backend().get(`channel/${channelKey}/playlist/${playlistKey}/`);
       this.setState({ isLoaded: true, playlist: result.data });
     } catch (error) {
       console.log(error);
@@ -64,7 +55,6 @@ class Playlist extends Component {
     * Изменить плейлист
     * */
     const { playlist, channelKey } = this.state;
-    console.log(channelKey, playlist);
     return (
       <div>
         <Card className={classes.card}>

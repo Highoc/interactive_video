@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
 import Fab from '@material-ui/core/Fab';
 import NavigationIcon from '@material-ui/icons/Navigation';
+import { Redirect } from 'react-router-dom';
 import Input from '../../components/Input/Input';
-import { backend as path } from '../../urls';
-import {Redirect} from "react-router-dom";
+import { RequestResolver, json } from '../../helpers/RequestResolver';
 
 
 const styles = theme => ({
@@ -27,29 +26,21 @@ class PlaylistEdit extends Component {
     this.state = {
       isValid: false,
       inputs: [],
-      channelKey: channelKey,
-      playlistKey: playlistKey,
+      channelKey,
+      playlistKey,
       isSent: false,
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     const { channelKey, playlistKey } = this.state;
-    const url = `http://${path}/channel/${channelKey}/playlist/${playlistKey}/update/`;
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
-
     try {
-      const result = await axios.get(url, config);
-      console.log(result.data);
+      const result = await this.backend().get(`channel/${channelKey}/playlist/${playlistKey}/update/`);
       this.setState({ inputs: result.data, isLoaded: true });
     } catch (error) {
       console.log(error);
     }
-
   }
 
   getData() {
@@ -68,17 +59,8 @@ class PlaylistEdit extends Component {
 
     if (isValid) {
       try {
-        const url = `http://${path}/channel/${channelKey}/playlist/${playlistKey}/update/`;
         const data = this.getData();
-        const configs = {
-          headers: {
-            Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-            'Content-Type': 'application/json',
-          },
-        };
-
-        const result = await axios.post(url, data, configs);
-
+        const result = await this.backend(json).post(`channel/${channelKey}/playlist/${playlistKey}/update/`, data);
         this.setState({ isSent: true });
       } catch (error) {
         console.log(error);
@@ -145,5 +127,3 @@ PlaylistEdit.propTypes = {
 };
 
 export default withStyles(styles)(PlaylistEdit);
-
-

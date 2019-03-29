@@ -59,7 +59,6 @@ class SignIn extends Component {
           description: 'Логин',
           rules: {
             max_length: 64,
-            min_length: 8,
             required: true,
           },
         },

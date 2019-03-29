@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
 import Fab from '@material-ui/core/Fab';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import Input from '../../components/Input/Input';
-import { backend as path } from '../../urls';
+import { RequestResolver } from '../../helpers/RequestResolver';
 
 
 const styles = theme => ({
@@ -47,17 +46,12 @@ class CreateChannel extends Component {
           },
         }],
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     try {
-      const url = `http://${path}/channel/update/`;
-      const config = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-        },
-      };
-      const result = await axios.get(url, config);
+      const result = await this.backend().get('channel/update/');
       this.setState({ isLoaded: true });
     } catch (error) {
       console.log(error);

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import 'react-tree-graph/dist/style.css';
 
 import Tree from 'react-d3-tree';
-import axios from 'axios';
 
 import clone from 'clone';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -18,8 +17,8 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import { backend as path } from '../../urls';
 import ConstructPanelRight from '../../components/ConctructPanelRight';
+import { RequestResolver, json } from '../../helpers/RequestResolver';
 import Input from '../../components/Input/Input';
 
 const styles = {
@@ -106,20 +105,13 @@ class CreateVideo extends Component {
           },
         }],
     };
-
+    this.backend = RequestResolver.getBackend();
     this.uploadVideo = this.uploadVideo.bind(this);
   }
 
   async componentDidMount() {
     try {
-      const url = `http://${path}/video/source/list/`;
-
-      const config = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-        },
-      };
-      const result = await axios.get(url, config);
+      const result = await this.backend().get('video/source/list/');
       this.setState({ sources: result.data });
     } catch (error) {
       console.log(error);
@@ -204,15 +196,8 @@ class CreateVideo extends Component {
 
     if (isValid) {
       try {
-        const url = `http://${path}/video/upload/`;
         const data = this.getVideoData();
-        const config = {
-          headers: {
-            Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-            'Content-Type': 'application/json',
-          },
-        };
-        const result = await axios.post(url, data, config);
+        const result = await this.backend(json).post('video/upload/', data);
         this.setState({ videoKey: result.data.key });
       } catch (error) {
         this.setState({ videoKey: 'error' });

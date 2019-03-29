@@ -5,7 +5,6 @@ import { withStyles } from '@material-ui/core/styles';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import { connect } from 'react-redux';
-import axios from 'axios';
 import Drawer from '@material-ui/core/Drawer';
 import Typography from '@material-ui/core/Typography';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -15,7 +14,7 @@ import VideoCamera from '@material-ui/icons/Videocam';
 import HomeIcon from '@material-ui/icons/Home';
 import Page from '@material-ui/icons/RestorePage';
 import { Link } from 'react-router-dom';
-import { backend as path } from '../../urls';
+import { RequestResolver } from '../../helpers/RequestResolver';
 import ChannelList from '../ChannelList';
 
 const drawerWidth = '90%';
@@ -121,17 +120,12 @@ class MenuLeft extends Component {
     this.state = {
       channels: [],
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     try {
-      const url = `http://${path}/channel/list/`;
-      const config = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-        },
-      };
-      const result = await axios.get(url, config);
+      const result = await this.backend().get('channel/list/');
       this.setState({ channels: result.data });
     } catch (error) {
       console.log(error);

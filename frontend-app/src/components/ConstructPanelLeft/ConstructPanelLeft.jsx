@@ -5,7 +5,6 @@ import { DragDropContext } from 'react-dnd';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import Divider from '@material-ui/core/Divider';
-import axios from 'axios';
 import Drawer from '@material-ui/core/Drawer';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -18,10 +17,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import { connect } from 'react-redux';
 import SourceList from '../SourceList';
-import { backend as path } from '../../urls';
 import DropBox from '../Drop/index';
 import { uploadFile } from '../../actions/buttonActions';
-
+import { RequestResolver } from '../../helpers/RequestResolver';
 
 const drawerWidth = '80%';
 
@@ -97,17 +95,12 @@ class ConstructPanelLeft extends Component {
       open: true,
       dialogOpen: false,
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     try {
-      const url = `http://${path}/video/source/list/`;
-      const config = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-        },
-      };
-      const result = await axios.get(url,config);
+      const result = await this.backend().get('video/source/list/');
       this.setState({ sources: result.data });
     } catch (error) {
       console.log(error);

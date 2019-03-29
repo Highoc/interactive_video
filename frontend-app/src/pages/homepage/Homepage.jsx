@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core";
 import ChannelPlaylist from '../../components/ChannelPlaylist';
-import { backend as path } from '../../urls';
 import Typography from '@material-ui/core/Typography';
-
+import { RequestResolver } from '../../helpers/RequestResolver';
 
 const styles = theme => ({
   root: {
@@ -30,24 +28,18 @@ class Homepage extends Component {
     super(props);
 
     const channelKey = 'adminadmin00';
-
     this.state = {
       channelKey,
       channel: null,
       isLoaded: false,
     };
+    this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     const channelKey = 'adminadmin00';
     try {
-      const url = `http://${path}/channel/get/${channelKey}/`;
-      const config = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-        },
-      };
-      const result = await axios.get(url, config);
+      const result = await this.backend().get(`channel/get/${channelKey}/`);
       this.setState({ isLoaded: true, channel: result.data });
     } catch (error) {
       console.log(error);

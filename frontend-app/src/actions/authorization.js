@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { backend as path } from '../urls';
+import { RequestResolver } from '../helpers/RequestResolver';
 
 import * as actionTypes from './actionTypes';
 
@@ -28,7 +27,7 @@ export const logout = () => {
 export const login = (username, password) => (dispatch) => {
   dispatch(loginStart());
 
-  axios.post(`http://${path}/auth/login/`, { username, password })
+  RequestResolver.getGuest()().post('auth/login/', { username, password })
     .then((result) => {
       const { token, user } = result.data;
       localStorage.setItem('jwt-token', token);
@@ -44,13 +43,7 @@ export const loginCheckState = () => (dispatch) => {
   dispatch(loginStart());
   const token = localStorage.getItem('jwt-token');
   if (token) {
-    const url = `http://${path}/core/user/current/`;
-    const config = {
-      headers: {
-        Authorization: `JWT ${token}`,
-      },
-    };
-    axios.post(url, config)
+    RequestResolver.getBackend()().get('core/user/current/')
       .then((result) => {
         const { username } = result.data;
         dispatch(loginSuccess(token, username));
