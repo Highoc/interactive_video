@@ -11,6 +11,8 @@ import thunk from 'redux-thunk';
 
 import authorizationReducer from './reducers/authorization';
 import centrifugoReducer from './reducers/centrifugo';
+import registrationReducer from './reducers/register';
+import buttonsReducer from './reducers/buttonReducers';
 
 import './index.css';
 import App from './App';
@@ -19,6 +21,8 @@ import * as serviceWorker from './serviceWorker';
 const rootReducer = combineReducers({
   authorization: authorizationReducer,
   centrifugo: centrifugoReducer,
+  reg: registrationReducer,
+  buttonsAct: buttonsReducer,
 });
 
 /* eslint-disable no-underscore-dangle */

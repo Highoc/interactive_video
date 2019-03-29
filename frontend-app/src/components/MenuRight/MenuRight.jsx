@@ -3,10 +3,12 @@ import { Link, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
-import HomeIcon from '@material-ui/icons/Home';
+
 import Button from '@material-ui/core/Button';
 import Drawer from '@material-ui/core/Drawer';
 import VideoCamera from '@material-ui/icons/Videocam';
+import Divider from "@material-ui/core/Divider";
+import HomeIcon from '@material-ui/icons/Home';
 
 
 const drawerWidth = 240;
@@ -15,6 +17,7 @@ const buttonContainer = {
   display: 'flex',
   marginTop: '70px',
   justifyContent: 'center',
+  marginBottom: '5px',
 };
 
 const styles = theme => ({
@@ -22,7 +25,6 @@ const styles = theme => ({
     padding: '5px',
     float: 'right',
     width: '15%',
-    height: '600px',
   },
   divider: {
     marginTop: theme.spacing.unit * 2,
@@ -104,6 +106,7 @@ class MenuRight extends Component {
             На главную
             </Button>
           </div>
+          <Divider />
         </Drawer>
       </div>
     );

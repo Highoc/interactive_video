@@ -31,36 +31,31 @@ const styles = theme => ({
 class SourceList extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      name: props.name,
-      keyVideo: props.keyVideo,
-    };
   }
 
-
   render() {
-    const { name } = this.state;
-    const { classes } = this.props;
+    const { classes, name } = this.props;
+    console.log(name);
     return (
-        <Card className={classes.card}>
-          <CardActionArea>
-            <CardMedia
-              className={classes.media}
-              title={name}
-              image="https://image.freepik.com/free-icon/no-translate-detected_318-40191.jpg"
-            />
-            <CardContent className={classes.content}>
-              <Typography gutterBottom variant="h6" component="h2" align="center">
-                {name}
-              </Typography>
-            </CardContent>
-            <CardActions>
-              <Button size="small" color="primary">
+      <Card className={classes.card}>
+        <CardActionArea>
+          <CardMedia
+            className={classes.media}
+            title={name}
+            image="https://image.freepik.com/free-icon/no-translate-detected_318-40191.jpg"
+          />
+          <CardContent className={classes.content}>
+            <Typography gutterBottom variant="h6" component="h2" align="center">
+              {name}
+            </Typography>
+          </CardContent>
+          <CardActions>
+            <Button size="small" color="primary">
                 Изменить
-              </Button>
-            </CardActions>
-          </CardActionArea>
-        </Card>
+            </Button>
+          </CardActions>
+        </CardActionArea>
+      </Card>
     );
   }
 }
@@ -70,5 +65,3 @@ SourceList.propTypes = {
 };
 
 export default withStyles(styles)(SourceList);
-
-

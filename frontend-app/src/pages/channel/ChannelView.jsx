@@ -11,6 +11,7 @@ const styles = theme => ({
   root: {
     display: 'flex',
     flexWrap: 'wrap',
+    width: '100%',
     justifyContent: 'space-around',
     overflow: 'hidden',
     backgroundColor: theme.palette.background.paper,
@@ -27,32 +28,51 @@ const styles = theme => ({
 class ChannelView extends Component {
   constructor(props) {
     super(props);
-
-    const { channelKey } = props.match.params;
-
     this.state = {
-      channelKey,
+      channelKey: props.match.params.channelKey,
       channel: null,
       isLoaded: false,
     };
   }
 
-  componentDidMount() {
-    const { channelKey } = this.state;
+  async componentDidMount() {
+    try {
+      const { channelKey } = this.state;
+      const url = `http://${path}/channel/get/${channelKey}/`;
+      const config = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+        },
+      };
+      const result = await axios.get(url, config);
+      this.setState({ isLoaded: true, channel: result.data });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-    const url = `http://${path}/channel/get/${channelKey}/`;
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
+  componentWillReceiveProps(nextProps, nextContext) {
+    if (nextProps.match.params.channelKey !== this.props.match.params.channelKey) {
+      this.setState({ channelKey: nextProps.match.params.channelKey, isLoaded: false });
+    }
+  }
 
-    axios.get(url, config).then(
-      (result) => {
-        console.log(result.data);
+  async componentWillUpdate(nextProps, nextState, snapshot) {
+
+    if (nextProps.match.params.channelKey !== this.props.match.params.channelKey) {
+      try {
+        const url = `http://${path}/channel/get/${nextProps.match.params.channelKey}/`;
+        const config = {
+          headers: {
+            Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+          },
+        };
+        const result = await axios.get(url, config);
         this.setState({ isLoaded: true, channel: result.data });
-      },
-    ).catch(error => console.log(error));
+      } catch (error) {
+        console.log(error);
+      }
+    }
   }
 
   render() {

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import 'video-react/dist/video-react.css';
 import PropTypes from 'prop-types';
-import { backend as path } from '../../urls';
 
 import { withStyles } from '@material-ui/core/styles';
 import ButtonBase from '@material-ui/core/ButtonBase';
@@ -17,32 +16,14 @@ import {
   CurrentTimeDisplay,
   TimeDivider,
   BigPlayButton,
+  DurationDisplay,
+  ProgressControl,
 } from 'video-react';
+import { backend as path } from '../../urls';
 
 const propTypes = {
   player: PropTypes.object,
   className: PropTypes.string,
-};
-
-const videoStyles = {
-  position: 'relative',
-  maxhight: '560',
-  overflow: 'hidden',
-};
-const buttonStyles = {
-  position: 'absolute',
-  zIndex: '10',
-  top: '70%',
-  width: '100%',
-  height: '20%',
-  marginRight: '10%',
-};
-const oneBlock = {
-  width: '40%',
-  height: '100%',
-  float: 'left',
-  backgroundImage: 'url(https://ak8.picdn.net/shutterstock/videos/871678/thumb/1.jpg)',
-  marginLeft: '5%',
 };
 
 const styles = theme => ({
@@ -56,6 +37,26 @@ const styles = theme => ({
   focusVisible: {},
   textContainer: {
     justifyContent: 'center',
+  },
+  videoStyles: {
+    position: 'relative',
+    maxhight: '560',
+    overflow: 'hidden',
+  },
+  buttonStyles: {
+    position: 'absolute',
+    zIndex: '10',
+    top: '70%',
+    width: '100%',
+    height: '20%',
+    marginRight: '10%',
+  },
+  oneBlock: {
+    width: '40%',
+    height: '100%',
+    float: 'left',
+    backgroundImage: 'url(https://ak8.picdn.net/shutterstock/videos/871678/thumb/1.jpg)',
+    marginLeft: '5%',
   },
 });
 
@@ -77,46 +78,43 @@ class InteractivePlayer extends Component {
     this.handleEvents();
   }
 
-  componentDidMount() {
-    this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
+  async componentDidMount() {
+    try {
+      this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
+      const { codec, main } = this.props;
+      const mimeCodec = `video/mp4; codecs="${codec}"`;
 
-    const { codec, main } = this.props;
-    const mimeCodec = `video/mp4; codecs="${codec}"`;
+      const { videoQueue, timeResolver } = this.state;
+      this.setState({ url: videoQueue.addMediaSource(mimeCodec) });
 
-    const { videoQueue, timeResolver } = this.state;
-    this.setState({ url: videoQueue.addMediaSource(mimeCodec) });
+      const url = `http://${path}/video/part/get/${main}/`;
+      const config = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+        },
+      };
+      const configSource = {
+        responseType: 'arraybuffer',
+      };
 
-    const url = `http://${path}/video/part/get/${main}/`;
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
+      videoQueue.pushKey(main);
+      timeResolver.pushTimeKey(main);
 
-    videoQueue.pushKey(main);
-    timeResolver.pushTimeKey(main);
+      const responseMain = await axios.get(url, config);
 
-    axios.get(url, config).then(
-      (response) => {
-        console.log(response.data);
+      const responseSource = await axios.get(responseMain.data.content_url, configSource);
+      videoQueue.pushSource(main, responseSource.data, responseMain.data.time);
+      timeResolver.pushTimeSource(main, responseMain.data.time);
 
-        axios.get(response.data.content_url, {
-          responseType: 'arraybuffer',
-        }).then(
-          (responseSource) => {
-            videoQueue.pushSource(main, responseSource.data, response.data.time);
-            timeResolver.pushTimeSource(main, response.data.time);
+      this.setState({
+        children: [responseMain.data],
+        timeFrame: timeResolver.getTimeFrame(main),
+      });
 
-            this.setState({
-              children: [response.data],
-              timeFrame: timeResolver.getTimeFrame(main),
-            });
-
-            this.videoByChoice(main);
-          },
-        ).catch(error => console.log(error));
-      },
-    ).catch(error => console.log(error));
+      this.videoByChoice(main);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   componentWillUpdate(nextProps, nextState, nextContext) {
@@ -133,7 +131,7 @@ class InteractivePlayer extends Component {
     this.seek = this.seek.bind(this);
   }
 
-  videoByChoice(answerKey) {
+  async videoByChoice(answerKey) {
     const { videoQueue, timeResolver, children } = this.state;
 
     const currentVideo = children.find(child => child.key === answerKey);
@@ -154,35 +152,31 @@ class InteractivePlayer extends Component {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
       },
     };
+    const configSource = {
+      responseType: 'arraybuffer',
+    };
 
     for (const childKey of currentVideo.children) {
       videoQueue.pushKey(childKey);
       timeResolver.pushTimeKey(childKey);
+      try {
+        const url = `http://${path}/video/part/get/${childKey}/`;
+        const response = await axios.get(url, config);
+        const { questions } = this.state;
+        const { key, text } = response.data;
+        this.setState({
+          questions: [...questions, { key, text }],
+        });
+        const responseSource = await axios.get(response.data.content_url, configSource);
+        videoQueue.pushSource(childKey, responseSource.data, response.data.time);
+        timeResolver.pushTimeSource(childKey, response.data.time);
 
-      const url = `http://${path}/video/part/get/${childKey}/`;
-      axios.get(url, config).then(
-        (response) => {
-
-          const { questions } = this.state;
-          const { key, text } = response.data;
-          this.setState({
-            questions: [...questions, { key, text }],
-          });
-
-          axios.get(response.data.content_url, {
-            responseType: 'arraybuffer',
-          }).then(
-            (responseSource) => {
-              videoQueue.pushSource(childKey, responseSource.data, response.data.time);
-              timeResolver.pushTimeSource(childKey, response.data.time);
-
-              this.setState({
-                children: [...this.state.children, response.data],
-              });
-            },
-          ).catch(error => console.log(error));
-        },
-      ).catch(error => console.log(error));
+        this.setState({
+          children: [...this.state.children, response.data],
+        });
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
@@ -219,14 +213,14 @@ class InteractivePlayer extends Component {
     const d = timeFrame.end - currentTime;
     if (d > 0 && d < 5) {
       buttons = (
-        <div style={buttonStyles}>
+        <div className={classes.buttonStyles}>
           {questions.map(elem => (
             <ButtonBase
               focusRipple
               focusVisibleClassName={classes.focusVisible}
               key={elem.key}
               onClick={() => this.handleAnswer(elem.key)}
-              style={oneBlock}
+              className={classes.oneBlock}
             >
               <Typography
                 component="span"
@@ -243,15 +237,17 @@ class InteractivePlayer extends Component {
     }
 
     return (
-      <div style={videoStyles}>
+      <div className={classes.videoStyles}>
         {buttons}
-        <Player ref="player" src={url} fluid={true}>
+        <Player ref="player" src={url} fluid>
           <BigPlayButton position="center" />
           <ControlBar autoHide>
-            <ReplayControl seconds={10} order={1.1} />
-            <ForwardControl seconds={10} order={1.2} />
-            <CurrentTimeDisplay order={4.1} />
-            <TimeDivider order={4.2} />
+            <ReplayControl seconds={10} order={2} />
+            <ForwardControl seconds={10} order={3} />
+            <CurrentTimeDisplay disabled />
+            <TimeDivider disabled />
+            <DurationDisplay disabled />
+            <ProgressControl disabled />
             <VolumeMenuButton order={7} vertical />
           </ControlBar>
         </Player>

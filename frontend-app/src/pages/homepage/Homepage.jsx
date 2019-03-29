@@ -38,22 +38,20 @@ class Homepage extends Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const channelKey = 'adminadmin00';
-
-    const url = `http://${path}/channel/get/${channelKey}/`;
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
-
-    axios.get(url, config).then(
-      (result) => {
-        console.log(result.data);
-        this.setState({ isLoaded: true, channel: result.data });
-      },
-    ).catch(error => console.log(error));
+    try {
+      const url = `http://${path}/channel/get/${channelKey}/`;
+      const config = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+        },
+      };
+      const result = await axios.get(url, config);
+      this.setState({ isLoaded: true, channel: result.data });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   render() {
@@ -67,7 +65,6 @@ class Homepage extends Component {
     * Создать / Изменить / Удалить канал
     * */
     const { channel, channelKey } = this.state;
-    console.log(channel);
 
     if (isLoaded) {
       result = (

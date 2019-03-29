@@ -10,12 +10,6 @@ import PermMediaOutlinedIcon from '@material-ui/icons/PhotoSizeSelectActual';
 
 
 const styles = theme => ({
-  root: {
-    padding: '5px',
-    float: 'left',
-    width: '15%',
-    height: '600px',
-  },
   itemPrimary: {
     color: 'inherit',
     fontSize: 20,
@@ -37,28 +31,27 @@ class ChannelList extends Component {
     super(props);
     this.state = {
       name: props.name,
-      keyVideo: props.keyVideo,
+      keyChannel: props.keyChannel,
     };
   }
 
 
   render() {
-    const { name, keyVideo } = this.state;
+    const { name, keyChannel } = this.state;
     const { classes } = this.props;
     const icon = <PermMediaOutlinedIcon />;
-    const MyLink = props => <Link to={`/channel/${keyVideo}`} {...props} />;
+    const ChannelKey = props => <Link to={`/channel/${keyChannel}`} params={{ channelKey: keyChannel }} {...props} />;
 
     return (
       <ListItem
         button
-        component={MyLink}
-        key={`Video${keyVideo}`}
+        component={ChannelKey}
+        key={keyChannel}
       >
         <ListItemIcon>{icon}</ListItemIcon>
         <ListItemText
           primary={name}
-        >
-        </ListItemText>
+        />
       </ListItem>
     );
   }

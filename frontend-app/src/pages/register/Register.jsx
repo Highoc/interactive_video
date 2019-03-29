@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -7,11 +7,10 @@ import FormControl from '@material-ui/core/FormControl';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import Input from '../../components/Input/Input';
 import withStyles from '@material-ui/core/styles/withStyles';
-import { login } from '../../actions/authorization';
-import { openDrawer } from '../../actions/buttonActions';
 import { connect } from 'react-redux';
+import Input from '../../components/Input/Input';
+import { registration } from '../../actions/register';
 
 const styles = theme => ({
   main: {
@@ -45,7 +44,7 @@ const styles = theme => ({
   },
 });
 
-class SignIn extends Component {
+class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -54,46 +53,69 @@ class SignIn extends Component {
       inputs: [
         {
           type: 'text',
-          name: 'login',
+          name: 'username',
           value: '',
           description: 'Логин',
           rules: {
             max_length: 64,
-            min_length: 8,
             required: true,
           },
         },
         {
           type: 'text',
-          name: 'password',
+          name: 'password1',
           value: '',
           description: 'Пароль',
           rules: {
             max_length: 64,
-            min_length: 8,
             required: true,
+            min_length: 8,
           },
-        }],
+        },
+        {
+          type: 'text',
+          name: 'password2',
+          value: '',
+          description: 'Подтвердите пароль',
+          rules: {
+            max_length: 64,
+            required: true,
+            min_length: 8,
+          },
+        },
+      ],
     };
   }
 
   submitHandler(event) {
     event.preventDefault();
     const { inputs } = this.state;
-    const { onLogin } = this.props;
+    const { onRegister } = this.props;
     let isValid = true;
     for (const key in inputs) {
       isValid = isValid && inputs[key].isValid;
     }
-    if (isValid) {
-      const passwordInput = inputs.find(elem => elem.name === "password");
-      const loginInput = inputs.find(elem => elem.name === "login");
-      onLogin(event, loginInput.value, passwordInput.value);
+
+    const loginInput = inputs.find(elem => elem.name === 'username');
+    const passwordInput1 = inputs.find(elem => elem.name === 'password1');
+    const passwordInput2 = inputs.find(elem => elem.name === 'password2');
+
+    if (passwordInput1.value !== passwordInput2.value) {
+      isValid = false;
     }
-    else {
+
+    if (isValid) {
+      console.log('Отправить можно');
+      const data = {
+        username: loginInput.value,
+        password1: passwordInput1.value,
+        password2: passwordInput2.value,
+      };
+      onRegister(data);
+    } else {
       console.log('Invalid input');
     }
-  };
+  }
 
   callbackInput(state) {
     const { inputs } = this.state;
@@ -105,8 +127,8 @@ class SignIn extends Component {
 
 
   render() {
-    const {inputs} = this.state;
-    const { classes} = this.props;
+    const { inputs } = this.state;
+    const { classes } = this.props;
     const Inputs = Object.keys(inputs).map((key) => {
       const inputElement = inputs[key];
       return (
@@ -130,7 +152,7 @@ class SignIn extends Component {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Вход
+            Регистрация
           </Typography>
           <form className={classes.form}>
             <FormControl margin="normal" required fullWidth>
@@ -144,7 +166,7 @@ class SignIn extends Component {
               className={classes.submit}
               onClick={event => this.submitHandler(event)}
             >
-              Войти
+              Зарегистрироваться
             </Button>
           </form>
         </Paper>
@@ -153,25 +175,19 @@ class SignIn extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  isAuthorized: state.authorization.token !== null,
-  username: state.authorization.username,
-});
-
 const mapDispatchToProps = dispatch => ({
+  onRegister: data => dispatch(registration(data)),
+});
 
-  onLogin: (event, loginVal, passwordVal) => {
-    event.preventDefault();
-    dispatch(login(loginVal, passwordVal));
-    dispatch(openDrawer());
-  },
+const mapStateToProps = state => ({
+  loading: state.reg.loading,
+  error: state.reg.error,
 });
 
 
-SignIn.propTypes = {
+Register.propTypes = {
+  onRegister: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(SignIn));
-
-
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Register));

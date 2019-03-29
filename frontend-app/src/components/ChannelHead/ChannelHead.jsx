@@ -9,6 +9,8 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import axios from 'axios';
+import { backend as path } from '../../urls';
 
 
 const styles = theme => ({
@@ -34,15 +36,59 @@ class ChannelHead extends Component {
     this.state = {
       channel: props.channel,
       channelKey: props.channelKey,
+      subStatus: false,
     };
   }
 
+  async handleSubscribe(event) {
+    event.preventDefault();
+    try {
+      const { channelKey } = this.state;
+      const url = `http://${path}/channel/${channelKey}/subscribe/`;
+      const configs = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+          'Content-Type': 'application/json',
+        },
+      };
+      const result = await axios.post(url, {}, configs);
+      this.setState({ subStatus: true });
+    } catch (error) {
+      console.log(JSON.stringify(error));
+    }
+  }
+
+
+  async handleUnsubscribe(event) {
+    event.preventDefault();
+    try {
+      const { channelKey } = this.state;
+      const url = `http://${path}/channel/${channelKey}/unsubscribe/`;
+      const configs = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+          'Content-Type': 'application/json',
+        },
+      };
+      const result = await axios.post(url, {}, configs);
+      this.setState({ subStatus: false });
+    } catch (error) {
+      console.log(JSON.stringify(error));
+    }
+  }
 
   render() {
     const { classes } = this.props;
-    const { channel, channelKey } = this.state;
+    const { channel, channelKey, subStatus } = this.state;
     const MyLink = props => <Link to={`${channelKey}/playlist/all`} {...props} />;
     const Settings = props => <Link to={`${channelKey}/edit`} {...props} />;
+    let subscribed = <Typography> Не подписан </Typography>;
+    let button = <Button size="small" color="primary" onClick={event => this.handleSubscribe(event)}>Подписаться</Button>;
+
+    if (subStatus) {
+      subscribed = <Typography> Подписан </Typography>;
+      button = <Button size="small" color="primary" onClick={event => this.handleUnsubscribe(event)}>Отписаться</Button>;
+    }
 
     return (
       <Card className={classes.card}>
@@ -75,6 +121,8 @@ class ChannelHead extends Component {
           <Button size="small" color="primary" component={Settings}>
             Настройки канала
           </Button>
+          {button}
+          {subscribed}
         </CardActions>
       </Card>
     );

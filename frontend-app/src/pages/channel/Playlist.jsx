@@ -16,14 +16,9 @@ const styles = theme => ({
       'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, '
       + 'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
   },
-  icon: {
-    color: 'white',
-  },
   card: {
     width: '100%',
-  },
-  media: {
-    height: 150,
+    height: '15%',
   },
 });
 
@@ -42,22 +37,21 @@ class Playlist extends Component {
     };
   }
 
-  componentDidMount() {
-    const { channelKey, playlistKey } = this.state;
+  async componentDidMount() {
+    try {
+      const { channelKey, playlistKey } = this.state;
 
-    const url = `http://${path}/channel/${channelKey}/playlist/${playlistKey}/`;
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
-
-    axios.get(url, config).then(
-      (result) => {
-        console.log(result.data);
-        this.setState({ isLoaded: true, playlist: result.data });
-      },
-    ).catch(error => console.log(error));
+      const url = `http://${path}/channel/${channelKey}/playlist/${playlistKey}/`;
+      const config = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+        },
+      };
+      const result = await axios.get(url, config);
+      this.setState({ isLoaded: true, playlist: result.data });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   render() {
@@ -88,8 +82,6 @@ class Playlist extends Component {
         <ChannelPlaylist playlist={playlist} channelKey={channelKey} />
       </div>
 
-
-
     );
   }
 }
@@ -99,6 +91,3 @@ Playlist.propTypes = {
 };
 
 export default withStyles(styles)(Playlist);
-
-
-

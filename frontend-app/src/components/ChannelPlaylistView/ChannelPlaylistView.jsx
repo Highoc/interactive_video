@@ -1,8 +1,8 @@
-import {Component} from "react";
-import {Link} from "react-router-dom";
-import React from "react";
-import PropTypes from "prop-types";
-import {withStyles} from "@material-ui/core";
+import { Component } from 'react';
+import { Link } from 'react-router-dom';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
@@ -80,4 +80,3 @@ ChannelPlaylistView.propTypes = {
 };
 
 export default withStyles(styles)(ChannelPlaylistView);
-

@@ -8,14 +8,13 @@ import {
 
 import Header from './components/Header';
 import MenuLeft from './components/MenuLeft';
-import MenuRight from './components/MenuRight';
 import ConstructPanelLeft from './components/ConstructPanelLeft';
-import ConstructPanelRight from './components/ConctructPanelRight';
 import { Main } from './components/Main';
 import Homepage from './pages/homepage/Homepage';
 import { Account } from './pages/account';
 import { Channel } from './pages/channel';
 import SignIn from './pages/login/SignIn';
+import Register from './pages/register/Register';
 import { Test } from './pages/test';
 
 import Centrifugo from './components/Centrifugo';
@@ -23,51 +22,30 @@ import Centrifugo from './components/Centrifugo';
 import { loginCheckState } from './actions/authorization';
 
 
+
 const Guest = props => <div> Гостевая страница </div>;
-const Patch = props => <div />;
 
 
 class App extends Component {
+
   componentDidMount() {
     const { onTryAutoLogin } = this.props;
     onTryAutoLogin();
   }
 
   render() {
-    const styles = {
-      rootleft: {
-        padding: '5px',
-        float: 'left',
-        width: '15%',
-        height: '600px',
-      },
-      rootRight: {
-        padding: '5px',
-        float: 'right',
-        width: '15%',
-        height: '600px',
-      }
-    };
 
-    const LeftPatch = props => <div style={styles.rootleft} />;
-    const RightPatch = props => <div style={styles.rootRight} />;
-
-    let routes = (
+    let components = (
       <Switch>
         <Route path="/guest" exact component={Guest} />
         <Route path="/login" exact component={SignIn} />
-        <Route path="/register" exact component={Patch} />
+        <Route path="/register" exact component={Register} />
         <Route path="/test" component={Test} />
         <Redirect to="/guest" />
       </Switch>
     );
 
-    let components = (
-      <div>
-        <LeftPatch />
-        <RightPatch />
-      </div>
-    );
+    let routes = <div />;
 
     const { isAuthorized } = this.props;
     if (isAuthorized) {
@@ -89,7 +67,6 @@ class App extends Component {
             render={props => (
               <div>
                 <ConstructPanelLeft />
-                <ConstructPanelRight />
               </div>
             )}
           />
@@ -99,7 +76,6 @@ class App extends Component {
             render={props => (
               <div>
                 <MenuLeft />
-                <MenuRight />
                 <Centrifugo />
               </div>
             )}
@@ -113,10 +89,10 @@ class App extends Component {
       <Router>
         <div>
           <Header />
-            {components}
-            <Main>
-              {routes}
-            </Main>
+          {components}
+          <Main>
+            {routes}
+          </Main>
         </div>
       </Router>
     );

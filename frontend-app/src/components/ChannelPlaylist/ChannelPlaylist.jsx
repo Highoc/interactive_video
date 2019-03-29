@@ -36,9 +36,6 @@ const styles = theme => ({
   card: {
     width: '100%',
   },
-  media: {
-    height: 150,
-  },
 });
 
 class ChannelPlaylist extends Component {
@@ -52,23 +49,22 @@ class ChannelPlaylist extends Component {
 
   render() {
     const { classes } = this.props;
-    const {playlist, channelKey} = this.state;
-    console.log(channelKey);
+    const { playlist, channelKey } = this.state;
     return (
 
       <div>
-        <GridList cellHeight={120} spacing={15} className={classes.gridList}>
+        <GridList cellHeight="auto" spacing={10} className={classes.gridList}>
           <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
             <ListSubheader component="div">{playlist.name}</ListSubheader>
           </GridListTile>
           {playlist.video.map(video => (
-            <GridListTile key={video.name} cols={0.5} rows={2} component={props => <Link to={`/channel/${channelKey}/watch/${video.key}`} {...props} />}>
-              <img src={video.preview_url} alt={video.name} />
+            <GridListTile key={video.name} cols={0.4} rows={1} component={props => <Link to={`/channel/${channelKey}/watch/${video.key}`} {...props} />}>
+              <img src={video.preview_url} alt={video.name} width="22%" height="100%" />
               <GridListTileBar
                 title={video.name}
                 actionIcon={
                   <IconButton className={classes.icon}>
-                    <InfoIcon/>
+                    <InfoIcon />
                   </IconButton>
                 }
               />

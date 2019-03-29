@@ -9,7 +9,6 @@ import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
-
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import { fade } from '@material-ui/core/styles/colorManipulator';
@@ -18,25 +17,39 @@ import Button from '@material-ui/core/Button';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
-import { logout, login } from '../../actions/authorization';
-import { Link } from "react-router-dom";
+import MenuIcon from '@material-ui/icons/Menu';
+
+
+import { Link } from 'react-router-dom';
+import { logout } from '../../actions/authorization';
+import { openDrawer, closeDrawer } from '../../actions/buttonActions';
+
 
 const styles = theme => ({
   root: {
-    width: '100%',
+    display: 'flex',
+  },
+  menuButton: {
+    marginLeft: 12,
+    marginRight: 36,
+  },
+  buttonContainer: {
+    position: 'relative',
+    marginRight: theme.spacing.unit * 2,
+    marginLeft: 0,
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing.unit * 3,
+      width: 'auto',
+    },
+  },
+  buttonPlace: {
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   grow: {
     flexGrow: 1,
-  },
-  menuButton: {
-    marginLeft: -12,
-    marginRight: 20,
-  },
-  title: {
-    display: 'none',
-    [theme.breakpoints.up('sm')]: {
-      display: 'block',
-    },
   },
   search: {
     position: 'relative',
@@ -83,12 +96,6 @@ const styles = theme => ({
       display: 'flex',
     },
   },
-  sectionMobile: {
-    display: 'flex',
-    [theme.breakpoints.up('md')]: {
-      display: 'none',
-    },
-  },
 });
 
 
@@ -97,23 +104,27 @@ class Header extends Component {
     anchorEl: null,
   };
 
+
   handleProfileMenuOpen = (event) => {
     this.setState({ anchorEl: event.currentTarget });
   };
 
   handleMenuClose = () => {
     this.setState({ anchorEl: null });
-    this.handleMobileMenuClose();
   };
 
   render() {
     const {
-      isAuthorized, username, onLogin, onLogout, classes,
+      isAuthorized, username, onLogout, classes, onOpenDrawer, openDrawerStatus, onCloseDrawer,
     } = this.props;
 
     const { anchorEl } = this.state;
-
     const isMenuOpen = Boolean(anchorEl);
+
+    const HomePage = props => <Link to="/" {...props} />;
+    const LoginPage = props => <Link to="/login" {...props} />;
+    const RegisterPage = props => <Link to="/register" {...props} />;
+    const AccountPage = props => <Link to="/account" {...props} />;
 
     const renderMenu = (
       <Menu
@@ -123,23 +134,40 @@ class Header extends Component {
         open={isMenuOpen}
         onClose={this.handleMenuClose}
       >
-        <MenuItem onClick={this.handleMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={this.handleMenuClose}>My account</MenuItem>
+        <MenuItem>Привет {username} </MenuItem>
+        <MenuItem component={AccountPage} onClick={this.handleMenuClose}>Мой аккаунт</MenuItem>
       </Menu>
     );
 
-    const HomePage = props => <Link to="/" {...props} />;
-    const LoginPage = props => <Link to="/login" {...props} />;
+    let buttons = (
+      <div className={classes.buttonPlace}>
+        <Button component={LoginPage} color="inherit" size="medium">Войти</Button>
+        <Button component={RegisterPage} color="inherit" size="medium">Регистрация</Button>
+      </div>
+    );
+
+    if (isAuthorized) {
+      buttons = <Button onClick={(event) => { onLogout(event); }} component={HomePage} color="inherit">Выйти</Button>;
+    }
+
 
     return (
       <div className={classes.root}>
-        <AppBar position="static">
+        <AppBar
+          position="static"
+        >
           <Toolbar>
-            <Typography className={classes.title} variant="h6" color="inherit" noWrap>
-              Привет
-              {'   '}
-              { username }!
-            </Typography>
+            <IconButton
+              className={classes.menuButton}
+              color="inherit"
+              aria-label="Open drawer"
+              onClick={(event) => { openDrawerStatus ? onCloseDrawer(event) : onOpenDrawer(event); }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Button component={HomePage} color="inherit" size="large">InterVideo</Button>
+
+
             <div className={classes.search}>
               <div className={classes.searchIcon}>
                 <SearchIcon />
@@ -149,15 +177,17 @@ class Header extends Component {
                 classes={{
                   root: classes.inputRoot,
                   input: classes.inputInput,
+                  fullWidth: true,
                 }}
               />
             </div>
-
             <div className={classes.grow} />
+
+            <div className={classes.buttonContainer}>
+              {buttons}
+            </div>
             <div className={classes.sectionDesktop}>
-              {
-                isAuthorized ? <Button onClick={(event) => { onLogout(event); }} component={HomePage} color="inherit">Выйти</Button> : <Button component={LoginPage} color="inherit">Войти</Button>
-              }
+
               <IconButton
                 aria-owns={isMenuOpen ? 'material-appbar' : undefined}
                 aria-haspopup="true"
@@ -178,11 +208,21 @@ class Header extends Component {
 const mapStateToProps = state => ({
   isAuthorized: state.authorization.token !== null,
   username: state.authorization.username,
+  openDrawerStatus: state.buttonsAct.openDrawer,
 });
 
 const mapDispatchToProps = dispatch => ({
   onLogout: (event) => {
+    event.preventDefault();
     dispatch(logout());
+  },
+  onOpenDrawer: (event) => {
+    event.preventDefault();
+    dispatch(openDrawer());
+  },
+  onCloseDrawer: (event) => {
+    event.preventDefault();
+    dispatch(closeDrawer());
   },
 });
 

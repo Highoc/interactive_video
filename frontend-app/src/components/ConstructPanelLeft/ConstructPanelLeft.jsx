@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import HTML5Backend from 'react-dnd-html5-backend';
+import { DragDropContext } from 'react-dnd';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
 import axios from 'axios';
 import Drawer from '@material-ui/core/Drawer';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
@@ -15,21 +14,26 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
-import Input from '../Input/Input';
+import { connect } from 'react-redux';
 import SourceList from '../SourceList';
 import { backend as path } from '../../urls';
+import DropBox from '../Drop/index';
+import { uploadFile } from '../../actions/buttonActions';
 
-const drawerWidth = 240;
 
+const drawerWidth = '80%';
 
 const styles = theme => ({
   root: {
     padding: '5px',
     float: 'left',
     width: '15%',
+  },
+  drop: {
+    marginLeft: '40%',
+    marginRight: '20%',
   },
   categoryHeader: {
     paddingTop: 20,
@@ -64,7 +68,7 @@ const styles = theme => ({
   toolbarIcon: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     padding: '0 8px',
     ...theme.mixins.toolbar,
   },
@@ -72,9 +76,7 @@ const styles = theme => ({
     display: 'none',
   },
   textDense: {},
-  Header: {
-    marginRight: '40px',
-  },
+
   card: {
     width: '100%',
   },
@@ -94,35 +96,23 @@ class ConstructPanelLeft extends Component {
       sources: [],
       open: true,
       dialogOpen: false,
-      inputs: [
-      ],
     };
   }
 
-  componentDidMount() {
-    const url = `http://${path}/video/source/list/`;
-
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
-
-    axios.get(url, config).then(
-      (result) => {
-        console.log(result.data);
-        this.setState({ sources: result.data });
-      },
-    ).catch(error => console.log(error));
+  async componentDidMount() {
+    try {
+      const url = `http://${path}/video/source/list/`;
+      const config = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+        },
+      };
+      const result = await axios.get(url,config);
+      this.setState({ sources: result.data });
+    } catch (error) {
+      console.log(error);
+    }
   }
-
-  handleDrawerOpen = () => {
-    this.setState({ open: true });
-  };
-
-  handleDrawerClose = () => {
-    this.setState({ open: false });
-  };
 
   handleClose = () => {
     this.setState({ dialogOpen: false });
@@ -132,39 +122,20 @@ class ConstructPanelLeft extends Component {
     this.setState({ dialogOpen: true });
   };
 
-  async submitHandler() {
-    const { inputs } = this.state;
-    let isValid = true;
-    console.log(inputs);
-    for (const key in inputs) {
-      isValid = isValid && inputs[key].isValid;
-    }
+  submitHandler() {
+    this.setState({ dialogOpen: false });
+  }
 
-    if (isValid) {
-      console.log('Можно добавить');
-      this.setState({ dialogOpen: false });
-    } else {
-      console.log('Invalid input');
-    }
+  callbackFiles(files) {
+    const { sources } = this.state;
+    sources.push(files);
+    this.props.onFileUpload(files);
+    this.setState({ sources });
   }
 
   render() {
     const { classes } = this.props;
-    const { sources, inputs, dialogOpen } = this.state;
-    const Inputs = Object.keys(inputs).map((key) => {
-      const inputElement = inputs[key];
-      return (
-        <Input
-          key={key}
-          type={inputElement.type}
-          name={inputElement.name}
-          description={inputElement.description}
-          value={inputElement.value}
-          rules={inputElement.rules}
-          callback={state => this.callbackInput(state)}
-        />
-      );
-    });
+    const { sources, dialogOpen } = this.state;
 
     return (
       <div className={classes.root}>
@@ -176,24 +147,13 @@ class ConstructPanelLeft extends Component {
           open={this.state.open}
         >
           <div className={classes.toolbarIcon}>
-            <div className={classes.Header}>
-              <Typography variant="h6" align="left">
-                Фрагменты
-              </Typography>
-            </div>
-            <IconButton
-              onClick={this.handleDrawerOpen}
-              className={this.state.open && classes.menuButtonHidden}
-            >
-              <ChevronRightIcon />
-            </IconButton>
-            <IconButton onClick={this.handleDrawerClose} className={!this.state.open && classes.menuButtonHidden}>
-              <ChevronLeftIcon />
-            </IconButton>
+            <Typography variant="h6">
+              Фрагменты
+            </Typography>
           </div>
           <Divider className={classes.divider} />
-          {sources.map(({ name, key }) => (
-            <SourceList name={name} keyVideo={key} key={key} />
+          {sources.map((video, i) => (
+            <SourceList name={video[0].name} keyVideo={i} key={i} />
           ))}
           <Divider className={classes.divider} />
           <Card className={classes.card}>
@@ -221,12 +181,12 @@ class ConstructPanelLeft extends Component {
           <DialogTitle onClose={this.handleClose}>
             Добавление фрагмента
           </DialogTitle>
-          <DialogContent>
-            {Inputs}
-          </DialogContent>
+          <div className={classes.drop}>
+            <DropBox callback={droppedFiles => this.callbackFiles(droppedFiles)} />
+          </div>
           <DialogActions>
             <Button onClick={(event) => { event.preventDefault(); this.submitHandler(); }} color="primary">
-              Добавить фрагмент
+             Закрыть
             </Button>
           </DialogActions>
         </Dialog>
@@ -238,5 +198,12 @@ class ConstructPanelLeft extends Component {
 ConstructPanelLeft.propTypes = {
   classes: PropTypes.object.isRequired,
 };
+const mapStateToProps = state => ({
+  isAuthorized: state.authorization.token !== null,
+});
 
-export default withStyles(styles)(ConstructPanelLeft);
+const mapDispatchToProps = dispatch => ({
+  onFileUpload: files => dispatch(uploadFile(files)),
+});
+
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(DragDropContext(HTML5Backend)(ConstructPanelLeft)));

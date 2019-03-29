@@ -39,7 +39,6 @@ class Centrifugo extends Component {
       centrifuge.setToken(token);
       centrifuge.on('connect', () => {
         centrifugoInit();
-        console.log('[Centrifugo] Was initialized');
         this.checkSubscriptions();
       });
 
@@ -62,12 +61,10 @@ class Centrifugo extends Component {
         subscription.unsubscribe();
         subscription.removeAllListeners();
         deleteSubscription(channel);
-        console.log(`[Centrifugo] Delete subscription to '${channel}'`);
       } else if (!current.isActive) {
         const { channel, callback } = current;
         const subscription = this.subscribeToChannel(channel, callback);
         activateSubscription(channel, subscription);
-        console.log(`[Centrifugo] Activate subscription to '${channel}'`);
       }
     }
   }

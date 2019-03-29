@@ -98,17 +98,14 @@ class WatchVideo extends Component {
       let url = `http://${path}/video/get/${videoKey}/`;
       let response = await axios.get(url, config);
       this.setState({ video: response.data });
-      console.log(`[WatchVideo] ${JSON.stringify(response.data)}`);
 
       url = `http://${path}/views/add/${videoKey}/`;
       response = await axios.post(url, {}, config);
       this.setState({ viewsCounter: response.data.counter });
-      console.log(`[WatchVideo] ${JSON.stringify(response.data)}`);
 
       url = `http://${path}/rating/get/${videoKey}/`;
       response = await axios.get(url, config);
       this.setState({ ratingCounter: response.data.counter, yourChoice: response.data.value });
-      console.log(`[WatchVideo] ${JSON.stringify(response.data)}`);
 
       this.setState({ status: statuses.LOADED });
 
@@ -124,7 +121,6 @@ class WatchVideo extends Component {
         },
       };
       const result = await axios.get(urlInput, configInput);
-      console.log(result.data);
       this.setState({ inputs: result.data, isLoaded: true });
     } catch (error) {
       this.setState({ status: statuses.ERROR });
@@ -151,17 +147,8 @@ class WatchVideo extends Component {
   }
 
   handleRatingChoice(choice) {
-    this.setState({ yourChoice: choice });
-    const { videoKey } = this.state;
-
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
-
-    const url = `http://${path}/rating/update/${videoKey}/`;
-    axios.post(url, { value: choice }, config);
+    const { ratingCounter } = this.state;
+    this.setState({ ratingCounter: ratingCounter + choice });
   }
 
   async submitHandler() {
@@ -173,7 +160,6 @@ class WatchVideo extends Component {
     }
 
     if (isValid) {
-      console.log('Отправить можно');
       this.setState({ dialogOpen: false });
       try {
         const url = `http://${path}/channel/${channelKey}/video/${videoKey}/comment/add/`;
@@ -187,7 +173,6 @@ class WatchVideo extends Component {
 
         const result = await axios.post(url, data, configs);
 
-        console.log(result);
         this.setState({ isSent: true });
       } catch (error) {
         console.log(error);
@@ -303,10 +288,8 @@ class WatchVideo extends Component {
           </Dialog>
         </div>
       );
-    } else if (status === statuses.NOT_LOADED) {
-      result = <div>Not loaded</div>;
     } else {
-      result = <div>Error</div>;
+      result = <div>Загрузка</div>;
     }
 
     return result;
