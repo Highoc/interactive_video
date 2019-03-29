@@ -25,33 +25,12 @@ class ChannelEdit extends Component {
     this.state = {
       isLoaded: false,
       isValid: false,
-      inputs: [
-        {
-          type: 'text',
-          name: 'name',
-          value: 'something',
-          description: 'Название канала',
-          rules: {
-            max_length: 64,
-            required: true,
-          },
-        },
-        {
-          type: 'textarea',
-          name: 'description',
-          value: 'something',
-          description: 'Описание канала',
-          rules: {
-            max_length: 4096,
-            required: false,
-          },
-        }],
+      inputs: [],
     };
   }
 
   componentDidMount() {
     const url = `http://${path}/channel/update/`;
-    /*
     const config = {
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
@@ -65,7 +44,7 @@ class ChannelEdit extends Component {
       },
     ).catch((error) => {
       console.log(error);
-    });*/
+    });
   }
 
 

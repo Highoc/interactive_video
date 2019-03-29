@@ -11,12 +11,11 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
-import Input from '../Input/Input';
 import axios from 'axios';
-import { backend as path } from '../../urls';
 import ArrowDropDown from '@material-ui/icons/ArrowDropDown';
 import ArrowDropUp from '@material-ui/icons/ArrowDropUp';
-
+import { backend as path } from '../../urls';
+import Input from '../Input/Input';
 
 
 const styles = theme => ({
@@ -67,7 +66,6 @@ const styles = theme => ({
 class ExpansionPanelVideo extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       isLoaded: false,
       isValid: false,
@@ -76,6 +74,7 @@ class ExpansionPanelVideo extends Component {
       channelKey: props.keyChannel,
       videoKey: props.keyVideo,
       expanded: false,
+      choice: props.choice,
     };
   }
 
@@ -94,7 +93,6 @@ class ExpansionPanelVideo extends Component {
     }
 
     if (isValid) {
-      console.log('Отправить можно');
       try {
         const url = `http://${path}/channel/${channelKey}/video/${videoKey}/comment/add/`;
         const data = this.getData();
@@ -106,8 +104,6 @@ class ExpansionPanelVideo extends Component {
         };
 
         const result = await axios.post(url, data, configs);
-
-        console.log(result);
         this.setState({ isSent: true });
       } catch (error) {
         console.log(error);
@@ -126,13 +122,11 @@ class ExpansionPanelVideo extends Component {
   }
 
   handleChange(expanded) {
-    if (expanded)
-    {
+    if (expanded) {
       this.setState({
         expanded: false,
       });
-    }
-    else {
+    } else {
       this.setState({
         expanded: true,
       });
@@ -141,13 +135,16 @@ class ExpansionPanelVideo extends Component {
 
   onReply(event, choice) {
     const { callback } = this.props;
+    this.setState({ choice });
     callback(choice);
     event.preventDefault();
   }
 
   render() {
-    const { classes, description, created, author, rating, views, choice } = this.props;
-    const { inputs, isSent, expanded } = this.state;
+    const {
+      classes, description, created, author, rating, views
+    } = this.props;
+    const { inputs, isSent, expanded, choice } = this.state;
 
     const Inputs = Object.keys(inputs).map((key) => {
       const inputElement = inputs[key];
@@ -200,13 +197,25 @@ class ExpansionPanelVideo extends Component {
             <div className={classes.rightcolumn}>
               <div className={classes.buttonContainer}>
                 <div>
-                  <IconButton color="secondary" className={classes.button} aria-label="Like" onClick={(event) => this.onReply(event, 1)}>
-                    <ArrowDropUp fontSize={"large"} />
+                  <IconButton
+                    color="secondary"
+                    className={classes.button}
+                    aria-label="Like"
+                    onClick={event => this.onReply(event, 1)}
+                    disabled={choice === 1}
+                  >
+                    <ArrowDropUp fontSize="large" />
                   </IconButton>
                 </div>
                 <div>
-                  <IconButton color="secondary" className={classes.button} aria-label="Like" onClick={(event) => this.onReply(event, -1)}>
-                    <ArrowDropDown fontSize={"large"} />
+                  <IconButton
+                    color="secondary"
+                    className={classes.button}
+                    aria-label="Like"
+                    onClick={event => this.onReply(event, -1)}
+                    disabled={choice === -1}
+                  >
+                    <ArrowDropDown fontSize="large" />
                   </IconButton>
                 </div>
               </div>

@@ -67,7 +67,6 @@ class PlaylistEdit extends Component {
     }
 
     if (isValid) {
-      console.log('Отправить можно');
       try {
         const url = `http://${path}/channel/${channelKey}/playlist/${playlistKey}/update/`;
         const data = this.getData();
@@ -80,7 +79,6 @@ class PlaylistEdit extends Component {
 
         const result = await axios.post(url, data, configs);
 
-        console.log(result);
         this.setState({ isSent: true });
       } catch (error) {
         console.log(error);

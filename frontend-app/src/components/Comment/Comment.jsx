@@ -26,24 +26,22 @@ export class Comment extends Component {
     };
   }
 
-  componentDidMount() {
-    const { commentId } = this.state;
+  async componentDidMount() {
+    try {
+      const { commentId } = this.state;
 
 
-    const url = `http://${path}/comment/get/${commentId}/`;
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
-
-    axios.get(url, config).then(
-      (result) => {
-        // console.log(result.data);
-        this.setState({ isLoaded: true, comment: result.data });
-      },
-    ).catch(error => console.log(error));
-
+      const url = `http://${path}/comment/get/${commentId}/`;
+      const config = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+        },
+      };
+      const result = await axios.get(url,config);
+      this.setState({ isLoaded: true, comment: result.data });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   onReply(event) {

@@ -14,29 +14,27 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Input from '../../components/Input/Input';
-import Fab from '@material-ui/core/Fab';
-import NavigationIcon from '@material-ui/icons/Navigation';
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
+import { connect } from 'react-redux';
 import { backend as path } from '../../urls';
+import ConstructPanelRight from '../../components/ConctructPanelRight';
+import Input from '../../components/Input/Input';
 
+const styles = {
+  width: '80%',
+  height: '1000px',
+  margin: '0% 1.5% 0 1.5%',
+  overflow: 'hidden',
+  display: 'inline-block',
+};
 
-
-const styles = theme => ({
-  margin: {
-    margin: theme.spacing.unit,
-  },
-  extendedIcon: {
-    marginRight: theme.spacing.unit,
-  },
-  container: {
-    width: '65%',
-    height: '700px',
-  },
-});
-
+const container = {
+  width: '100%',
+  margin: '0% 1.5% 0 1.5%',
+  overflow: 'hidden',
+};
 
 const activeSvgShape = {
   shape: 'circle',
@@ -75,7 +73,7 @@ class CreateVideo extends Component {
     super(props);
 
     this.state = {
-      sources: [],
+      sources: props.files,
       tree: new TreeData(),
       nodeChosen: null,
       dialogOpen: false,
@@ -112,21 +110,20 @@ class CreateVideo extends Component {
     this.uploadVideo = this.uploadVideo.bind(this);
   }
 
-  componentDidMount() {
-    const url = `http://${path}/video/source/list/`;
+  async componentDidMount() {
+    try {
+      const url = `http://${path}/video/source/list/`;
 
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
-
-    axios.get(url, config).then(
-      (result) => {
-        console.log(result.data);
-        this.setState({ sources: result.data });
-      },
-    ).catch(error => console.log(error));
+      const config = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+        },
+      };
+      const result = await axios.get(url, config);
+      this.setState({ sources: result.data });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   handleOpen = () => {
@@ -136,20 +133,19 @@ class CreateVideo extends Component {
   handleClose = () => {
     const { inputData } = this.state;
     inputData.text = document.getElementById('text').value;
-    console.log(inputData);
     const { tree, nodeChosen } = this.state;
     const node = tree.findNodeByKey(nodeChosen);
-    console.log(nodeChosen);
-    console.log(node);
     node.name = inputData.text;
     node.sourceKey = inputData.sourceKey;
     node.text = inputData.text;
     node.isReady = true;
+    this.onUpdateTree();
     this.setState({ dialogOpen: false });
   };
 
   handleChange = (event) => {
     const { inputData } = this.state;
+    console.log(event.target.value);
     inputData.sourceKey = event.target.value;
     this.setState({ inputData });
   };
@@ -199,7 +195,7 @@ class CreateVideo extends Component {
     this.setState({ inputs });
   }
 
-  uploadVideo(event) {
+  async uploadVideo() {
     const { inputs } = this.state;
     let isValid = true;
     for (const key in inputs) {
@@ -207,26 +203,23 @@ class CreateVideo extends Component {
     }
 
     if (isValid) {
-      console.log('Отправить можно');
-      axios.post(
-        `http://${path}/video/upload/`, this.getVideoData(),
-        {
+      try {
+        const url = `http://${path}/video/upload/`;
+        const data = this.getVideoData();
+        const config = {
           headers: {
             Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
             'Content-Type': 'application/json',
           },
-        },
-      )
-        .then((result) => {
-          this.setState({ videoKey: result.data.key });
-        })
-        .catch((error) => {
-          this.setState({ videoKey: 'error' });
-        });
+        };
+        const result = await axios.post(url, data, config);
+        this.setState({ videoKey: result.data.key });
+      } catch (error) {
+        this.setState({ videoKey: 'error' });
+      }
     } else {
       console.log('Invalid input');
     }
-    event.preventDefault();
   }
 
 
@@ -236,11 +229,29 @@ class CreateVideo extends Component {
     this.setState({ tree });
   }
 
+  handleButtonChoice(choice) {
+    const { nodeChosen, tree } = this.state;
+
+    if (choice === 1) {
+      tree.addChildNode(nodeChosen);
+      this.setState({ nodeChosen });
+      this.onUpdateTree();
+    }
+    if (choice === 2) {
+      tree.removeNode(nodeChosen);
+      this.setState({ nodeChosen: null });
+      this.onUpdateTree();
+    }
+    if (choice === 3) {
+      this.uploadVideo();
+    }
+  }
+
   render() {
     const {
-      sources, tree, dialogOpen, inputData, nodeChosen, inputs, isLoaded,
+      sources, tree, dialogOpen, inputData, inputs,
     } = this.state;
-    const { classes } = this.props;
+    const { classes, files } = this.props;
     const Inputs = Object.keys(inputs).map((key) => {
       const inputElement = inputs[key];
       return (
@@ -257,98 +268,90 @@ class CreateVideo extends Component {
     });
 
     return (
-      <div styles={styles.container}>
-        <div id="treeWrapper" style={{ width: '1000px', height: '500px' }}>
+      <div style={container}>
+        <div style={styles}>
+          <h2>
+Создание видео
+            {' '}
+            {' '}
+            {this.state.videoKey}
+          </h2>
+          <div id="treeWrapper" style={{ width: '100%', height: '60%' }}>
 
-          <Tree
-            data={tree.tree}
-            translate={{ x: 20, y: 225 }}
-            collapsible={false}
-            zoomable={false}
-            allowForeignObjects
-            nodeSvgShape={deactiveSvgShape}
-            nodeLabelComponent={{
-              render: <NodeImage nodeData={tree} />,
-              foreignObjectWrapper: {
-                y: -25,
-                x: -25,
-              },
-            }}
-            onClick={(nodeData, event) => { this.handleClick(nodeData.key); this.onUpdateTree(); }}
-          />
+            <Tree
+              data={tree.tree}
+              translate={{ x: '25', y: '300' }}
+              collapsible={false}
+              zoomable={false}
+              allowForeignObjects
+              nodeSvgShape={deactiveSvgShape}
+              nodeLabelComponent={{
+                render: <NodeImage nodeData={tree} />,
+                foreignObjectWrapper: {
+                  y: -25,
+                  x: -25,
+                },
+              }}
+              onClick={(nodeData, event) => { this.handleClick(nodeData.key); this.onUpdateTree(); }}
+            />
+          </div>
+          <Dialog
+            onClose={this.handleClose}
+            open={dialogOpen}
+          >
+            <DialogTitle onClose={this.handleClose}>
+              Добавление фрагмента видео
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Введите ответ, ведущий к этому фрагменту видео:
+              </DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="text"
+                type="text"
+                fullWidth
+              />
+              <Select
+                value={inputData.sourceKey}
+                name="sourceKey"
+                fullWidth
+                onChange={this.handleChange}
+              >
+                { files.map((source, i) => (
+                  <MenuItem key={i} value={i}>{source.name}</MenuItem>
+                ))}
+              </Select>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleClose} color="primary">
+                Спасти и сохранить
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          {Inputs}
 
         </div>
-        <Button variant="contained" color="primary" className={classes.button} onClick={() => { tree.addChildNode(nodeChosen); this.setState({ nodeChosen }); this.onUpdateTree() }}>
-          Add Child
-        </Button>
-        <Button variant="contained" color="primary" className={classes.button} onClick={() => { tree.removeNode(nodeChosen); this.setState({ nodeChosen: null }); this.onUpdateTree() }}>
-          Remove Child
-        </Button>
-        <Dialog
-          onClose={this.handleClose}
-          open={dialogOpen}
-        >
-          <DialogTitle onClose={this.handleClose}>
-            Добавление фрагмента видео
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Введите ответ, ведущий к этому фрагменту видео:
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="text"
-              type="text"
-              fullWidth
-            />
-            <Select
-              value={inputData.sourceKey}
-              name="sourceKey"
-              fullWidth
-              onChange={this.handleChange}
-            >
-              { sources.map(source => (
-                <MenuItem
-                  key={source.key}
-                  value={source.key}
-                >
-                  {source.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} color="primary">
-              Спасти и сохранить
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        <h2>Создание видео {' '} {this.state.videoKey}</h2>
-        {Inputs}
-
-        <Fab
-          variant="extended"
-          color="primary"
-          aria-label="Add"
-          className={classes.margin}
-          style={styles.button}
-          onClick={event => this.uploadVideo(event)}
-        >
-          <NavigationIcon className={classes.extendedIcon} />
-          Отправить
-        </Fab>
+        <ConstructPanelRight callback={choice => this.handleButtonChoice(choice)} />
       </div>
     );
   }
 }
 
+const mapStateToProps = state => ({
+  files: state.buttonsAct.filesUpload,
+});
+
+const mapDispatchToProps = dispatch => ({
+});
+
 CreateVideo.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(CreateVideo);
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(CreateVideo));
 
 class TreeData {
   constructor() {

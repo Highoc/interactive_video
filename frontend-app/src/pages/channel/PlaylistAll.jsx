@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import ChannelPlaylistView from '../../components/ChannelPlaylistView';
 import { backend as path } from '../../urls';
-
 import axios from 'axios';
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -54,22 +53,20 @@ class PlaylistAll extends Component {
     };
   }
 
-  componentDidMount() {
-    const { channelKey } = this.state;
-
-    const url = `http://${path}/channel/${channelKey}/playlist/all/`;
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
-
-    axios.get(url, config).then(
-      (result) => {
-        console.log(result.data);
-        this.setState({ isLoaded: true, playlists: result.data });
-      },
-    ).catch(error => console.log(error));
+  async componentDidMount() {
+    try {
+      const { channelKey } = this.state;
+      const url = `http://${path}/channel/${channelKey}/playlist/all/`;
+      const config = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+        },
+      };
+      const result = await axios.get(url, config);
+      this.setState({ isLoaded: true, playlists: result.data });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   render() {

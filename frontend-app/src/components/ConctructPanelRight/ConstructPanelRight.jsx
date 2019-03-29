@@ -8,7 +8,7 @@ import Button from '@material-ui/core/Button';
 import Drawer from '@material-ui/core/Drawer';
 import VideoCamera from '@material-ui/icons/Videocam';
 
-const drawerWidth = 240;
+const drawerWidth = '80%';
 
 const buttonContainer = {
   display: 'flex',
@@ -21,7 +21,6 @@ const styles = theme => ({
     padding: '5px',
     float: 'right',
     width: '15%',
-    height: '600px',
   },
   divider: {
     marginTop: theme.spacing.unit * 2,
@@ -66,6 +65,12 @@ export class ConstructPanelRight extends Component {
     };
   }
 
+  onReply(event, choice) {
+    const { callback } = this.props;
+    callback(choice);
+    event.preventDefault();
+  }
+
   render() {
     const { classes, ...other } = this.props;
 
@@ -81,17 +86,17 @@ export class ConstructPanelRight extends Component {
         >
 
           <div style={buttonContainer}>
-            <Button variant="contained" color="primary" className={classes.button} size="large">
+            <Button variant="contained" color="primary" className={classes.button} size="large" onClick={event => this.onReply(event, 1)}>
               Добавить узел
             </Button>
           </div>
           <div style={buttonContainer}>
-            <Button variant="contained" color="primary" className={classes.button} size="large">
+            <Button variant="contained" color="primary" className={classes.button} size="large" onClick={event => this.onReply(event, 2)}>
               Удалить узел
             </Button>
           </div>
           <div style={buttonContainer}>
-            <Button variant="contained" color="primary" className={classes.button}>
+            <Button variant="contained" color="primary" className={classes.button} onClick={event => this.onReply(event, 3)}>
               Создать видео
               <VideoCamera fontSize="large" />
             </Button>
@@ -108,7 +113,3 @@ ConstructPanelRight.propTypes = {
 
 
 export default withStyles(styles)(ConstructPanelRight);
-
-
-
-

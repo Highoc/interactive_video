@@ -49,23 +49,19 @@ class CreateChannel extends Component {
     };
   }
 
-  componentDidMount() {
-    const url = `http://${path}/channel/update/`;
-    /*
-    const config = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
-      },
-    };
-
-    axios.get(url, config).then(
-      (result) => {
-        console.log(result.data);
-        this.setState({ inputs: result.data, isLoaded: true });
-      },
-    ).catch((error) => {
+  async componentDidMount() {
+    try {
+      const url = `http://${path}/channel/update/`;
+      const config = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
+        },
+      };
+      const result = await axios.get(url, config);
+      this.setState({ isLoaded: true });
+    } catch (error) {
       console.log(error);
-    });*/
+    }
   }
 
 
@@ -78,12 +74,11 @@ class CreateChannel extends Component {
 
     if (isValid) {
       console.log('Отправить можно');
-    }
-    else {
+    } else {
       console.log('Invalid input');
     }
     event.preventDefault();
-  };
+  }
 
   callbackInput(state) {
     const { inputs } = this.state;
@@ -96,44 +91,47 @@ class CreateChannel extends Component {
   render() {
     const { inputs, isLoaded } = this.state;
     const { classes } = this.props;
-    let status = <div>Загружается</div>;
+    let Inputs = <div />;
+    let result = <div>Загружается</div>;
+
     if (isLoaded) {
-      status = <div>Загрузилось</div>;
-    }
-    const Inputs = Object.keys(inputs).map((key) => {
-      const inputElement = inputs[key];
-      return (
-        <Input
-          key={key}
-          type={inputElement.type}
-          name={inputElement.name}
-          description={inputElement.description}
-          value={inputElement.value}
-          rules={inputElement.rules}
-          callback={state => this.callbackInput(state)}
-        />
+      Inputs = Object.keys(inputs).map((key) => {
+        const inputElement = inputs[key];
+        return (
+          <Input
+            key={key}
+            type={inputElement.type}
+            name={inputElement.name}
+            description={inputElement.description}
+            value={inputElement.value}
+            rules={inputElement.rules}
+            callback={state => this.callbackInput(state)}
+          />
+        );
+      });
+      result = (
+        <div>
+          <form>
+            <h2>Создание канала</h2>
+            {Inputs}
+            <Fab
+              variant="extended"
+              color="primary"
+              aria-label="Add"
+              className={classes.margin}
+              style={styles.button}
+              onClick={event => this.submitHandler(event)}
+            >
+              <NavigationIcon className={classes.extendedIcon} />
+              Создать
+            </Fab>
+          </form>
+        </div>
       );
-    });
+    }
 
     return (
-      <div>
-        <form>
-          <h2>Создание канала</h2>
-          {Inputs}
-          <Fab
-            variant="extended"
-            color="primary"
-            aria-label="Add"
-            className={classes.margin}
-            style={styles.button}
-            onClick={event => this.submitHandler(event)}
-          >
-            <NavigationIcon className={classes.extendedIcon} />
-            Создать
-          </Fab>
-        </form>
-        {status}
-      </div>
+      { result }
     );
   }
 }
@@ -143,5 +141,3 @@ CreateChannel.propTypes = {
 };
 
 export default withStyles(styles)(CreateChannel);
-
-

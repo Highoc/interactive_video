@@ -28,8 +28,8 @@ function checkValidity(value, rules) {
     isValid = value.trim() !== '' && isValid;
   }
 
-  if (rules.minLength) {
-    isValid = value.length >= rules.minLength && isValid;
+  if (rules.min_length) {
+    isValid = value.length >= rules.min_length && isValid;
   }
 
   if (rules.max_length) {
@@ -42,9 +42,6 @@ function checkValidity(value, rules) {
 class Input extends Component {
   constructor(props) {
     super(props);
-    this.onDrop = (files) => {
-      this.setState({files})
-    };
     this.state = {
       value: props.value,
       rules: props.rules,

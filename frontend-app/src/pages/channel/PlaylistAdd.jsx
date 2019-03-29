@@ -66,7 +66,6 @@ class PlaylistAdd extends Component {
     }
 
     if (isValid) {
-      console.log('Отправить можно');
       try {
         const url = `http://${path}/channel/${channelKey}/playlist/create/`;
         const data = this.getData();
