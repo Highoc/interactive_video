@@ -9,8 +9,8 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Input from '../../components/Input/Input';
 import withStyles from '@material-ui/core/styles/withStyles';
-import { login } from '../../actions/authorization';
-import { openDrawer } from '../../actions/buttonActions';
+import { login } from '../../store/actions/authorization';
+import { openDrawer } from '../../store/actions/buttonActions';
 import { connect } from 'react-redux';
 
 const styles = theme => ({

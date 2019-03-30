@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core";
-import ChannelPlaylist from '../../components/ChannelPlaylist';
+import ChannelPlaylist from '../../components/Channel/ChannelInfo/ChannelPlaylist';
 import { RequestResolver } from '../../helpers/RequestResolver';
-import ChannelHead from '../../components/ChannelHead';
+import ChannelHead from '../../components/Channel/ChannelHead';
 
 const styles = theme => ({
   root: {

@@ -8,7 +8,7 @@ import {
   centrifugoInit as init,
   activateSubscription as activate,
   deleteSubscription as remove,
-} from '../../actions/centrifugo';
+} from '../../store/actions/centrifugo';
 
 import { centrifuge as centrifugeURL, RequestResolver } from '../../helpers/RequestResolver';
 

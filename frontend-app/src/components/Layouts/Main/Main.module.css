@@ -1,0 +1,9 @@
+.default {
+    overflow: auto;
+
+    min-height: 800px;
+
+    width: 70%;
+    min-width: 1200px;
+}
+

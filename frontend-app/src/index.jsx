@@ -9,10 +9,10 @@ import { Provider } from 'react-redux';
 
 import thunk from 'redux-thunk';
 
-import authorizationReducer from './reducers/authorization';
-import centrifugoReducer from './reducers/centrifugo';
-import registrationReducer from './reducers/register';
-import buttonsReducer from './reducers/buttonReducers';
+import authorizationReducer from './store/reducers/authorization';
+import centrifugoReducer from './store/reducers/centrifugo';
+import registrationReducer from './store/reducers/register';
+import buttonsReducer from './store/reducers/buttonReducers';
 
 import './index.css';
 import App from './App';

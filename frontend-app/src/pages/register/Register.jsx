@@ -10,7 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { connect } from 'react-redux';
 import Input from '../../components/Input/Input';
-import { registration } from '../../actions/register';
+import { registration } from '../../store/actions/register';
 
 const styles = theme => ({
   main: {

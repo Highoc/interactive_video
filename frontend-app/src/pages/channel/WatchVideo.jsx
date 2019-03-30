@@ -14,16 +14,16 @@ import { withStyles } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import { Comment } from '../../components/Comment/Comment';
-import InteractivePlayer from '../../components/InteractivePlayer/InteractivePlayer';
-import ExpansionPanelVideo from '../../components/ExpansionPanel';
+import { Comment } from '../../components/VideoWatch/Comment/Comment';
+import InteractivePlayer from '../../components/VideoWatch/InteractivePlayer/InteractivePlayer';
+import ExpansionPanelVideo from '../../components/VideoWatch/ExpansionPanel';
 import Input from '../../components/Input/Input';
 import { RequestResolver, json } from '../../helpers/RequestResolver';
 
 import {
   subscribeToChannel as subscribe,
   unsubscribeFromChannel as unsubscribe,
-} from '../../actions/centrifugo';
+} from '../../store/actions/centrifugo';
 
 
 const textStyles = {

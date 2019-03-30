@@ -1,0 +1,10 @@
+.default {
+    color: #36ff19;
+    background-color: #ff00db;
+
+    min-height: 800px;
+
+    width: 15%;
+    min-width: 240px;
+    max-width: 300px;
+}

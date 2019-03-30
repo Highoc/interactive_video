@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core";
-import ChannelPlaylist from '../../components/ChannelPlaylist';
+import ChannelPlaylist from '../../components/Channel/ChannelInfo/ChannelPlaylist';
 import Typography from '@material-ui/core/Typography';
 import { RequestResolver } from '../../helpers/RequestResolver';
 import { pprint, perror } from '../../helpers/SmartPrint';
