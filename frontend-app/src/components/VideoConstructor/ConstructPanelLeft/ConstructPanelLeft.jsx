@@ -4,95 +4,24 @@ import HTML5Backend from 'react-dnd-html5-backend/lib/cjs/index';
 import { DragDropContext } from 'react-dnd/lib/cjs/index';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles/index';
-import Divider from '@material-ui/core/Divider/index';
-import Drawer from '@material-ui/core/Drawer/index';
-import Card from '@material-ui/core/Card/index';
-import CardActionArea from '@material-ui/core/CardActionArea/index';
-import CardContent from '@material-ui/core/CardContent/index';
-import CardMedia from '@material-ui/core/CardMedia/index';
-import Typography from '@material-ui/core/Typography/index';
-import Dialog from '@material-ui/core/Dialog/index';
-import DialogActions from '@material-ui/core/DialogActions/index';
-import DialogTitle from '@material-ui/core/DialogTitle/index';
-import Button from '@material-ui/core/Button/index';
+import {
+  Divider, Drawer, Card, CardActionArea, CardContent, CardMedia, Typography,
+} from '@material-ui/core';
+
 import { connect } from 'react-redux';
 import SourceList from '../SourceList';
+import Dialog from '../../Dialog';
 import DropBox from '../../Drop';
 import { uploadFile } from '../../../store/actions/buttonActions';
 import { RequestResolver } from '../../../helpers/RequestResolver';
-
-const drawerWidth = '80%';
-
-const styles = theme => ({
-  root: {
-    padding: '5px',
-    float: 'left',
-    width: '15%',
-  },
-  drop: {
-    marginLeft: '40%',
-    marginRight: '20%',
-  },
-  categoryHeader: {
-    paddingTop: 20,
-    paddingBottom: 16,
-  },
-  categoryHeaderPrimary: {
-    color: theme.palette.common.white,
-  },
-  divider: {
-    marginTop: theme.spacing.unit * 2,
-  },
-  drawerPaper: {
-    position: 'relative',
-    whiteSpace: 'nowrap',
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawerPaperClose: {
-    overflowX: 'hidden',
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    width: theme.spacing.unit * 7,
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing.unit * 9,
-    },
-  },
-  toolbarIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    padding: '0 8px',
-    ...theme.mixins.toolbar,
-  },
-  menuButtonHidden: {
-    display: 'none',
-  },
-  textDense: {},
-
-  card: {
-    width: '100%',
-  },
-  media: {
-    height: 120,
-  },
-  content: {
-    height: '80%',
-    width: '90%',
-  },
-});
+import { perror } from '../../../helpers/SmartPrint';
+import leftStyles from './ConstructPanelLeft.styles';
 
 class ConstructPanelLeft extends Component {
   constructor(props) {
     super(props);
     this.state = {
       sources: [],
-      open: true,
       dialogOpen: false,
     };
     this.backend = RequestResolver.getBackend();
@@ -103,27 +32,23 @@ class ConstructPanelLeft extends Component {
       const result = await this.backend().get('video/source/list/');
       this.setState({ sources: result.data });
     } catch (error) {
-      console.log(error);
+      perror('ConstructPanelLeft', error);
     }
   }
-
-  handleClose = () => {
-    this.setState({ dialogOpen: false });
-  };
 
   handleAdd = () => {
     this.setState({ dialogOpen: true });
   };
 
-  submitHandler() {
-    this.setState({ dialogOpen: false });
-  }
-
   callbackFiles(files) {
     const { sources } = this.state;
-    sources.push(files);
-    this.props.onFileUpload(files);
+    sources.push(files[0]);
+    this.props.onFileUpload(files[0]);
     this.setState({ sources });
+  }
+
+  callbackDialog(state) {
+    this.setState({ dialogOpen: state });
   }
 
   render() {
@@ -135,18 +60,16 @@ class ConstructPanelLeft extends Component {
         <Drawer
           variant="permanent"
           classes={{
-            paper: classNames(classes.drawerPaper, !this.state.open && classes.drawerPaperClose),
+            paper: classNames(classes.drawerPaper),
           }}
-          open={this.state.open}
+          open={true}
         >
-          <div className={classes.toolbarIcon}>
-            <Typography variant="h6">
-              Фрагменты
-            </Typography>
-          </div>
+          <Typography variant="h6">
+            Фрагменты
+          </Typography>
           <Divider className={classes.divider} />
           {sources.map((video, i) => (
-            <SourceList name={video[0].name} keyVideo={i} key={i} />
+            <SourceList name={video.name} keyVideo={i} key={i} />
           ))}
           <Divider className={classes.divider} />
           <Card className={classes.card}>
@@ -164,25 +87,10 @@ class ConstructPanelLeft extends Component {
               </CardContent>
             </CardActionArea>
           </Card>
-        </Drawer>
-        <Dialog
-          onClose={this.handleClose}
-          open={dialogOpen}
-          fullWidth
-          maxWidth="md"
-        >
-          <DialogTitle onClose={this.handleClose}>
-            Добавление фрагмента
-          </DialogTitle>
-          <div className={classes.drop}>
+          <Dialog dialogOpen={dialogOpen} callback={state => this.callbackDialog(state)}>
             <DropBox callback={droppedFiles => this.callbackFiles(droppedFiles)} />
-          </div>
-          <DialogActions>
-            <Button onClick={(event) => { event.preventDefault(); this.submitHandler(); }} color="primary">
-             Закрыть
-            </Button>
-          </DialogActions>
-        </Dialog>
+          </Dialog>
+        </Drawer>
       </div>
     );
   }
@@ -191,12 +99,9 @@ class ConstructPanelLeft extends Component {
 ConstructPanelLeft.propTypes = {
   classes: PropTypes.object.isRequired,
 };
-const mapStateToProps = state => ({
-  isAuthorized: state.authorization.token !== null,
-});
 
 const mapDispatchToProps = dispatch => ({
   onFileUpload: files => dispatch(uploadFile(files)),
 });
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(DragDropContext(HTML5Backend)(ConstructPanelLeft)));
+export default withStyles(leftStyles)(connect(mapDispatchToProps)(DragDropContext(HTML5Backend)(ConstructPanelLeft)));

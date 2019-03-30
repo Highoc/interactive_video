@@ -1,9 +1,6 @@
 .default {
-    color: #ff2700;
-    background-color: #004dff;
-
-    height: 70px;
-    min-height: 70px;
+    height: 64px;
+    min-height: 64px;
 
     width: 100%;
     min-width: 1680px;

@@ -1,11 +1,12 @@
+.icon {
+    color: white;
+}
 .card {
     width: 100%;
 }
-
 .media {
-    height: 150px;
+    height: 120px;
 }
-
 .content {
     height: 80%;
     width: 90%;

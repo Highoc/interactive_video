@@ -1,11 +1,15 @@
 .card {
     width: 100%;
 }
-
 .media {
     height: 150px;
 }
-
+.container {
+    display: inline-block;
+    width: 280px;
+    margin: 5px;
+    height: 280px;
+}
 .content {
     height: 80%;
     width: 90%;

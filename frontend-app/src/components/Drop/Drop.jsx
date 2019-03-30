@@ -5,7 +5,7 @@ import classes from './Drop.module.css';
 const TargetBox = ({ canDrop, isOver, connectDropTarget }) => {
   const isActive = canDrop && isOver;
   return connectDropTarget(
-    <div className={classes.default}>{isActive ? 'Release to drop' : 'Переместите файлы сюда'}</div>,
+    <div className={classes.default}>{isActive ? 'Release to drop' : 'Переместите файл сюда'}</div>,
   );
 };
 export default DropTarget(

@@ -1,27 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
-import {withStyles} from "@material-ui/core";
 import ChannelPlaylist from '../../components/Channel/ChannelInfo/ChannelPlaylist';
 import Typography from '@material-ui/core/Typography';
 import { RequestResolver } from '../../helpers/RequestResolver';
 import { pprint, perror } from '../../helpers/SmartPrint';
-
-const styles = theme => ({
-  root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'left',
-    marginTop: '2%',
-    overflow: 'hidden',
-    backgroundColor: theme.palette.background.paper,
-  },
-  gridList: {
-    width: '100%',
-    height: '100%',
-    // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
-    transform: 'translateZ(0)',
-  },
-});
+import classes from './Homepage.module.css';
 
 
 class Homepage extends Component {
@@ -50,7 +33,6 @@ class Homepage extends Component {
 
   render() {
     const { isLoaded } = this.state;
-    const { classes } = this.props;
     let result;
     if (!isLoaded) {
       return <div> Еще не загружено </div>;
@@ -94,4 +76,4 @@ Homepage.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Homepage);
+export default Homepage;

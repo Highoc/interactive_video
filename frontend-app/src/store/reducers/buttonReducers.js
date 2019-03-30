@@ -8,10 +8,9 @@ const initialState = {
 
 const uploadFile = (state, action) => {
   const { files } = action.payload;
-  const file = files[0];
   return {
     ...state,
-    filesUpload: [...state.filesUpload, file],
+    filesUpload: [...state.filesUpload, files],
   };
 };
 

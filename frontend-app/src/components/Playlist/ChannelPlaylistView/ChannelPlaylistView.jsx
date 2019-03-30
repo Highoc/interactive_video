@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import {
   Card, CardMedia, CardContent, CardActionArea, Typography, Button, CardActions,
 } from '@material-ui/core';
 import classes from './ChannelPlaylistView.module.css';
-import { withStyles } from '@material-ui/core/styles/index';
 
 class ChannelPlaylistView extends Component {
   constructor(props) {

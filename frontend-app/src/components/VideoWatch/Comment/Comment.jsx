@@ -1,21 +1,10 @@
 import React, { Component } from 'react';
-
-import axios from 'axios/index';
-
-import Card from '@material-ui/core/Card/index';
-import CardHeader from '@material-ui/core/CardHeader/index';
-import CardContent from '@material-ui/core/CardContent/index';
-
-import Typography from '@material-ui/core/Typography/index';
-import Avatar from '@material-ui/core/Avatar/index';
-import Button from '@material-ui/core/Button/index';
+import {
+  Card, CardHeader, CardContent, Typography, Avatar, Button,
+} from '@material-ui/core';
 import { RequestResolver } from '../../../helpers/RequestResolver';
-
-const styles = {
-  container: {
-    marginLeft: '800px',
-  },
-};
+import { perror } from '../../../helpers/SmartPrint';
+import classes from './Comment.module.css';
 
 export class Comment extends Component {
   constructor(props) {
@@ -33,7 +22,7 @@ export class Comment extends Component {
       const result = await this.backend().get(`comment/get/${commentId}/`);
       this.setState({ isLoaded: true, comment: result.data });
     } catch (error) {
-      console.log(error);
+      perror('Comment', error);
     }
   }
 
@@ -42,7 +31,6 @@ export class Comment extends Component {
     callback(this.state);
     event.preventDefault();
   }
-
 
   render() {
     const { isLoaded } = this.state;
@@ -60,7 +48,6 @@ export class Comment extends Component {
 
     const { comment } = this.state;
 
-
     return (
       <div>
         <Card>
@@ -74,7 +61,7 @@ export class Comment extends Component {
           <CardContent>
             <Typography component="p">
               {comment.text}
-              <div style={styles.container}>
+              <div className={classes.container}>
                 <Button onClick={(event) => this.onReply(event)} color="primary">
                   Ответить
                 </Button>
@@ -84,7 +71,6 @@ export class Comment extends Component {
           </CardContent>
         </Card>
       </div>
-
     );
   }
 }

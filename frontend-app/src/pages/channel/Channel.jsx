@@ -6,10 +6,10 @@ import ChannelView from './ChannelView';
 import CreateVideo from './CreateVideo';
 import WatchVideo from './WatchVideo';
 import ChannelEdit from './ChannelEdit';
-import PlaylistAdd from '../Playlist/PlaylistAdd';
-import PlaylistAll from '../Playlist/PlaylistAll';
+import PlaylistAdd from '../Playlist/PlaylistAdd/PlaylistAdd';
+import PlaylistAll from '../Playlist/PlaylistAll/PlaylistAll';
 import Playlist from '../Playlist/Playlist';
-import PlaylistEdit from '../Playlist/PlaylistEdit';
+import PlaylistEdit from '../Playlist/PlaylistEdit/PlaylistEdit';
 
 export const Channel = () => (
   <div>

@@ -9,31 +9,11 @@ import Button from '@material-ui/core/Button/index';
 import CardActions from '@material-ui/core/CardActions/index';
 import CardContent from '@material-ui/core/CardContent/index';
 import Typography from '@material-ui/core/Typography/index';
-
-const styles = theme => ({
-  icon: {
-    color: 'white',
-  },
-  card: {
-    width: '100%',
-  },
-  media: {
-    height: 120,
-  },
-  content: {
-    height: '80%',
-    width: '90%',
-  },
-});
-
+import classes from './SourceList.module.css';
 
 class SourceList extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
-    const { classes, name } = this.props;
+    const { name } = this.props;
     return (
       <Card className={classes.card}>
         <CardActionArea>
@@ -62,4 +42,4 @@ SourceList.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(SourceList);
+export default SourceList;

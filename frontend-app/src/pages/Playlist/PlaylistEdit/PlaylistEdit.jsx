@@ -1,44 +1,35 @@
 import React, { Component } from 'react';
-import axios from 'axios/index';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles/index';
-import classNames from 'classnames';
 import Fab from '@material-ui/core/Fab/index';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import { Redirect } from 'react-router-dom';
-import Input from '../../components/Input/Input';
-import { RequestResolver, json } from '../../helpers/RequestResolver';
+import Input from '../../../components/Input/Input';
+import { RequestResolver, json } from '../../../helpers/RequestResolver';
+import { perror } from '../../../helpers/SmartPrint';
+import styles from './PlaylistEdit.styles';
 
-const styles = theme => ({
-  margin: {
-    margin: theme.spacing.unit,
-  },
-  extendedIcon: {
-    marginRight: theme.spacing.unit,
-  },
-});
-
-
-class PlaylistAdd extends Component {
+class PlaylistEdit extends Component {
   constructor(props) {
     super(props);
-    const { channelKey } = props.match.params;
+    const { channelKey, playlistKey } = props.match.params;
     this.state = {
       isValid: false,
       inputs: [],
       channelKey,
+      playlistKey,
       isSent: false,
     };
     this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
-    const { channelKey } = this.state;
+    const { channelKey, playlistKey } = this.state;
     try {
-      const result = await this.backend().get(`channel/${channelKey}/playlist/create/`);
+      const result = await this.backend().get(`channel/${channelKey}/playlist/${playlistKey}/update/`);
       this.setState({ inputs: result.data, isLoaded: true });
     } catch (error) {
-      console.log(`[ComponentDidMount] Error: ${error}`);
+      perror('PlaylistEdit', error);
     }
   }
 
@@ -50,7 +41,7 @@ class PlaylistAdd extends Component {
   }
 
   async submitHandler() {
-    const { inputs, channelKey } = this.state;
+    const { inputs, channelKey, playlistKey } = this.state;
     let isValid = true;
     for (const key in inputs) {
       isValid = isValid && inputs[key].isValid;
@@ -59,10 +50,10 @@ class PlaylistAdd extends Component {
     if (isValid) {
       try {
         const data = this.getData();
-        const result = await this.backend(json).post(`channel/${channelKey}/playlist/create/`, data);
+        const result = await this.backend(json).post(`channel/${channelKey}/playlist/${playlistKey}/update/`, data);
         this.setState({ isSent: true });
       } catch (error) {
-        console.log(error);
+        perror('PlaylistEdit', error);
       }
     } else {
       console.log('Invalid input');
@@ -81,12 +72,9 @@ class PlaylistAdd extends Component {
     const { inputs, isSent, channelKey } = this.state;
     const { classes } = this.props;
 
-    const status = <div>Не отправлено</div>;
-
     if (isSent) {
       return <Redirect to={`/channel/${channelKey}/playlist/all`} />;
     }
-
     const Inputs = Object.keys(inputs).map((key) => {
       const inputElement = inputs[key];
       return (
@@ -105,7 +93,7 @@ class PlaylistAdd extends Component {
     return (
       <div>
         <form>
-          <h2>Создание плейлиста</h2>
+          <h2>Редактирование плейлиста</h2>
           {Inputs}
           <Fab
             variant="extended"
@@ -113,20 +101,19 @@ class PlaylistAdd extends Component {
             aria-label="Add"
             className={classes.margin}
             style={styles.button}
-            onClick={(event) => { event.preventDefault(); this.submitHandler(); }}
+            onClick={event => this.submitHandler(event)}
           >
             <NavigationIcon className={classes.extendedIcon} />
             Создать
           </Fab>
         </form>
-        {status}
       </div>
     );
   }
 }
 
-PlaylistAdd.propTypes = {
+PlaylistEdit.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(PlaylistAdd);
+export default withStyles(styles)(PlaylistEdit);

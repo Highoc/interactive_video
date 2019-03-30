@@ -2,67 +2,13 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles/index';
-import Button from '@material-ui/core/Button/index';
-import Drawer from '@material-ui/core/Drawer/index';
+import {
+  Button, Drawer,
+} from '@material-ui/core';
 import VideoCamera from '@material-ui/icons/Videocam';
-
-const drawerWidth = '80%';
-
-const buttonContainer = {
-  display: 'flex',
-  marginTop: '70px',
-  justifyContent: 'center',
-};
-
-const styles = theme => ({
-  root: {
-    padding: '5px',
-    float: 'right',
-    width: '15%',
-  },
-  divider: {
-    marginTop: theme.spacing.unit * 2,
-  },
-  drawerPaper: {
-    position: 'relative',
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawerPaperClose: {
-    overflowX: 'hidden',
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    width: theme.spacing.unit * 7,
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing.unit * 9,
-    },
-  },
-  toolbarIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '0 8px',
-    ...theme.mixins.toolbar,
-  },
-  menuButtonHidden: {
-    display: 'none',
-  },
-
-});
+import rightStyles from './ConstructPanelRight.styles';
 
 export class ConstructPanelRight extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      open: true,
-    };
-  }
-
   onReply(event, choice) {
     const { callback } = this.props;
     callback(choice);
@@ -70,7 +16,7 @@ export class ConstructPanelRight extends Component {
   }
 
   render() {
-    const { classes, ...other } = this.props;
+    const { classes } = this.props;
 
     return (
       <div className={classes.root}>
@@ -78,22 +24,21 @@ export class ConstructPanelRight extends Component {
           variant="permanent"
           anchor="right"
           classes={{
-            paperAnchorDockedRight: classNames(classes.drawerPaper, !this.state.open && classes.drawerPaperClose),
+            paperAnchorDockedRight: classNames(classes.drawerPaper),
           }}
-          open={this.state.open}
+          open
         >
-
-          <div style={buttonContainer}>
+          <div className={classes.buttonContainer}>
             <Button variant="contained" color="primary" className={classes.button} size="large" onClick={event => this.onReply(event, 1)}>
               Добавить узел
             </Button>
           </div>
-          <div style={buttonContainer}>
+          <div className={classes.buttonContainer}>
             <Button variant="contained" color="primary" className={classes.button} size="large" onClick={event => this.onReply(event, 2)}>
               Удалить узел
             </Button>
           </div>
-          <div style={buttonContainer}>
+          <div className={classes.buttonContainer}>
             <Button variant="contained" color="primary" className={classes.button} onClick={event => this.onReply(event, 3)}>
               Создать видео
               <VideoCamera fontSize="large" />
@@ -110,4 +55,4 @@ ConstructPanelRight.propTypes = {
 };
 
 
-export default withStyles(styles)(ConstructPanelRight);
+export default withStyles(rightStyles)(ConstructPanelRight);

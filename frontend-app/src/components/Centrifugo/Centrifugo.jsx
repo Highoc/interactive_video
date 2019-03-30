@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-
 import Centrifuge from 'centrifuge';
+import { perror } from '../../helpers/SmartPrint';
 
 import {
   centrifugoInit as init,
@@ -37,7 +37,7 @@ class Centrifugo extends Component {
 
       centrifuge.connect();
     } catch (error) {
-      console.log(`[Centrifugo] ${error}`);
+      perror('Centrifugo', error);
     }
   }
 

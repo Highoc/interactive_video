@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import 'video-react/dist/video-react.css';
 import PropTypes from 'prop-types';
-
-import { withStyles } from '@material-ui/core/styles';
-import ButtonBase from '@material-ui/core/ButtonBase';
-import Typography from '@material-ui/core/Typography';
-
+import { perror } from '../../../helpers/SmartPrint';
+import { ButtonBase, Typography } from '@material-ui/core';
+import classes from './InteractivePlayer.module.css';
 import {
   Player,
   ControlBar,
@@ -20,44 +18,6 @@ import {
 } from 'video-react';
 import { RequestResolver } from '../../../helpers/RequestResolver';
 
-const propTypes = {
-  player: PropTypes.object,
-  className: PropTypes.string,
-};
-
-const styles = theme => ({
-  button: {
-    margin: theme.spacing.unit,
-    position: 'absolute',
-  },
-  input: {
-    display: 'none',
-  },
-  focusVisible: {},
-  textContainer: {
-    justifyContent: 'center',
-  },
-  videoStyles: {
-    position: 'relative',
-    maxhight: '560',
-    overflow: 'hidden',
-  },
-  buttonStyles: {
-    position: 'absolute',
-    zIndex: '10',
-    top: '70%',
-    width: '100%',
-    height: '20%',
-    marginRight: '10%',
-  },
-  oneBlock: {
-    width: '40%',
-    height: '100%',
-    float: 'left',
-    backgroundImage: 'url(https://ak8.picdn.net/shutterstock/videos/871678/thumb/1.jpg)',
-    marginLeft: '5%',
-  },
-});
 
 class InteractivePlayer extends Component {
   constructor(props) {
@@ -103,7 +63,7 @@ class InteractivePlayer extends Component {
 
       this.videoByChoice(main);
     } catch (error) {
-      console.log(error);
+      perror('InteractivePlayer', error);
     }
   }
 
@@ -156,7 +116,7 @@ class InteractivePlayer extends Component {
           children: [...this.state.children, response.data],
         });
       } catch (error) {
-        console.log(error);
+        perror('InteractivePlayer', error);
       }
     }
   }
@@ -180,7 +140,6 @@ class InteractivePlayer extends Component {
   }
 
   handleAnswer(key) {
-    console.log(key);
     this.setState({ nextKey: key });
   }
 
@@ -188,7 +147,6 @@ class InteractivePlayer extends Component {
     const {
       url, currentTime, timeFrame, questions,
     } = this.state;
-    const { classes } = this.props;
 
     let buttons = <div />;
     const d = timeFrame.end - currentTime;
@@ -198,7 +156,6 @@ class InteractivePlayer extends Component {
           {questions.map(elem => (
             <ButtonBase
               focusRipple
-              focusVisibleClassName={classes.focusVisible}
               key={elem.key}
               onClick={() => this.handleAnswer(elem.key)}
               className={classes.oneBlock}
@@ -218,11 +175,11 @@ class InteractivePlayer extends Component {
     }
 
     return (
-      <div className={classes.videoStyles}>
+      <div>
         {buttons}
         <Player ref="player" src={url} fluid>
           <BigPlayButton position="center" />
-          <ControlBar autoHide>
+          <ControlBar>
             <ReplayControl seconds={10} order={2} />
             <ForwardControl seconds={10} order={3} />
             <CurrentTimeDisplay disabled />
@@ -241,7 +198,7 @@ InteractivePlayer.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(InteractivePlayer);
+export default InteractivePlayer;
 
 class AppendQueue {
   constructor() {

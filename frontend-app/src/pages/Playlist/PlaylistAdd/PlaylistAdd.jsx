@@ -1,45 +1,35 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles/index';
-import classNames from 'classnames';
 import Fab from '@material-ui/core/Fab/index';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import { Redirect } from 'react-router-dom';
-import Input from '../../components/Input/Input';
-import { RequestResolver, json } from '../../helpers/RequestResolver';
+import Input from '../../../components/Input/Input';
+import { RequestResolver, json } from '../../../helpers/RequestResolver';
+import styles from './PlaylistAdd.styles';
+import { perror } from '../../../helpers/SmartPrint';
 
-
-const styles = theme => ({
-  margin: {
-    margin: theme.spacing.unit,
-  },
-  extendedIcon: {
-    marginRight: theme.spacing.unit,
-  },
-});
-
-
-class PlaylistEdit extends Component {
+class PlaylistAdd extends Component {
   constructor(props) {
     super(props);
-    const { channelKey, playlistKey } = props.match.params;
+    const { channelKey } = props.match.params;
     this.state = {
       isValid: false,
       inputs: [],
       channelKey,
-      playlistKey,
       isSent: false,
+      isLoaded: false,
     };
     this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
-    const { channelKey, playlistKey } = this.state;
+    const { channelKey } = this.state;
     try {
-      const result = await this.backend().get(`channel/${channelKey}/playlist/${playlistKey}/update/`);
+      const result = await this.backend().get(`channel/${channelKey}/playlist/create/`);
       this.setState({ inputs: result.data, isLoaded: true });
     } catch (error) {
-      console.log(error);
+      perror('PlaylistAdd', error);
     }
   }
 
@@ -51,7 +41,7 @@ class PlaylistEdit extends Component {
   }
 
   async submitHandler() {
-    const { inputs, channelKey, playlistKey } = this.state;
+    const { inputs, channelKey } = this.state;
     let isValid = true;
     for (const key in inputs) {
       isValid = isValid && inputs[key].isValid;
@@ -60,10 +50,10 @@ class PlaylistEdit extends Component {
     if (isValid) {
       try {
         const data = this.getData();
-        const result = await this.backend(json).post(`channel/${channelKey}/playlist/${playlistKey}/update/`, data);
+        const result = await this.backend(json).post(`channel/${channelKey}/playlist/create/`, data);
         this.setState({ isSent: true });
       } catch (error) {
-        console.log(error);
+        perror('PlaylistAdd', error);
       }
     } else {
       console.log('Invalid input');
@@ -79,12 +69,17 @@ class PlaylistEdit extends Component {
   }
 
   render() {
-    const { inputs, isSent, channelKey } = this.state;
+    const { inputs, isSent, channelKey, isLoaded } = this.state;
     const { classes } = this.props;
+
+    if (!isLoaded) {
+      return <div> Еще не загружено </div>;
+    }
 
     if (isSent) {
       return <Redirect to={`/channel/${channelKey}/playlist/all`} />;
     }
+
     const Inputs = Object.keys(inputs).map((key) => {
       const inputElement = inputs[key];
       return (
@@ -103,7 +98,7 @@ class PlaylistEdit extends Component {
     return (
       <div>
         <form>
-          <h2>Редактирование плейлиста</h2>
+          <h2>Создание плейлиста</h2>
           {Inputs}
           <Fab
             variant="extended"
@@ -111,7 +106,7 @@ class PlaylistEdit extends Component {
             aria-label="Add"
             className={classes.margin}
             style={styles.button}
-            onClick={event => this.submitHandler(event)}
+            onClick={(event) => { event.preventDefault(); this.submitHandler(); }}
           >
             <NavigationIcon className={classes.extendedIcon} />
             Создать
@@ -122,8 +117,8 @@ class PlaylistEdit extends Component {
   }
 }
 
-PlaylistEdit.propTypes = {
+PlaylistAdd.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(PlaylistEdit);
+export default withStyles(styles)(PlaylistAdd);

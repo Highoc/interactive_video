@@ -1,7 +1,5 @@
 .default {
-    color: #ffa102;
-    background-color: #00fff3;
-
+    overflow: auto;
     min-height: 800px;
 
     width: 15%;

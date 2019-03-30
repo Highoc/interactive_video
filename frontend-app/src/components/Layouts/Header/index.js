@@ -1,1 +1,3 @@
-export * from './Header';
+import HeaderLayout from './Header';
+
+export default HeaderLayout;

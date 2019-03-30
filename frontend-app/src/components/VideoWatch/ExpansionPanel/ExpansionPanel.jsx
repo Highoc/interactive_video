@@ -2,63 +2,15 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles/index';
 import classNames from 'classnames';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel/index';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails/index';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary/index';
-import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions/index';
-import Typography from '@material-ui/core/Typography/index';
-import IconButton from '@material-ui/core/IconButton/index';
-import Button from '@material-ui/core/Button/index';
-import Divider from '@material-ui/core/Divider/index';
+import {
+  ExpansionPanel, ExpansionPanelActions, ExpansionPanelDetails, ExpansionPanelSummary, Typography, IconButton, Button, Divider,
+} from '@material-ui/core';
 import ArrowDropDown from '@material-ui/icons/ArrowDropDown';
 import ArrowDropUp from '@material-ui/icons/ArrowDropUp';
 import Input from '../../Input/Input';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
-
-const styles = theme => ({
-  root: {
-    width: '100%',
-  },
-  heading: {
-    fontSize: theme.typography.pxToRem(24),
-  },
-  secondaryHeading: {
-    fontSize: theme.typography.pxToRem(15),
-    color: theme.palette.text.secondary,
-  },
-  icon: {
-    verticalAlign: 'bottom',
-    height: 20,
-    width: 20,
-  },
-  details: {
-    alignItems: 'center',
-  },
-  column: {
-    flexBasis: '33.33%',
-  },
-  rightcolumn: {
-    flexBasis: '16.5%',
-  },
-  columnButton: {
-    marginLeft: '30%',
-    marginRight: '30%',
-  },
-  buttonContainer: {
-    marginLeft: '60%',
-  },
-  helper: {
-    borderLeft: `2px solid ${theme.palette.divider}`,
-    padding: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
-  },
-  link: {
-    color: theme.palette.primary.main,
-    textDecoration: 'none',
-    '&:hover': {
-      textDecoration: 'underline',
-    },
-  },
-});
+import { perror } from '../../../helpers/SmartPrint';
+import styles from './ExpansionPanel.styles';
 
 class ExpansionPanelVideo extends Component {
   constructor(props) {
@@ -89,14 +41,13 @@ class ExpansionPanelVideo extends Component {
     for (const key in inputs) {
       isValid = isValid && inputs[key].isValid;
     }
-
     if (isValid) {
       try {
         const data = this.getData();
         const result = await this.backend(json).post(`channel/${channelKey}/video/${videoKey}/comment/add/`, data);
         this.setState({ isSent: true });
       } catch (error) {
-        console.log(error);
+        perror('ExpansionPanel', error);
       }
     } else {
       console.log('Invalid input');
@@ -132,7 +83,7 @@ class ExpansionPanelVideo extends Component {
 
   render() {
     const {
-      classes, description, created, author, rating, views
+      classes, created, author, rating, views,
     } = this.props;
     const { inputs, expanded, choice } = this.state;
 

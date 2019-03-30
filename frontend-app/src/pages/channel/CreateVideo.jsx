@@ -17,7 +17,6 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import ConstructPanelRight from '../../components/VideoConstructor/ConctructPanelRight';
 import { RequestResolver, json } from '../../helpers/RequestResolver';
 import Input from '../../components/Input/Input';
 
@@ -319,7 +318,6 @@ class CreateVideo extends Component {
           {Inputs}
 
         </div>
-        <ConstructPanelRight callback={choice => this.handleButtonChoice(choice)} />
       </div>
     );
   }

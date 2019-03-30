@@ -1,8 +1,10 @@
 import React from 'react';
 import classes from './Header.module.css';
 
-export const Header = props => (
+const HeaderLayout = props => (
   <div className={classes.default}>
     { props.children }
   </div>
 );
+
+export default HeaderLayout;

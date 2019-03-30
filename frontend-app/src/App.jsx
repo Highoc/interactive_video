@@ -6,13 +6,14 @@ import {
   BrowserRouter as Router, Switch, Route, Redirect, Link,
 } from 'react-router-dom';
 
-//import { Header } from './components/Layouts/Header';
+import HeaderLayout from './components/Layouts/Header';
 import { Main } from './components/Layouts/Main';
 import { Left } from './components/Layouts/Left';
 import { Right } from './components/Layouts/Right';
 import { Footer } from './components/Layouts/Footer';
 
 import MenuLeft from './components/Interface/MenuLeft';
+import MenuRight from './components/Interface/MenuRight';
 import ConstructPanelLeft from './components/VideoConstructor/ConstructPanelLeft';
 import Header from './components/Interface/Header';
 import Homepage from './pages/homepage/Homepage';
@@ -24,6 +25,7 @@ import Register from './pages/register/Register';
 import Centrifugo from './components/Centrifugo';
 
 import { loginCheckState } from './store/actions/authorization';
+import ConstructPanelRight from './components/VideoConstructor/ConctructPanelRight';
 
 const Guest = props => <div> Гостевая страница </div>;
 
@@ -33,6 +35,7 @@ class App extends Component {
     const { onTryAutoLogin } = this.props;
     onTryAutoLogin();
   }
+
   /*
   render() {
     return (
@@ -50,7 +53,7 @@ class App extends Component {
   }
   */
   render() {
-    let components = (
+    let routes = (
       <Switch>
         <Route path="/guest" exact component={Guest} />
         <Route path="/login" exact component={SignIn} />
@@ -59,7 +62,8 @@ class App extends Component {
       </Switch>
     );
 
-    let routes = <div />;
+    let componentLeft = <div />;
+    let componentRight = <div />;
 
     const { isAuthorized } = this.props;
     if (isAuthorized) {
@@ -72,40 +76,37 @@ class App extends Component {
         </Switch>
       );
 
-      components = (
+      componentLeft = (
         <Switch>
-          <Route
-            path="/channel/:channelKey/create"
-            exact
-            render={props => (
-              <div>
-                <ConstructPanelLeft />
-              </div>
-            )}
-          />
-
-          <Route
-            path="/"
-            render={props => (
-              <div>
-                <MenuLeft />
-                <Centrifugo />
-              </div>
-            )}
-          />
-
+          <Route exact path="/channel/:channelKey/create" component={ConstructPanelLeft} />
+          <Route path="/" component={MenuLeft} />
+        </Switch>
+      );
+      componentRight = (
+        <Switch>
+          <Route exact path="/channel/:channelKey/create" component={ConstructPanelRight} />
+          <Route path="/" component={MenuRight} />
         </Switch>
       );
     }
 
     return (
       <Router>
-        <div>
-          <Header />
-          {components}
-          <Main>
-            {routes}
-          </Main>
+        <div className="content-column">
+          <HeaderLayout>
+            <Header />
+          </HeaderLayout>
+          <div className="content-row">
+            <Left>
+              {componentLeft}
+            </Left>
+            <Main>
+              {routes}
+            </Main>
+            <Right>
+              {componentRight}
+            </Right>
+          </div>
         </div>
       </Router>
     );
