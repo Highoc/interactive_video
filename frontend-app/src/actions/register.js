@@ -1,6 +1,7 @@
 import * as actionTypes from './actionTypes';
 import { login } from './authorization';
 import { RequestResolver } from '../helpers/RequestResolver';
+import SmartPrint from '../helpers/SmartPrint/SmartPrint';
 
 export const registrationStart = () => {
   return {
@@ -31,7 +32,7 @@ export const registration = (data) => {
         dispatch(login(username, password1));
       })
       .catch((error) => {
-        console.log(error);
+        SmartPrint.error('Registration', error);
         dispatch(registrationFailed(error));
       });
   };

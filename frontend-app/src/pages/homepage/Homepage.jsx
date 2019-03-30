@@ -4,6 +4,7 @@ import {withStyles} from "@material-ui/core";
 import ChannelPlaylist from '../../components/ChannelPlaylist';
 import Typography from '@material-ui/core/Typography';
 import { RequestResolver } from '../../helpers/RequestResolver';
+import { pprint, perror } from '../../helpers/SmartPrint';
 
 const styles = theme => ({
   root: {
@@ -41,8 +42,9 @@ class Homepage extends Component {
     try {
       const result = await this.backend().get(`channel/get/${channelKey}/`);
       this.setState({ isLoaded: true, channel: result.data });
+      pprint('HomePage', result.data);
     } catch (error) {
-      console.log(error);
+      perror('HomePage', error);
     }
   }
 

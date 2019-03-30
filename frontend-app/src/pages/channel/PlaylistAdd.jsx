@@ -38,7 +38,7 @@ class PlaylistAdd extends Component {
       const result = await this.backend().get(`channel/${channelKey}/playlist/create/`);
       this.setState({ inputs: result.data, isLoaded: true });
     } catch (error) {
-      console.log(error);
+      console.log(`[ComponentDidMount] Error: ${error}`);
     }
   }
 
