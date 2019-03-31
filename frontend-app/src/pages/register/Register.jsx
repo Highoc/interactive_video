@@ -123,7 +123,7 @@ class Register extends Component {
             Регистрация
           </Typography>
           <form className={classes.form}>
-            <FormControl margin="normal" required fullWidth>
+            <FormControl margin="normal" fullWidth>
               {Inputs}
             </FormControl>
             <Button

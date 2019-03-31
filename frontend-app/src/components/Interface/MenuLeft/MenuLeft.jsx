@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles/index';
 import {
@@ -46,9 +45,9 @@ class MenuLeft extends Component {
               Каналы
             </Typography>
             {channels.map(({ name, key }) => (
-              <div>
-                <Divider />
-                <ChannelList name={name} keyChannel={key} key={key} />
+              <div key={`Channel${key}`}>
+                <Divider key={`Devider${key}`} />
+                <ChannelList name={name} keyChannel={key}  />
               </div>
             ))}
             <Divider />
@@ -58,9 +57,5 @@ class MenuLeft extends Component {
     );
   }
 }
-
-MenuLeft.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
 
 export default withStyles(menuLeftStyles)(MenuLeft);

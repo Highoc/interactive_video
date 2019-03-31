@@ -87,7 +87,7 @@ class ConstructPanelLeft extends Component {
               </CardContent>
             </CardActionArea>
           </Card>
-          <Dialog dialogOpen={dialogOpen} callback={state => this.callbackDialog(state)}>
+          <Dialog dialogOpen={dialogOpen} callback={state => this.callbackDialog(state)} title="Загрузите видео">
             <DropBox callback={droppedFiles => this.callbackFiles(droppedFiles)} />
           </Dialog>
         </Drawer>
@@ -100,8 +100,12 @@ ConstructPanelLeft.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
+const mapStateToProps = state => ({
+  files: state.buttonsAct.filesUpload,
+});
+
 const mapDispatchToProps = dispatch => ({
   onFileUpload: files => dispatch(uploadFile(files)),
 });
 
-export default withStyles(leftStyles)(connect(mapDispatchToProps)(DragDropContext(HTML5Backend)(ConstructPanelLeft)));
+export default withStyles(leftStyles)(connect(mapStateToProps, mapDispatchToProps)(DragDropContext(HTML5Backend)(ConstructPanelLeft)));

@@ -44,12 +44,12 @@ class DialogSmart extends Component {
         maxWidth="md"
       >
         <DialogTitle onClose={this.handleClose}>
-          Диалоговое окно
+          {this.props.title}
         </DialogTitle>
         {this.props.children}
         <DialogActions>
           <Button onClick={(event) => { event.preventDefault(); this.submitHandler(); }} color="primary">
-            Закрыть
+            Отправить
           </Button>
         </DialogActions>
       </Dialog>

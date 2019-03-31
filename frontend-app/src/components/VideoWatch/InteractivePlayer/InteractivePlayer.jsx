@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import 'video-react/dist/video-react.css';
-import PropTypes from 'prop-types';
 import { perror } from '../../../helpers/SmartPrint';
 import { ButtonBase, Typography } from '@material-ui/core';
 import classes from './InteractivePlayer.module.css';
@@ -193,10 +192,6 @@ class InteractivePlayer extends Component {
     );
   }
 }
-
-InteractivePlayer.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
 
 export default InteractivePlayer;
 

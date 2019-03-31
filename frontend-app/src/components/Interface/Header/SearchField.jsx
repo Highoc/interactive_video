@@ -16,7 +16,7 @@ class SearchField extends Component {
           classes={{
             root: classes.inputRoot,
             input: classes.inputInput,
-            fullWidth: true,
+            fullWidth: 'true',
           }}
         />
       </div>

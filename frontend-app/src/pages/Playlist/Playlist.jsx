@@ -1,23 +1,11 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core';
-import Card from '@material-ui/core/Card/index';
-import CardContent from '@material-ui/core/CardContent/index';
-import Typography from '@material-ui/core/Typography/index';
+import {
+  Card, CardContent, Typography,
+} from '@material-ui/core';
 import ChannelPlaylist from '../../components/Channel/ChannelInfo/ChannelPlaylist';
 import { RequestResolver } from '../../helpers/RequestResolver';
-
-const styles = theme => ({
-  titleBar: {
-    background:
-      'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, '
-      + 'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
-  },
-  card: {
-    width: '100%',
-    height: '15%',
-  },
-});
+import classes from './Playlist.module.css';
+import { perror } from '../../helpers/SmartPrint';
 
 
 class Playlist extends Component {
@@ -41,12 +29,11 @@ class Playlist extends Component {
       const result = await this.backend().get(`channel/${channelKey}/playlist/${playlistKey}/`);
       this.setState({ isLoaded: true, playlist: result.data });
     } catch (error) {
-      console.log(error);
+      perror('Playlist', error);
     }
   }
 
   render() {
-    const { classes } = this.props;
     const { isLoaded } = this.state;
     if (!isLoaded) {
       return <div> Еще не загружено </div>;
@@ -58,16 +45,16 @@ class Playlist extends Component {
     return (
       <div>
         <Card className={classes.card}>
-            <CardContent>
-              <Typography gutterBottom variant="h5" component="h2" align="center">
-                Название плейлиста:
-                {' '}
-                {playlist.name}
-              </Typography>
-              <Typography component="p" align="center">
-                {playlist.description}
-              </Typography>
-            </CardContent>
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="h2" align="center">
+              Название плейлиста:
+              {' '}
+              {playlist.name}
+            </Typography>
+            <Typography component="p" align="center">
+              {playlist.description}
+            </Typography>
+          </CardContent>
         </Card>
         <ChannelPlaylist playlist={playlist} channelKey={channelKey} />
       </div>
@@ -76,8 +63,4 @@ class Playlist extends Component {
   }
 }
 
-Playlist.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles)(Playlist);
+export default Playlist;

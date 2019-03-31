@@ -50,7 +50,7 @@ class PlaylistAdd extends Component {
     if (isValid) {
       try {
         const data = this.getData();
-        const result = await this.backend(json).post(`channel/${channelKey}/playlist/create/`, data);
+        await this.backend(json).post(`channel/${channelKey}/playlist/create/`, data);
         this.setState({ isSent: true });
       } catch (error) {
         perror('PlaylistAdd', error);

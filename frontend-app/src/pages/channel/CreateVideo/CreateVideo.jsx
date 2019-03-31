@@ -1,70 +1,17 @@
 import React, { Component } from 'react';
 import 'react-tree-graph/dist/style.css';
-
 import Tree from 'react-d3-tree';
-
 import clone from 'clone';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import classNames from 'classnames';
+import {
+  MenuItem, Select, DialogContent,
+} from '@material-ui/core';
 import { connect } from 'react-redux';
-import { RequestResolver, json } from '../../helpers/RequestResolver';
-import Input from '../../components/Input/Input';
-
-const styles = {
-  width: '80%',
-  height: '1000px',
-  margin: '0% 1.5% 0 1.5%',
-  overflow: 'hidden',
-  display: 'inline-block',
-};
-
-const container = {
-  width: '100%',
-  margin: '0% 1.5% 0 1.5%',
-  overflow: 'hidden',
-};
-
-const activeSvgShape = {
-  shape: 'circle',
-  shapeProps: {
-    r: 10,
-    fill: 'green',
-  },
-  transitionDuration: 0,
-};
-
-const deactiveSvgShape = {
-  shape: 'circle',
-  shapeProps: {
-    r: 10,
-    fill: 'blue',
-  },
-  transitionDuration: 0,
-};
-
-class NodeImage extends Component {
-  render() {
-    const { nodeData } = this.props;
-    return (
-      <div>
-
-        <div>
-          {nodeData.name}
-        </div>
-      </div>
-    );
-  }
-}
+import { RequestResolver, json } from '../../../helpers/RequestResolver';
+import Input from '../../../components/Input/Input';
+import Dialog from '../../../components/Dialog';
+import { perror } from '../../../helpers/SmartPrint';
+import classes from './CreateVideo.module.css';
+import { activeSvgShape, deactiveSvgShape, NodeImage } from './CreateVideo.styles';
 
 class CreateVideo extends Component {
   constructor(props) {
@@ -102,7 +49,18 @@ class CreateVideo extends Component {
             max_length: 4096,
             required: false,
           },
-        }],
+        },
+        {
+          type: 'text',
+          name: 'Dialog',
+          value: '',
+          description: 'Ответ ведущий к этому фрагменту видео',
+          rules: {
+            max_length: 64,
+            required: true,
+          },
+        },
+      ],
     };
     this.backend = RequestResolver.getBackend();
     this.uploadVideo = this.uploadVideo.bind(this);
@@ -113,7 +71,7 @@ class CreateVideo extends Component {
       const result = await this.backend().get('video/source/list/');
       this.setState({ sources: result.data });
     } catch (error) {
-      console.log(error);
+      perror('CreateVideo', error);
     }
   }
 
@@ -121,22 +79,8 @@ class CreateVideo extends Component {
     this.setState({ dialogOpen: true });
   };
 
-  handleClose = () => {
-    const { inputData } = this.state;
-    inputData.text = document.getElementById('text').value;
-    const { tree, nodeChosen } = this.state;
-    const node = tree.findNodeByKey(nodeChosen);
-    node.name = inputData.text;
-    node.sourceKey = inputData.sourceKey;
-    node.text = inputData.text;
-    node.isReady = true;
-    this.onUpdateTree();
-    this.setState({ dialogOpen: false });
-  };
-
   handleChange = (event) => {
     const { inputData } = this.state;
-    console.log(event.target.value);
     inputData.sourceKey = event.target.value;
     this.setState({ inputData });
   };
@@ -200,12 +144,25 @@ class CreateVideo extends Component {
         this.setState({ videoKey: result.data.key });
       } catch (error) {
         this.setState({ videoKey: 'error' });
+        perror('CreateVideo', error);
       }
     } else {
       console.log('Invalid input');
     }
   }
 
+  callbackDialog(state) {
+    this.setState({ dialogOpen: state });
+    const { inputData, inputs } = this.state;
+    inputData.text = inputs.find(elem => elem.name === 'Dialog').value;
+    const { tree, nodeChosen } = this.state;
+    const node = tree.findNodeByKey(nodeChosen);
+    node.name = inputData.text;
+    node.sourceKey = inputData.sourceKey;
+    node.text = inputData.text;
+    node.isReady = true;
+    this.onUpdateTree();
+  }
 
   onUpdateTree() {
     const { tree } = this.state;
@@ -233,9 +190,9 @@ class CreateVideo extends Component {
 
   render() {
     const {
-      sources, tree, dialogOpen, inputData, inputs,
+      tree, dialogOpen, inputData, inputs,
     } = this.state;
-    const { classes, files } = this.props;
+    const { files } = this.props;
     const Inputs = Object.keys(inputs).map((key) => {
       const inputElement = inputs[key];
       return (
@@ -252,72 +209,46 @@ class CreateVideo extends Component {
     });
 
     return (
-      <div style={container}>
-        <div style={styles}>
-          <h2>
+      <div className={classes.container}>
+        <h2>
 Создание видео
-            {' '}
-            {' '}
-            {this.state.videoKey}
-          </h2>
-          <div id="treeWrapper" style={{ width: '100%', height: '60%' }}>
-
-            <Tree
-              data={tree.tree}
-              translate={{ x: '25', y: '300' }}
-              collapsible={false}
-              zoomable={false}
-              allowForeignObjects
-              nodeSvgShape={deactiveSvgShape}
-              nodeLabelComponent={{
-                render: <NodeImage nodeData={tree} />,
-                foreignObjectWrapper: {
-                  y: -25,
-                  x: -25,
-                },
-              }}
-              onClick={(nodeData, event) => { this.handleClick(nodeData.key); this.onUpdateTree(); }}
-            />
-          </div>
-          <Dialog
-            onClose={this.handleClose}
-            open={dialogOpen}
-          >
-            <DialogTitle onClose={this.handleClose}>
-              Добавление фрагмента видео
-            </DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                Введите ответ, ведущий к этому фрагменту видео:
-              </DialogContentText>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="text"
-                type="text"
-                fullWidth
-              />
-              <Select
-                value={inputData.sourceKey}
-                name="sourceKey"
-                fullWidth
-                onChange={this.handleChange}
-              >
-                { files.map((source, i) => (
-                  <MenuItem key={i} value={i}>{source.name}</MenuItem>
-                ))}
-              </Select>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={this.handleClose} color="primary">
-                Спасти и сохранить
-              </Button>
-            </DialogActions>
-          </Dialog>
-
-          {Inputs}
-
+          {this.state.videoKey}
+        </h2>
+        <div id="treeWrapper" style={{ width: '100%', height: '60%' }}>
+          <Tree
+            data={tree.tree}
+            translate={{ x: 25, y: 350 }}
+            collapsible={false}
+            zoomable={false}
+            allowForeignObjects
+            nodeSvgShape={deactiveSvgShape}
+            nodeLabelComponent={{
+              render: <NodeImage nodeData={tree} />,
+              foreignObjectWrapper: {
+                y: -25,
+                x: -25,
+              },
+            }}
+            onClick={(nodeData, event) => { this.handleClick(nodeData.key); this.onUpdateTree(); }}
+          />
         </div>
+        <Dialog dialogOpen={dialogOpen} callback={state => this.callbackDialog(state)} title="Выберите фрагмент">
+          <DialogContent>
+            {Inputs[2]}
+            <Select
+              value={inputData.sourceKey}
+              name="sourceKey"
+              fullWidth
+              onChange={this.handleChange}
+            >
+              { files.map((source, i) => (
+                <MenuItem key={i} value={i}>{source.name}</MenuItem>
+              ))}
+            </Select>
+          </DialogContent>
+        </Dialog>
+        {Inputs[0]}
+        {Inputs[1]}
       </div>
     );
   }
@@ -327,14 +258,8 @@ const mapStateToProps = state => ({
   files: state.buttonsAct.filesUpload,
 });
 
-const mapDispatchToProps = dispatch => ({
-});
 
-CreateVideo.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(CreateVideo));
+export default connect(mapStateToProps)(CreateVideo);
 
 class TreeData {
   constructor() {

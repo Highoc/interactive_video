@@ -23,7 +23,7 @@ class ChannelHead extends Component {
     event.preventDefault();
     try {
       const { channelKey } = this.state;
-      const result = await this.backend(json).post(`channel/${channelKey}/subscribe/`, {});
+      await this.backend(json).post(`channel/${channelKey}/subscribe/`, {});
       this.setState({ subStatus: true });
     } catch (error) {
       perror('ChannelHead', error);
@@ -35,7 +35,7 @@ class ChannelHead extends Component {
     event.preventDefault();
     try {
       const { channelKey } = this.state;
-      const result = await this.backend(json).post(`channel/${channelKey}/unsubscribe/`, {});
+      await this.backend(json).post(`channel/${channelKey}/unsubscribe/`, {});
       this.setState({ subStatus: false });
     } catch (error) {
       perror('ChannelHead', error);

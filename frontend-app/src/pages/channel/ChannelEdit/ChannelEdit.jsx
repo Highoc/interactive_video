@@ -1,22 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import classNames from 'classnames';
-import Fab from '@material-ui/core/Fab';
+import { withStyles } from '@material-ui/core/styles/index';
+import Fab from '@material-ui/core/Fab/index';
 import NavigationIcon from '@material-ui/icons/Navigation';
-import Input from '../../components/Input/Input';
-import { RequestResolver } from '../../helpers/RequestResolver';
-
-
-const styles = theme => ({
-  margin: {
-    margin: theme.spacing.unit,
-  },
-  extendedIcon: {
-    marginRight: theme.spacing.unit,
-  },
-});
-
+import Input from '../../../components/Input/Input';
+import { RequestResolver } from '../../../helpers/RequestResolver';
+import styles from './ChannelEdit.styles';
+import { perror } from '../../../helpers/SmartPrint';
 
 class ChannelEdit extends Component {
   constructor(props) {
@@ -34,7 +24,7 @@ class ChannelEdit extends Component {
       const result = await this.backend().get('channel/update/');
       this.setState({ inputs: result.data, isLoaded: true });
     } catch (error) {
-      console.log(error);
+      perror('ChannelEdit', error);
     }
   }
 

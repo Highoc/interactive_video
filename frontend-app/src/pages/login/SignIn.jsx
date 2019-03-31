@@ -97,7 +97,7 @@ class SignIn extends Component {
             Вход
           </Typography>
           <form className={classes.form}>
-            <FormControl margin="normal" required fullWidth>
+            <FormControl margin="normal" fullWidth>
               {Inputs}
             </FormControl>
             <Button

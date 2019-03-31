@@ -59,15 +59,13 @@ export class Comment extends Component {
             }
           />
           <CardContent>
-            <Typography component="p">
+            <Typography>
               {comment.text}
-              <div className={classes.container}>
-                <Button onClick={(event) => this.onReply(event)} color="primary">
-                  Ответить
-                </Button>
-              </div>
+              <Button onClick={(event) => this.onReply(event)} color="primary" className={classes.container}>
+                Ответить
+              </Button>
             </Typography>
-            {comment.children.map(childId => <Comment commentId={childId} callback={this.props.callback} />)}
+            {comment.children.map(childId => <Comment commentId={childId} callback={this.props.callback} key={childId} />)}
           </CardContent>
         </Card>
       </div>

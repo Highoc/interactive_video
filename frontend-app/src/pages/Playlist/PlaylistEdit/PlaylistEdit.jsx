@@ -50,7 +50,7 @@ class PlaylistEdit extends Component {
     if (isValid) {
       try {
         const data = this.getData();
-        const result = await this.backend(json).post(`channel/${channelKey}/playlist/${playlistKey}/update/`, data);
+        await this.backend(json).post(`channel/${channelKey}/playlist/${playlistKey}/update/`, data);
         this.setState({ isSent: true });
       } catch (error) {
         perror('PlaylistEdit', error);

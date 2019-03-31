@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import {
   Card, CardContent, CardActionArea, CardMedia, Typography,
 } from '@material-ui/core';
@@ -47,7 +46,7 @@ class PlaylistAll extends Component {
     return (
       <div>
         { playlists.map((playlist, i) => (
-          <div className={classes.container}>
+          <div className={classes.container} key={playlist.key}>
             <ChannelPlaylistView playlist={playlist} channelKey={channelKey} key={playlist.key} />
           </div>
         ))
@@ -74,9 +73,5 @@ class PlaylistAll extends Component {
     );
   }
 }
-
-PlaylistAll.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
 
 export default PlaylistAll;

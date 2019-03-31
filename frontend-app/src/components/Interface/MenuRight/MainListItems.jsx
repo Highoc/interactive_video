@@ -5,15 +5,28 @@ import {
 import React from 'react';
 import VideoCamera from '@material-ui/icons/Videocam';
 import HomeIcon from '@material-ui/icons/Home';
+import CreateIcon from '@material-ui/icons/Create';
 import Page from '@material-ui/icons/RestorePage';
 
 
 const CreateVideo = props => <Link to="/channel/adminadmin00/create" {...props} />;
 const MyChannel = props => <Link to="/channel/adminadmin00" {...props} />;
+const CreateChannel = props => <Link to="/channel/create" {...props} />;
 const Home = props => <Link to="/" {...props} />;
 
 const mainListItems = (
   <div>
+    <ListItem
+      button
+      component={CreateChannel}
+      key="button0"
+    >
+      <ListItemIcon><CreateIcon /></ListItemIcon>
+      <ListItemText
+        primary="Создать канал"
+      />
+    </ListItem>
+    <Divider />
     <ListItem
       button
       component={MyChannel}

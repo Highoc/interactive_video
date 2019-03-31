@@ -1,22 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import classNames from 'classnames';
-import Fab from '@material-ui/core/Fab';
+import { withStyles } from '@material-ui/core/styles/index';
+import Fab from '@material-ui/core/Fab/index';
 import NavigationIcon from '@material-ui/icons/Navigation';
-import Input from '../../components/Input/Input';
-import { RequestResolver } from '../../helpers/RequestResolver';
-
-
-const styles = theme => ({
-  margin: {
-    margin: theme.spacing.unit,
-  },
-  extendedIcon: {
-    marginRight: theme.spacing.unit,
-  },
-});
-
+import Input from '../../../components/Input/Input';
+import { RequestResolver } from '../../../helpers/RequestResolver';
+import styles from './CreateChannel.styles';
+import { perror } from '../../../helpers/SmartPrint';
 
 class CreateChannel extends Component {
   constructor(props) {
@@ -51,10 +41,10 @@ class CreateChannel extends Component {
 
   async componentDidMount() {
     try {
-      const result = await this.backend().get('channel/update/');
+      await this.backend().get('channel/update/');
       this.setState({ isLoaded: true });
     } catch (error) {
-      console.log(error);
+      perror('CreateChannel', error);
     }
   }
 
@@ -85,47 +75,41 @@ class CreateChannel extends Component {
   render() {
     const { inputs, isLoaded } = this.state;
     const { classes } = this.props;
-    let Inputs = <div />;
-    let result = <div>Загружается</div>;
-
-    if (isLoaded) {
-      Inputs = Object.keys(inputs).map((key) => {
-        const inputElement = inputs[key];
-        return (
-          <Input
-            key={key}
-            type={inputElement.type}
-            name={inputElement.name}
-            description={inputElement.description}
-            value={inputElement.value}
-            rules={inputElement.rules}
-            callback={state => this.callbackInput(state)}
-          />
-        );
-      });
-      result = (
-        <div>
-          <form>
-            <h2>Создание канала</h2>
-            {Inputs}
-            <Fab
-              variant="extended"
-              color="primary"
-              aria-label="Add"
-              className={classes.margin}
-              style={styles.button}
-              onClick={event => this.submitHandler(event)}
-            >
-              <NavigationIcon className={classes.extendedIcon} />
-              Создать
-            </Fab>
-          </form>
-        </div>
-      );
+    if (!isLoaded) {
+      return <div>Загружается</div>;
     }
-
+    const Inputs = Object.keys(inputs).map((key) => {
+      const inputElement = inputs[key];
+      return (
+        <Input
+          key={key}
+          type={inputElement.type}
+          name={inputElement.name}
+          description={inputElement.description}
+          value={inputElement.value}
+          rules={inputElement.rules}
+          callback={state => this.callbackInput(state)}
+        />
+      );
+    });
     return (
-      { result }
+      <div>
+        <form>
+          <h2>Создание канала</h2>
+          {Inputs}
+          <Fab
+            variant="extended"
+            color="primary"
+            aria-label="Add"
+            className={classes.margin}
+            style={styles.button}
+            onClick={event => this.submitHandler(event)}
+          >
+            <NavigationIcon className={classes.extendedIcon} />
+            Создать
+          </Fab>
+        </form>
+      </div>
     );
   }
 }

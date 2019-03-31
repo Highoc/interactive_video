@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import PropTypes from "prop-types";
 import ChannelPlaylist from '../../components/Channel/ChannelInfo/ChannelPlaylist';
 import Typography from '@material-ui/core/Typography';
 import { RequestResolver } from '../../helpers/RequestResolver';
 import { pprint, perror } from '../../helpers/SmartPrint';
 import classes from './Homepage.module.css';
-
 
 class Homepage extends Component {
   constructor(props) {
@@ -45,14 +43,14 @@ class Homepage extends Component {
     if (isLoaded) {
       result = (
         <div className={classes.root}>
-          <Typography className={classes.heading} variant="h4">
+          <Typography variant="h4">
             Тренды:
           </Typography>
           <div>
             <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
           </div>
           <div>
-            <Typography className={classes.heading} variant="h4">
+            <Typography variant="h4">
               Подписки:
             </Typography>
           </div>
@@ -71,9 +69,5 @@ class Homepage extends Component {
     );
   }
 }
-
-Homepage.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
 
 export default Homepage;

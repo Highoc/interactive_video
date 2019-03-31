@@ -1,61 +1,24 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Button from '@material-ui/core/Button';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import {
+  DialogContent, ExpansionPanel, ExpansionPanelSummary, CardContent, Typography, Card,
+} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
-import { Comment } from '../../components/VideoWatch/Comment/Comment';
-import InteractivePlayer from '../../components/VideoWatch/InteractivePlayer/InteractivePlayer';
-import ExpansionPanelVideo from '../../components/VideoWatch/ExpansionPanel';
-import Input from '../../components/Input/Input';
-import { RequestResolver, json } from '../../helpers/RequestResolver';
+import { Comment } from '../../../components/VideoWatch/Comment/Comment';
+import InteractivePlayer from '../../../components/VideoWatch/InteractivePlayer/InteractivePlayer';
+import ExpansionPanelVideo from '../../../components/VideoWatch/ExpansionPanel';
+import Input from '../../../components/Input/Input';
+import Dialog from '../../../components/Dialog';
+import { RequestResolver, json } from '../../../helpers/RequestResolver';
+import classes from './WatchVideo.module.css';
+import { perror } from '../../../helpers/SmartPrint';
 
 import {
   subscribeToChannel as subscribe,
   unsubscribeFromChannel as unsubscribe,
-} from '../../store/actions/centrifugo';
+} from '../../../store/actions/centrifugo';
 
-
-const textStyles = {
-  position: 'relative',
-  overflow: 'hidden',
-  paddingLeft: '5%',
-  paddingRight: '5%',
-};
-
-const styles = theme => ({
-  titleBar: {
-    background:
-      'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, '
-      + 'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
-  },
-  icon: {
-    color: 'white',
-  },
-  card: {
-    width: '100%',
-  },
-  media: {
-    height: 150,
-  },
-  root: {
-    width: '100%',
-  },
-  heading: {
-    fontSize: theme.typography.pxToRem(15),
-    fontWeight: theme.typography.fontWeightRegular,
-  },
-});
 
 const statuses = {
   LOADED: 1,
@@ -105,7 +68,7 @@ class WatchVideo extends Component {
       this.setState({ inputs: result.data, isLoaded: true });
     } catch (error) {
       this.setState({ status: statuses.ERROR });
-      console.log(`[WatchVideo] ${error} ${JSON.stringify(error.response.data)}`);
+      perror('WatchVideo', error);
     }
   }
 
@@ -135,7 +98,6 @@ class WatchVideo extends Component {
   async submitHandler() {
     const { inputs, channelKey, videoKey } = this.state;
     let isValid = true;
-    console.log(inputs);
     for (const key in inputs) {
       isValid = isValid && inputs[key].isValid;
     }
@@ -144,10 +106,10 @@ class WatchVideo extends Component {
       this.setState({ dialogOpen: false });
       try {
         const data = this.getData();
-        const result = await this.backend(json).post(`channel/${channelKey}/video/${videoKey}/comment/add/`, data);
+        await this.backend(json).post(`channel/${channelKey}/video/${videoKey}/comment/add/`, data);
         this.setState({ isSent: true });
       } catch (error) {
-        console.log(error);
+        perror('WatchVideo', error);
       }
     } else {
       console.log('Invalid input');
@@ -162,10 +124,13 @@ class WatchVideo extends Component {
       result.parent_id = parentId;
       return 0;
     });
-    console.log(result);
     return result;
   }
 
+  callbackDialog(state) {
+    this.setState({ dialogOpen: state });
+    this.submitHandler();
+  }
 
   callbackInput(state) {
     const { inputs } = this.state;
@@ -179,11 +144,6 @@ class WatchVideo extends Component {
   callbackComment(state) {
     this.setState({ dialogOpen: true, parentId: state.commentId });
   }
-
-  handleClose = () => {
-    this.setState({ dialogOpen: false });
-  };
-
 
   render() {
     const {
@@ -204,11 +164,11 @@ class WatchVideo extends Component {
         />
       );
     });
-    const { classes } = this.props;
     let result = null;
     if (status === statuses.LOADED && isLoaded) {
       result = (
-        <div style={textStyles}>
+        <div className={classes.textStyles}>
+
           <Card className={classes.card}>
             <CardContent>
               <Typography gutterBottom variant="h5" component="h2" align="center">
@@ -218,7 +178,9 @@ class WatchVideo extends Component {
               </Typography>
             </CardContent>
           </Card>
+
           <InteractivePlayer main={video.head_video_part} codec={video.codec} />
+
           <ExpansionPanelVideo
             created={video.created}
             author={author}
@@ -231,32 +193,18 @@ class WatchVideo extends Component {
             inputs={inputs}
             callback={choice => this.handleRatingChoice(choice)}
           />
+
           <ExpansionPanel>
             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography className={classes.heading}>Ко всем комментариям:</Typography>
+              <Typography variant="h5">Ко всем комментариям:</Typography>
             </ExpansionPanelSummary>
-            { video.head_comments.map(commentId => <Comment commentId={commentId} callback={state => this.callbackComment(state)} />)}
+            { video.head_comments.map(commentId => <Comment commentId={commentId} callback={state => this.callbackComment(state)} key={commentId} />)}
           </ExpansionPanel>
-          <Dialog
-            onClose={this.handleClose}
-            open={dialogOpen}
-            fullWidth
-            maxWidth="md"
-          >
-            <DialogTitle onClose={this.handleClose}>
-              Добавление комментария
-            </DialogTitle>
+
+          <Dialog dialogOpen={dialogOpen} callback={state => this.callbackDialog(state)} title="Ответ на комментарий">
             <DialogContent>
-              <DialogContentText>
-                Ваш комментарий:
-              </DialogContentText>
               {Inputs}
             </DialogContent>
-            <DialogActions>
-              <Button onClick={(event) => { event.preventDefault(); this.submitHandler(); }} color="primary">
-                Добавить комментарий
-              </Button>
-            </DialogActions>
           </Dialog>
         </div>
       );
@@ -269,7 +217,6 @@ class WatchVideo extends Component {
 }
 
 WatchVideo.propTypes = {
-  classes: PropTypes.object.isRequired,
   subscribeToChannel: PropTypes.func.isRequired,
   unsubscribeFromChannel: PropTypes.func.isRequired,
 };
@@ -283,4 +230,4 @@ const mapDispatchToProps = dispatch => ({
   unsubscribeFromChannel: channel => dispatch(unsubscribe(channel)),
 });
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(WatchVideo));
+export default connect(mapStateToProps, mapDispatchToProps)(WatchVideo);

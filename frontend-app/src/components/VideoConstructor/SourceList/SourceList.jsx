@@ -1,14 +1,7 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import { withStyles } from '@material-ui/core/styles/index';
-import Card from '@material-ui/core/Card/index';
-import CardActionArea from '@material-ui/core/CardActionArea/index';
-import CardMedia from '@material-ui/core/CardMedia/index';
-import Button from '@material-ui/core/Button/index';
-import CardActions from '@material-ui/core/CardActions/index';
-import CardContent from '@material-ui/core/CardContent/index';
-import Typography from '@material-ui/core/Typography/index';
+import {
+  Card, CardContent, CardMedia, CardActionArea, CardActions, Button, Typography,
+} from '@material-ui/core';
 import classes from './SourceList.module.css';
 
 class SourceList extends Component {
@@ -37,9 +30,5 @@ class SourceList extends Component {
     );
   }
 }
-
-SourceList.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
 
 export default SourceList;

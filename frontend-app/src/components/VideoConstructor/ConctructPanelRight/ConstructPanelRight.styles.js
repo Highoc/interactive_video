@@ -15,7 +15,7 @@ const styles = ({
     }),
   },
   root: {
-    marginLeft: '10%',
+    marginLeft: '5%',
   },
 
   buttonContainer: {

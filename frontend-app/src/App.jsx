@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import './App.css';
 import {
-  BrowserRouter as Router, Switch, Route, Redirect, Link,
+  BrowserRouter as Router, Switch, Route, Redirect,
 } from 'react-router-dom';
 
 import HeaderLayout from './components/Layouts/Header';
 import { Main } from './components/Layouts/Main';
 import { Left } from './components/Layouts/Left';
 import { Right } from './components/Layouts/Right';
-import { Footer } from './components/Layouts/Footer';
+
 
 import MenuLeft from './components/Interface/MenuLeft';
 import MenuRight from './components/Interface/MenuRight';
@@ -36,22 +36,6 @@ class App extends Component {
     onTryAutoLogin();
   }
 
-  /*
-  render() {
-    return (
-      <Router>
-        <div className="content-column">
-          <Header />
-          <div className="content-row">
-            <Left>Неправо</Left>
-            <Main>Мэйн<br/>>adwwad</Main>
-            <Right>Право</Right>
-          </div>
-        </div>
-      </Router>
-    );
-  }
-  */
   render() {
     let routes = (
       <Switch>
@@ -64,6 +48,7 @@ class App extends Component {
 
     let componentLeft = <div />;
     let componentRight = <div />;
+    let centrifuge = <div />;
 
     const { isAuthorized } = this.props;
     if (isAuthorized) {
@@ -82,12 +67,15 @@ class App extends Component {
           <Route path="/" component={MenuLeft} />
         </Switch>
       );
+
       componentRight = (
         <Switch>
           <Route exact path="/channel/:channelKey/create" component={ConstructPanelRight} />
           <Route path="/" component={MenuRight} />
         </Switch>
       );
+
+      centrifuge = <Centrifugo />;
     }
 
     return (
@@ -102,6 +90,7 @@ class App extends Component {
             </Left>
             <Main>
               {routes}
+              {centrifuge}
             </Main>
             <Right>
               {componentRight}

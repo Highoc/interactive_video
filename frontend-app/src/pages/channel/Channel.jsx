@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { Switch, Route } from 'react-router-dom';
-import CreateChannel from './CreateChannel';
-import ChannelView from './ChannelView';
-import CreateVideo from './CreateVideo';
-import WatchVideo from './WatchVideo';
-import ChannelEdit from './ChannelEdit';
+import CreateChannel from './CreateChannel/CreateChannel';
+import ChannelView from './ChannelView/ChannelView';
+import CreateVideo from './CreateVideo/CreateVideo';
+import WatchVideo from './WatchVideo/WatchVideo';
+import ChannelEdit from './ChannelEdit/ChannelEdit';
 import PlaylistAdd from '../Playlist/PlaylistAdd/PlaylistAdd';
 import PlaylistAll from '../Playlist/PlaylistAll/PlaylistAll';
 import Playlist from '../Playlist/Playlist';

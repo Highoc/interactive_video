@@ -4,6 +4,7 @@ const styles = theme => ({
   },
   heading: {
     fontSize: theme.typography.pxToRem(24),
+    flexBasis: '33.33%',
   },
   secondaryHeading: {
     fontSize: theme.typography.pxToRem(15),
@@ -16,6 +17,7 @@ const styles = theme => ({
     flexBasis: '33.33%',
   },
   rightcolumn: {
+    fontSize: theme.typography.pxToRem(24),
     flexBasis: '16.5%',
   },
   columnButton: {
