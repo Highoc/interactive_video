@@ -68,8 +68,8 @@ class ConstructPanelLeft extends Component {
             Фрагменты
           </Typography>
           <Divider className={classes.divider} />
-          {sources.map((video, i) => (
-            <SourceList name={video.name} keyVideo={i} key={i} />
+          {sources.map((video, key) => (
+            <SourceList name={video.name} keyVideo={key} key={key} />
           ))}
           <Divider className={classes.divider} />
           <Card className={classes.card}>

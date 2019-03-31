@@ -2,14 +2,13 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles/index';
 import {
-  ExpansionPanel, ExpansionPanelActions, ExpansionPanelDetails, ExpansionPanelSummary, Typography, IconButton, Button, Divider,
+  ExpansionPanel, ExpansionPanelActions, ExpansionPanelDetails, ExpansionPanelSummary, Typography, Button, Divider,
 } from '@material-ui/core';
-import ArrowDropDown from '@material-ui/icons/ArrowDropDown';
-import ArrowDropUp from '@material-ui/icons/ArrowDropUp';
 import Input from '../../Input/Input';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import { perror } from '../../../helpers/SmartPrint';
 import styles from './ExpansionPanel.styles';
+import RatingViews from './RatingViews';
 
 class ExpansionPanelVideo extends Component {
   constructor(props) {
@@ -22,7 +21,6 @@ class ExpansionPanelVideo extends Component {
       channelKey: props.keyChannel,
       videoKey: props.keyVideo,
       expanded: false,
-      choice: props.choice,
     };
     this.backend = RequestResolver.getBackend();
   }
@@ -73,18 +71,19 @@ class ExpansionPanelVideo extends Component {
     }
   }
 
-  onReply(event, choice) {
-    const { callback } = this.props;
-    this.setState({ choice });
-    callback(choice);
-    event.preventDefault();
-  }
-
   render() {
     const {
-      classes, created, author, rating, views,
+      classes, created, author,
     } = this.props;
-    const { inputs, expanded, choice } = this.state;
+    const { inputs, expanded, videoKey } = this.state;
+
+    const dateOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    };
 
     const Inputs = Object.keys(inputs).map((key) => {
       const inputElement = inputs[key];
@@ -105,14 +104,19 @@ class ExpansionPanelVideo extends Component {
       <div className={classes.root}>
         <ExpansionPanel expanded={expanded}>
           <ExpansionPanelSummary>
-            <Typography className={classes.heading}>
-              Автор:
-              {author}
-              <br />
-              Создано:
-              {created}
-            </Typography>
-            <div className={classes.column}>
+            <div className={classes.row}>
+              <div className={classes.columnContainer}>
+                <Typography className={classes.ratingViews}>
+                  Автор:
+                  {author}
+                </Typography>
+                <Typography className={classes.ratingViews}>
+                  Создано:
+                  {new Date(created).toLocaleDateString('en-EN', dateOptions)}
+                </Typography>
+              </div>
+            </div>
+            <div className={classes.row}>
               <Button
                 variant="contained"
                 color="secondary"
@@ -122,39 +126,9 @@ class ExpansionPanelVideo extends Component {
                 Оставить свой комментарий
               </Button>
             </div>
-            <Typography className={classes.rightcolumn}>
-              Рейтинг:
-              {rating}
-              <br/>
-              Просмотров:
-              {views}
-            </Typography>
-            <div className={classes.rightcolumn}>
-              <div className={classes.buttonContainer}>
-                <div>
-                  <IconButton
-                    color="secondary"
-                    className={classes.button}
-                    aria-label="Like"
-                    onClick={event => this.onReply(event, 1)}
-                    disabled={choice === 1}
-                  >
-                    <ArrowDropUp fontSize="large" />
-                  </IconButton>
-                </div>
-                <div>
-                  <IconButton
-                    color="secondary"
-                    className={classes.button}
-                    aria-label="Like"
-                    onClick={event => this.onReply(event, -1)}
-                    disabled={choice === -1}
-                  >
-                    <ArrowDropDown fontSize="large" />
-                  </IconButton>
-                </div>
-              </div>
-            </div>
+
+            <RatingViews videoKey={videoKey} />
+
           </ExpansionPanelSummary>
           <ExpansionPanelDetails className={classes.details}>
             {Inputs}

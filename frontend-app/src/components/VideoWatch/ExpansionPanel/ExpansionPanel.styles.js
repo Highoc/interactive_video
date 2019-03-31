@@ -3,12 +3,8 @@ const styles = theme => ({
     width: '100%',
   },
   heading: {
-    fontSize: theme.typography.pxToRem(24),
+    fontSize: theme.typography.pxToRem(22),
     flexBasis: '33.33%',
-  },
-  secondaryHeading: {
-    fontSize: theme.typography.pxToRem(15),
-    color: theme.palette.text.secondary,
   },
   details: {
     alignItems: 'center',
@@ -16,16 +12,24 @@ const styles = theme => ({
   column: {
     flexBasis: '33.33%',
   },
-  rightcolumn: {
-    fontSize: theme.typography.pxToRem(24),
-    flexBasis: '16.5%',
+  row: {
+    flexBasis: '33.33%',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    justifyItems: 'center',
+    flex: 'auto',
+  },
+  ratingViews: {
+    fontSize: theme.typography.pxToRem(22),
   },
   columnButton: {
     marginLeft: '30%',
     marginRight: '30%',
   },
-  buttonContainer: {
-    marginLeft: '60%',
+  columnContainer: {
+    display: 'flex',
+    flexDirection: 'column',
   },
 });
 

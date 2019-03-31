@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import {
   DialogContent, ExpansionPanel, ExpansionPanelSummary, CardContent, Typography, Card,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import PropTypes from 'prop-types';
 import { Comment } from '../../../components/VideoWatch/Comment/Comment';
 import InteractivePlayer from '../../../components/VideoWatch/InteractivePlayer/InteractivePlayer';
 import ExpansionPanelVideo from '../../../components/VideoWatch/ExpansionPanel';
@@ -13,12 +11,6 @@ import Dialog from '../../../components/Dialog';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import classes from './WatchVideo.module.css';
 import { perror } from '../../../helpers/SmartPrint';
-
-import {
-  subscribeToChannel as subscribe,
-  unsubscribeFromChannel as unsubscribe,
-} from '../../../store/actions/centrifugo';
-
 
 const statuses = {
   LOADED: 1,
@@ -35,7 +27,6 @@ class WatchVideo extends Component {
       video: null,
       author: 'admin',
       videoKey,
-      viewsCounter: 0,
       dialogOpen: false,
       channelKey,
       inputs: [],
@@ -48,21 +39,8 @@ class WatchVideo extends Component {
     try {
       const { videoKey, channelKey } = this.state;
 
-      let response = await this.backend().get(`video/get/${videoKey}/`);
+      const response = await this.backend().get(`video/get/${videoKey}/`);
       this.setState({ video: response.data });
-
-      response = await this.backend().post(`views/add/${videoKey}/`, {});
-      this.setState({ viewsCounter: response.data.counter });
-
-      response = await this.backend().get(`rating/get/${videoKey}/`);
-      this.setState({ ratingCounter: response.data.counter, yourChoice: response.data.value });
-
-      this.setState({ status: statuses.LOADED });
-
-      const { subscribeToChannel } = this.props;
-      subscribeToChannel(`video/${videoKey}/comments`, data => console.log(data));
-      subscribeToChannel(`video/${videoKey}/rating`, data => this.updateRatingCounter(data));
-      subscribeToChannel(`video/${videoKey}/views`, data => this.updateViewsCounter(data));
 
       const result = await this.backend().get(`channel/${channelKey}/video/${videoKey}/comment/add/`);
       this.setState({ inputs: result.data, isLoaded: true });
@@ -70,29 +48,6 @@ class WatchVideo extends Component {
       this.setState({ status: statuses.ERROR });
       perror('WatchVideo', error);
     }
-  }
-
-  componentWillUnmount() {
-    const { unsubscribeFromChannel } = this.props;
-    const { videoKey } = this.state;
-    unsubscribeFromChannel(`video/${videoKey}/comments`);
-    unsubscribeFromChannel(`video/${videoKey}/rating`);
-    unsubscribeFromChannel(`video/${videoKey}/views`);
-  }
-
-  updateViewsCounter(views) {
-    this.setState({ viewsCounter: views.counter });
-    console.log(`[WatchVideo] Centrifugo > ${JSON.stringify(views)}`);
-  }
-
-  updateRatingCounter(rating) {
-    this.setState({ ratingCounter: rating.counter });
-    console.log(`[WatchVideo] Centrifugo > ${JSON.stringify(rating)}`);
-  }
-
-  handleRatingChoice(choice) {
-    const { ratingCounter } = this.state;
-    this.setState({ ratingCounter: ratingCounter + choice });
   }
 
   async submitHandler() {
@@ -147,7 +102,7 @@ class WatchVideo extends Component {
 
   render() {
     const {
-      status, video, viewsCounter, ratingCounter, yourChoice,
+      video, viewsCounter, ratingCounter, yourChoice,
       isLoaded, dialogOpen, channelKey, videoKey, inputs, author,
     } = this.state;
     const Inputs = Object.keys(inputs).map((key) => {
@@ -165,7 +120,7 @@ class WatchVideo extends Component {
       );
     });
     let result = null;
-    if (status === statuses.LOADED && isLoaded) {
+    if (isLoaded) {
       result = (
         <div className={classes.textStyles}>
 
@@ -191,7 +146,6 @@ class WatchVideo extends Component {
             rating={ratingCounter}
             choice={yourChoice}
             inputs={inputs}
-            callback={choice => this.handleRatingChoice(choice)}
           />
 
           <ExpansionPanel>
@@ -216,18 +170,4 @@ class WatchVideo extends Component {
   }
 }
 
-WatchVideo.propTypes = {
-  subscribeToChannel: PropTypes.func.isRequired,
-  unsubscribeFromChannel: PropTypes.func.isRequired,
-};
-
-const mapStateToProps = state => ({
-  isReady: state.centrifugo.isInitialised,
-});
-
-const mapDispatchToProps = dispatch => ({
-  subscribeToChannel: (channel, callback) => dispatch(subscribe(channel, callback)),
-  unsubscribeFromChannel: channel => dispatch(unsubscribe(channel)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(WatchVideo);
+export default WatchVideo;
