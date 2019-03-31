@@ -6,7 +6,7 @@ function list(files) {
   return files.map(file => <li key={file.name}>{label(file)}</li>);
 }
 const FileList = ({ files }) => (files.length === 0 ? (
-  <div>Добавьте файлы</div>
+  <div>Добавьте файл</div>
 ) : (
   <div>{list(files)}</div>
 ));

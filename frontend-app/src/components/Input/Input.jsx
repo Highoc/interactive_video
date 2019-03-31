@@ -1,27 +1,8 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component } from 'react';
 import TextField from '@material-ui/core/TextField';
 import classes from './Input.module.css';
 
-
-const styles = theme => ({
-  container: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
-  },
-  dense: {
-    marginTop: 16,
-  },
-  menu: {
-    width: 200,
-  },
-});
-
 function checkValidity(value, rules) {
-
   let isValid = true;
 
   if (rules.required) {
@@ -59,7 +40,7 @@ class Input extends Component {
   inputChangedHandler(event) {
     const isValid = checkValidity(event.target.value, this.state.rules);
     this.setState({ isValid, value: event.target.value, isTouched: true });
-  };
+  }
 
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -73,7 +54,9 @@ class Input extends Component {
   render() {
     let inputElement = null;
     let labelValue = 'Not-required';
-    const { rules, value, isValid, isTouched } = this.state;
+    const {
+      rules, value, isValid, isTouched,
+    } = this.state;
     const isCorrect = !isTouched || isValid;
     if (rules.required) {
       labelValue = 'Required';
@@ -90,7 +73,6 @@ class Input extends Component {
             fullWidth
             value={value}
             placeholder={this.props.description}
-            className={classes.textField}
             name={this.props.name}
             margin="normal"
             variant="outlined"
@@ -110,7 +92,6 @@ class Input extends Component {
             label={labelValue}
             value={value}
             placeholder={this.props.description}
-            className={classes.textField}
             name={this.props.name}
             margin="normal"
             variant="outlined"
@@ -126,7 +107,6 @@ class Input extends Component {
             fullWidth
             value={value}
             placeholder={this.props.description}
-            className={classes.textField}
             name={this.props.name}
             margin="normal"
             variant="outlined"
@@ -146,4 +126,3 @@ class Input extends Component {
 
 
 export default Input;
-

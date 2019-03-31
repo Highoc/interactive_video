@@ -8,5 +8,5 @@ urlpatterns = [
     url(r'^user/subscriptions/$', UserSubscriptionsList.as_view()),
     url(r'^profile/update/$', ProfileUpdateView.as_view()),
     url(r'^profile/current/$', ProfileCurrentView.as_view()),
-    url(r'^centrifugo/token/$', CentrifugoTokenView.as_view())
+    url(r'^centrifuge/token/$', CentrifugoTokenView.as_view())
 ]

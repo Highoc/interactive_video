@@ -1,0 +1,10 @@
+.default {
+    color: #1600ff;
+    background-color: #10ff1c;
+
+    height: 140px;
+    min-height: 140px;
+
+    width: 100%;
+    min-width: 1680px;
+}

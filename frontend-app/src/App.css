@@ -1,0 +1,23 @@
+.main {
+    padding-top: 20px;
+    min-height: 100%;
+    height:auto;
+    border: 1px solid #f5f5f5;
+    background-color: white;
+}
+
+.content-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.content-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex: auto;
+
+    min-height: 600px;
+}

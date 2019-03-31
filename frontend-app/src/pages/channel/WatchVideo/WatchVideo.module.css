@@ -1,0 +1,10 @@
+.card {
+    width: 100%;
+}
+
+.textStyles {
+    position: relative;
+    overflow: hidden;
+    padding-left: 5%;
+    padding-right: 5%;
+}

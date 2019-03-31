@@ -1,17 +1,11 @@
 import React from 'react';
 import { DropTarget } from 'react-dnd';
+import classes from './Drop.module.css';
 
-const style = {
-  border: '1px solid gray',
-  height: '15rem',
-  width: '15rem',
-  padding: '2rem',
-  textAlign: 'center',
-};
 const TargetBox = ({ canDrop, isOver, connectDropTarget }) => {
   const isActive = canDrop && isOver;
   return connectDropTarget(
-    <div style={style}>{isActive ? 'Release to drop' : 'Переместите файлы сюда'}</div>,
+    <div className={classes.default}>{isActive ? 'Release to drop' : 'Переместите файл сюда'}</div>,
   );
 };
 export default DropTarget(
