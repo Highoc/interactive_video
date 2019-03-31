@@ -65,7 +65,7 @@ class Header extends Component {
 }
 
 const mapStateToProps = state => ({
-  isAuthorized: state.authorization.token !== null,
+  isAuthorized: state.authorization.isAuthorized,
   openDrawerStatus: state.buttonsAct.openDrawer,
 });
 

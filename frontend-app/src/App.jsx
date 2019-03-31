@@ -17,7 +17,7 @@ import MenuRight from './components/Interface/MenuRight';
 import ConstructPanelLeft from './components/VideoConstructor/ConstructPanelLeft';
 import Header from './components/Interface/Header';
 import Homepage from './pages/homepage/Homepage';
-import { Account } from './pages/account';
+import Account from './pages/account/Account';
 import { Channel } from './pages/channel';
 import SignIn from './pages/login/SignIn';
 import Register from './pages/register/Register';
@@ -103,7 +103,7 @@ class App extends Component {
 }
 
 const mapStateToProps = state => ({
-  isAuthorized: state.authorization.token !== null,
+  isAuthorized: state.authorization.isAuthorized,
 });
 
 const initMapDispatchToProps = dispatch => ({

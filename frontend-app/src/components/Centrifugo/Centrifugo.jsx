@@ -6,6 +6,7 @@ import { perror } from '../../helpers/SmartPrint';
 
 import {
   centrifugoInit as init,
+  centrifugoDtor as dtor,
   activateSubscription as activate,
   deleteSubscription as remove,
 } from '../../store/actions/centrifugo';
@@ -45,6 +46,12 @@ class Centrifugo extends Component {
     this.checkSubscriptions();
   }
 
+  componentWillUnmount() {
+    const { centrifugoDtor } = this.props;
+    this.checkSubscriptions();
+    centrifugoDtor();
+  }
+
   checkSubscriptions() {
     const { subscriptions, deleteSubscription, activateSubscription } = this.props;
 
@@ -80,6 +87,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   centrifugoInit: () => dispatch(init()),
+  centrifugoDtor: () => dispatch(dtor()),
   activateSubscription: (channel, subscription) => dispatch(activate(channel, subscription)),
   deleteSubscription: channel => dispatch(remove(channel)),
 });

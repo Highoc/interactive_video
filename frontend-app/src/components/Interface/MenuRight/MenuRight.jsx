@@ -6,12 +6,13 @@ import { withStyles } from '@material-ui/core/styles/index';
 import {
   Drawer, Divider, Typography, List,
 } from '@material-ui/core';
-import mainListItems from './MainListItems';
+import MainListItems from './MainListItems';
 import menuRightStyles from './MenuRight.styles';
 
 class MenuRight extends Component {
   render() {
     const { classes } = this.props;
+
 
     return (
       <div className={classes.root}>
@@ -28,7 +29,7 @@ class MenuRight extends Component {
               Кнопки
             </Typography>
             <Divider />
-            {mainListItems}
+            <MainListItems />
           </List>
           <Divider />
         </Drawer>
@@ -42,3 +43,4 @@ MenuRight.propTypes = {
 };
 
 export default withStyles(menuRightStyles)(MenuRight);
+

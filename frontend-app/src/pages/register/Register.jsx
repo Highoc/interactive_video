@@ -1,15 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import FormControl from '@material-ui/core/FormControl';
+import {
+  Avatar, Button, CssBaseline, FormControl, Paper, Typography, Input, InputLabel,
+} from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { connect } from 'react-redux';
-import Input from '../../components/Input/Input';
 import { registration } from '../../store/actions/register';
 import styles from './Register.styles';
 
@@ -19,55 +15,17 @@ class Register extends Component {
     this.state = {
       isLoaded: false,
       isValid: false,
-      inputs: [
-        {
-          type: 'text',
-          name: 'username',
-          value: '',
-          description: 'Логин',
-          rules: {
-            max_length: 64,
-            required: true,
-          },
-        },
-        {
-          type: 'text',
-          name: 'password1',
-          value: '',
-          description: 'Пароль',
-          rules: {
-            max_length: 64,
-            required: true,
-            min_length: 8,
-          },
-        },
-        {
-          type: 'text',
-          name: 'password2',
-          value: '',
-          description: 'Подтвердите пароль',
-          rules: {
-            max_length: 64,
-            required: true,
-            min_length: 8,
-          },
-        },
-      ],
     };
   }
 
   submitHandler(event) {
     event.preventDefault();
-    const { inputs } = this.state;
     const { onRegister } = this.props;
     let isValid = true;
-    for (const key in inputs) {
-      isValid = isValid && inputs[key].isValid;
-    }
 
-    const loginInput = inputs.find(elem => elem.name === 'username');
-    const passwordInput1 = inputs.find(elem => elem.name === 'password1');
-    const passwordInput2 = inputs.find(elem => elem.name === 'password2');
+    const passwordInput1 = document.getElementById('password1');
+    const passwordInput2 = document.getElementById('password2');
+    const loginInput = document.getElementById('username');
 
     if (passwordInput1.value !== passwordInput2.value) {
       isValid = false;
@@ -85,32 +43,8 @@ class Register extends Component {
     }
   }
 
-  callbackInput(state) {
-    const { inputs } = this.state;
-    const input = inputs.find(elem => elem.name === state.name);
-    input.value = state.value;
-    input.isValid = state.isValid;
-    this.setState({ inputs });
-  }
-
-
   render() {
-    const { inputs } = this.state;
     const { classes } = this.props;
-    const Inputs = Object.keys(inputs).map((key) => {
-      const inputElement = inputs[key];
-      return (
-        <Input
-          key={key}
-          type={inputElement.type}
-          name={inputElement.name}
-          description={inputElement.description}
-          value={inputElement.value}
-          rules={inputElement.rules}
-          callback={state => this.callbackInput(state)}
-        />
-      );
-    });
 
     return (
       <main className={classes.main}>
@@ -123,8 +57,17 @@ class Register extends Component {
             Регистрация
           </Typography>
           <form className={classes.form}>
-            <FormControl margin="normal" fullWidth>
-              {Inputs}
+            <FormControl margin="normal" required fullWidth>
+              <InputLabel htmlFor="username">Имя пользователя</InputLabel>
+              <Input id="username" name="username" autoFocus />
+            </FormControl>
+            <FormControl margin="normal" required fullWidth>
+              <InputLabel htmlFor="password">Пароль</InputLabel>
+              <Input name="password1" type="password" id="password1" autoComplete="current-password" />
+            </FormControl>
+            <FormControl margin="normal" required fullWidth>
+              <InputLabel htmlFor="password">Подтвердите пароль</InputLabel>
+              <Input name="password2" type="password" id="password2" autoComplete="current-password" />
             </FormControl>
             <Button
               type="submit"
