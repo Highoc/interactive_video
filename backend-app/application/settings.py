@@ -26,7 +26,7 @@ SECRET_KEY = '8lvp&489^c(f3f^6fog80nyac0bf8)+z6^zjlt54zl4m^e)5-v'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '192.168.1.205',
+    '192.168.0.113',
     'backend-app',
     'localhost',
 ]
@@ -169,4 +169,6 @@ AWS_SECRET_ACCESS_KEY   = os.environ.get('AWS_SECRET_KEY')
 
 # Centrifugo
 
+CENTRIFUGO_URL = "http://centrifugo:9000"
 CENTRIFUGO_SECRET = '09a3bbb7-8b2b-445b-b1f4-7913287a3ea5'
+CENTRIFUGO_API_KEY = "1erj444h-9fhj-pasd-oas4-988f33d33d21"

@@ -10,6 +10,7 @@ class ChannelSerializer(serializers.ModelSerializer):
     def create(self):
         return Channel(**self.validated_data)
 
+
 class PlaylistSerializer(serializers.ModelSerializer):
     class Meta():
         model = Playlist

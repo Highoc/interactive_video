@@ -1,3 +1,5 @@
+from application import settings
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,6 +9,7 @@ from .models import Channel, Playlist
 
 from video.helpers.video import get_short_key
 
+from cent import Client
 
 class ChannelUpdateView(APIView):
 
@@ -44,8 +47,7 @@ class ChannelUpdateView(APIView):
         return Response(forms, status=status.HTTP_200_OK)
 
     def post(self, request):
-        return Response("nope", status=status.HTTP_400_BAD_REQUEST)
-        serializer = ChannelSerializer(request.data)
+        serializer = ChannelSerializer(data=request.data)
         if serializer.is_valid():
             channel = Channel.objects.filter(owner=request.user)
             data = serializer.validated_data
@@ -56,7 +58,9 @@ class ChannelUpdateView(APIView):
                 channel.save()
                 return Response({ 'key': channel.key }, status=status.HTTP_200_OK)
             else:
-                channel = serializer.save(owner=request.user)
+                channel = serializer.create()
+                channel.owner = request.user
+                channel.save()
                 channel.key = get_short_key(channel.id)
                 channel.save()
 
@@ -84,7 +88,7 @@ class ChannelUpdateView(APIView):
                 return Response({'key': channel.key}, status=status.HTTP_201_CREATED)
 
         else:
-            return Response("nope", status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChannelView(APIView):
@@ -115,7 +119,10 @@ class ChannelView(APIView):
                     'preview_url': f'https://hb.bizmrg.com/interactive_video/public_pic/{video.id % 3 + 1}.jpg'
                 } for video in uploaded_playlist.video.all()]
             },
-            'created': channel.created
+            'created': channel.created,
+            'subscription': {
+                'is_active': channel in request.user.subscriptions.all(),
+            }
         }
 
         return Response(response, status=status.HTTP_200_OK)
@@ -314,7 +321,17 @@ class ChannelSubscribeView(APIView):
         if not channel.subscribers.filter(id=request.user.id):
             channel.subscribers.add(request.user)
 
-        return Response({ 'status': 'subscription is activated' }, status=status.HTTP_200_OK)
+        response = {
+            'channel_key': channel.key,
+            'name': channel.name,
+            'is_active': True,
+        }
+
+        client = Client(settings.CENTRIFUGO_URL, api_key=settings.CENTRIFUGO_API_KEY, timeout=1)
+        channel = f"subscriptions#{request.user.id}"
+        client.publish(channel, response)
+
+        return Response(response, status=status.HTTP_200_OK)
 
 
 class ChannelUnsubscribeView(APIView):
@@ -328,4 +345,14 @@ class ChannelUnsubscribeView(APIView):
         if channel.subscribers.filter(id=request.user.id):
             channel.subscribers.remove(request.user)
 
-        return Response({'status': 'subscription is deactivated'}, status=status.HTTP_200_OK)
+        response = {
+            'channel_key': channel.key,
+            'name': channel.name,
+            'is_active': False,
+        }
+
+        client = Client(settings.CENTRIFUGO_URL, api_key=settings.CENTRIFUGO_API_KEY, timeout=1)
+        channel = f"subscriptions#{request.user.id}"
+        client.publish(channel, response)
+
+        return Response(response, status=status.HTTP_200_OK)

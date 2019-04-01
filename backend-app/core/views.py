@@ -34,6 +34,7 @@ class UserSubscriptionsList(APIView):
     def get(self, request):
         subscriptions = [{
             'channel_key': channel.key,
+            'name': channel.name,
         } for channel in request.user.subscriptions.all()]
         return Response(subscriptions, status=status.HTTP_200_OK)
 
@@ -93,11 +94,13 @@ class ProfileUpdateView(APIView):
 
 class ProfileCurrentView(APIView):
     def get(self, request):
-        profile = Profile.objects.get(user=request.user)
+        user = request.user
+        profile = Profile.objects.get(user=user)
         response = {
-            'first_name': request.user.first_name,
-            'last_name': request.user.last_name,
-            'email': request.user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'date_joined': user.date_joined,
             'avatar_url': get_avatar_url(profile.key)
         }
         return Response(response, status=status.HTTP_200_OK)

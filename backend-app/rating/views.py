@@ -1,3 +1,5 @@
+from application import settings
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,8 +9,6 @@ from .models import Rating, RatingRecord
 
 from cent import Client
 
-CENTRIFUGO_URL = "http://centrifugo:9000"
-CENTRIFUGO_API_KEY = "1erj444h-9fhj-pasd-oas4-988f33d33d21"
 
 class RatingRecordUpdateView(APIView):
     def post(self, request, video_key):
@@ -50,7 +50,7 @@ class RatingRecordUpdateView(APIView):
             'counter': rating.counter,
         }
 
-        client = Client(CENTRIFUGO_URL, api_key=CENTRIFUGO_API_KEY, timeout=1)
+        client = Client(settings.CENTRIFUGO_URL, api_key=settings.CENTRIFUGO_API_KEY, timeout=1)
         channel = f"video/{video_key}/rating"
         client.publish(channel, response)
 
