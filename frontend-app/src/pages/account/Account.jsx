@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { RequestResolver } from '../../helpers/RequestResolver';
 import { perror, pprint } from '../../helpers/SmartPrint';
-import { Card, CardActionArea, CardMedia } from "@material-ui/core";
+import date from '../../helpers/Date/date';
+import {
+  Card, CardActionArea, CardMedia, CardContent, Typography, CardActions, Button,
+} from "@material-ui/core";
+import {Link} from "react-router-dom";
 
 class Account extends Component {
   constructor(props) {
@@ -9,6 +13,7 @@ class Account extends Component {
     this.state = {
       info: {},
       isSent: false,
+      avatar: null,
     };
     this.backend = RequestResolver.getBackend();
   }
@@ -17,56 +22,39 @@ class Account extends Component {
     try {
       const result = await this.backend().get('core/profile/current/');
       pprint('Account', result.data);
-      this.setState({ info: result.data, isLoaded: true });
+      this.setState({ info: result.data, isLoaded: true, avatar: result.data.avatar_url });
     } catch (error) {
       perror('PlaylistEdit', error);
     }
   }
-  /*
-  getData() {
-    const { inputs } = this.state;
-    const result = {};
-    inputs.map((input) => { result[input.name] = input.value; return 0; });
-    return result;
-  }
-
-  async submitHandler() {
-    const { inputs, channelKey, playlistKey } = this.state;
-    let isValid = true;
-
-    if (isValid) {
-      try {
-
-      } catch (error) {
-        perror('PlaylistEdit', error);
-      }
-    } else {
-      console.log('Invalid input');
-    }
-  }*/
-
-  callbackInput(state) {
-    const { inputs } = this.state;
-    const input = inputs.find(elem => elem.name === state.name);
-    input.value = state.value;
-    input.isValid = state.isValid;
-    this.setState({ inputs });
-  }
 
   render() {
-    const { info } = this.state;
-
+    const { info, avatar } = this.state;
+    const EditAccount = props => <Link to="/account/edit" {...props} />;
 
     return (
       <div>
         <h2>Ваш аккаунт</h2>
-        <Card style={{ width: '100%', height: '500px' }}>
+        <Card style={{ width: '100%', height: '700px' }}>
           <CardActionArea>
             <CardMedia
               style={{height: '500px', width: '100%' }}
-              image={info.avatar_url}
+              image={avatar}
             />
-          </CardActionArea>ч
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="h2">
+                {`Имя:${info.first_name}, ${info.last_name}  ` }
+              </Typography>
+              <Typography component="p">
+                {`Почта:${info.email} Создан: ${date(info.date_joined)} `}
+              </Typography>
+            </CardContent>
+          </CardActionArea>
+          <CardActions>
+            <Button size="small" color="primary" component={EditAccount}>
+              Изменить
+            </Button>
+          </CardActions>
         </Card>
       </div>
     );

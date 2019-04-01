@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
-import TextField from '@material-ui/core/TextField';
+import {
+  TextField,
+} from '@material-ui/core';
 import classes from './Input.module.css';
+import FileInput from './FileInput/FileInput';
+
 
 function checkValidity(value, rules) {
   let isValid = true;
@@ -17,6 +21,20 @@ function checkValidity(value, rules) {
     isValid = value.length <= rules.max_length && isValid;
   }
 
+  if (rules.max_size && value !== undefined) {
+    isValid = value.size <= rules.max_size && isValid;
+  }
+
+  if (rules.mime_type && value !== undefined) {
+    let appropriateFormat = false;
+    for (const type in rules.mime_type) {
+      if (rules.mime_type[type] === value.type){
+        appropriateFormat = true;
+      }
+    }
+    isValid = appropriateFormat && isValid;
+  }
+
   return isValid;
 }
 
@@ -29,6 +47,8 @@ class Input extends Component {
       isValid: checkValidity(props.value, props.rules),
       isTouched: false,
       name: props.name,
+      avatarUrl: props.avatar,
+      file: null,
     };
   }
 
@@ -42,11 +62,15 @@ class Input extends Component {
     this.setState({ isValid, value: event.target.value, isTouched: true });
   }
 
+  fileChangedHandler(url, file) {
+    const isValid = checkValidity(file, this.state.rules);
+    this.setState({ isValid, avatarUrl: url, isTouched: true, file });
+  }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const { value } = this.state;
+    const { value, avatarUrl } = this.state;
     const { callback } = this.props;
-    if (prevState.value !== value) {
+    if (prevState.value !== value || prevState.avatarUrl !== avatarUrl) {
       callback(this.state);
     }
   }
@@ -55,7 +79,7 @@ class Input extends Component {
     let inputElement = null;
     let labelValue = 'Not-required';
     const {
-      rules, value, isValid, isTouched,
+      rules, value, isValid, isTouched, avatarUrl,
     } = this.state;
     const isCorrect = !isTouched || isValid;
     if (rules.required) {
@@ -76,6 +100,14 @@ class Input extends Component {
             name={this.props.name}
             margin="normal"
             variant="outlined"
+          />
+        );
+        break;
+      case ('image'):
+        inputElement = (
+          <FileInput
+            avatar={avatarUrl}
+            callback={(url, file) => this.fileChangedHandler(url, file)}
           />
         );
         break;
