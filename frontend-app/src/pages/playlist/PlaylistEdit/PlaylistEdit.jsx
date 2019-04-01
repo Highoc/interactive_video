@@ -6,7 +6,7 @@ import NavigationIcon from '@material-ui/icons/Navigation';
 import { Redirect } from 'react-router-dom';
 import Input from '../../../components/Input/Input';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
-import { perror } from '../../../helpers/SmartPrint';
+import { perror, pprint } from '../../../helpers/SmartPrint';
 import styles from './PlaylistEdit.styles';
 
 class PlaylistEdit extends Component {
@@ -27,6 +27,7 @@ class PlaylistEdit extends Component {
     const { channelKey, playlistKey } = this.state;
     try {
       const result = await this.backend().get(`channel/${channelKey}/playlist/${playlistKey}/update/`);
+      pprint('PlaylistEdit', result.data);
       this.setState({ inputs: result.data, isLoaded: true });
     } catch (error) {
       perror('PlaylistEdit', error);

@@ -3,6 +3,11 @@ import * as actionTypes from '../actionTypes';
 const initialState = {
   token: null,
   username: 'Guest',
+  isAuthorized: false,
+  isSuperUser: false,
+  channelExists: false,
+  channelKey: null,
+  id: 0,
 
   loading: false,
   error: null,
@@ -19,7 +24,12 @@ const loginStart = (state, action) => ({
 const loginSuccess = (state, action) => ({
   ...state,
   token: action.payload.token,
-  username: action.payload.username,
+  username: action.payload.user.username,
+  isSuperUser: action.payload.user.is_superuser,
+  isAuthorized: true,
+  channelExists: action.payload.user.channel.is_exist,
+  channelKey: action.payload.user.channel.key,
+  id: action.payload.user.id,
 
   loading: false,
   error: null,
@@ -36,6 +46,11 @@ const loginFail = (state, action) => ({
 const logout = (state, action) => ({
   ...state,
 
+  id: 0,
+  channelKey: null,
+  isSuperUser: false,
+  channelExists: false,
+  isAuthorized: false,
   token: null,
   username: 'Guest',
 });

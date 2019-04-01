@@ -4,6 +4,7 @@ import {
 } from '@material-ui/core';
 import { RequestResolver } from '../../../helpers/RequestResolver';
 import { perror } from '../../../helpers/SmartPrint';
+import date from '../../../helpers/Date/date';
 import classes from './Comment.module.css';
 
 export class Comment extends Component {
@@ -38,14 +39,6 @@ export class Comment extends Component {
       return <div> Еще не загружено </div>;
     }
 
-    const dateOptions = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    };
-
     const { comment } = this.state;
 
     return (
@@ -53,7 +46,7 @@ export class Comment extends Component {
         <Card>
           <CardHeader
             title={comment.author}
-            subheader={new Date(comment.created).toLocaleDateString('en-EN', dateOptions)}
+            subheader={date(comment.created)}
             avatar={
               <Avatar src="https://hb.bizmrg.com/interactive_video/public_pic/1.jpg" />
             }

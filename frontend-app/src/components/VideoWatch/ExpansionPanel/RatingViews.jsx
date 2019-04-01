@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles/index';
 import styles from './ExpansionPanel.styles';
-import { perror } from '../../../helpers/SmartPrint';
+import {perror, pprint} from '../../../helpers/SmartPrint';
 import {
   subscribeToChannel as subscribe,
   unsubscribeFromChannel as unsubscribe,
@@ -26,7 +26,6 @@ class RatingViews extends Component {
     this.state = {
       viewsCounter: 0,
       videoKey: props.videoKey,
-      choice: 0,
       status: statuses.NOT_LOADED,
     };
     this.backend = RequestResolver.getBackend();
@@ -39,6 +38,7 @@ class RatingViews extends Component {
       this.setState({ viewsCounter: response.data.counter });
 
       response = await this.backend().get(`rating/get/${videoKey}/`);
+      pprint('eee', response);
       this.setState({ ratingCounter: response.data.counter, choice: response.data.value });
 
       this.setState({ status: statuses.LOADED });
@@ -61,20 +61,25 @@ class RatingViews extends Component {
     unsubscribeFromChannel(`video/${videoKey}/views`);
   }
 
-  onReply(event, choice) {
-    const { ratingCounter } = this.state;
-    this.setState({ ratingCounter: ratingCounter + choice, choice });
-    event.preventDefault();
+  async onReply(choice) {
+    const { videoKey } = this.state;
+    try {
+      this.setState({ choice });
+      const result = await this.backend().post(`rating/update/${videoKey}/`, { value: choice });
+      pprint('RatingViews', result.data);
+    } catch (error) {
+      perror('RatingViews', error);
+    }
   }
 
   updateViewsCounter(views) {
     this.setState({ viewsCounter: views.counter });
-    console.log(`[WatchVideo] Centrifugo > ${JSON.stringify(views)}`);
+    pprint('[WatchVideo] Centrifuge', views);
   }
 
   updateRatingCounter(rating) {
     this.setState({ ratingCounter: rating.counter });
-    console.log(`[WatchVideo] Centrifugo > ${JSON.stringify(rating)}`);
+    pprint('[WatchVideo] Centrifuge', rating);
   }
 
   render() {
@@ -100,14 +105,14 @@ class RatingViews extends Component {
         <div className={classes.columnContainer}>
           <IconButton
             color="secondary"
-            onClick={event => this.onReply(event, 1)}
+            onClick={event => this.onReply( 1)}
             disabled={choice === 1}
           >
             <ArrowDropUp fontSize="large" />
           </IconButton>
           <IconButton
             color="secondary"
-            onClick={event => this.onReply(event, -1)}
+            onClick={event => this.onReply( -1)}
             disabled={choice === -1}
           >
             <ArrowDropDown fontSize="large" />

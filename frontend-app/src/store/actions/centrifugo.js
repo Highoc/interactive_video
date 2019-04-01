@@ -6,6 +6,10 @@ export const centrifugoInit = () => ({
 });
 
 
+export const centrifugoDtor = () => ({
+  type: actionTypes.CENTRIFUGO_DTOR,
+});
+
 export const subscribeToChannel = (channel, callback) => ({
   type: actionTypes.SUBSCRIBE_TO_CHANNEL,
   payload: { channel, callback },

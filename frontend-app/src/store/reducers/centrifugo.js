@@ -12,6 +12,12 @@ const centrifugoInit = (state, action) => ({
 });
 
 
+const centrifugoDtor = (state, action) => ({
+  ...state,
+  isInitialised: false,
+});
+
+
 const subscribeToChannel = (state, action) => {
   const { channel, callback } = action.payload;
   const subscription = {
@@ -65,6 +71,7 @@ const deleteSubscription = (state, action) => {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.CENTRIFUGO_INIT: return centrifugoInit(state, action);
+    case actionTypes.CENTRIFUGO_DTOR: return centrifugoDtor(state, action);
     case actionTypes.SUBSCRIBE_TO_CHANNEL: return subscribeToChannel(state, action);
     case actionTypes.UNSUBSCRIBE_FROM_CHANNEL: return unsubscribeFromChannel(state, action);
     case actionTypes.ACTIVATE_SUBSCRIPTION: return activateSubscription(state, action);

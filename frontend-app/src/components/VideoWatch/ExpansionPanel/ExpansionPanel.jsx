@@ -7,6 +7,7 @@ import {
 import Input from '../../Input/Input';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import { perror } from '../../../helpers/SmartPrint';
+import date from '../../../helpers/Date/date';
 import styles from './ExpansionPanel.styles';
 import RatingViews from './RatingViews';
 
@@ -77,14 +78,6 @@ class ExpansionPanelVideo extends Component {
     } = this.props;
     const { inputs, expanded, videoKey } = this.state;
 
-    const dateOptions = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    };
-
     const Inputs = Object.keys(inputs).map((key) => {
       const inputElement = inputs[key];
       return (
@@ -112,7 +105,7 @@ class ExpansionPanelVideo extends Component {
                 </Typography>
                 <Typography className={classes.ratingViews}>
                   Создано:
-                  {new Date(created).toLocaleDateString('en-EN', dateOptions)}
+                  {date(created)}
                 </Typography>
               </div>
             </div>

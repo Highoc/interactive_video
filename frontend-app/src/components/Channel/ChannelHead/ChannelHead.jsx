@@ -6,7 +6,7 @@ import {
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import classes from './ChannelHead.module.css';
 import { perror } from '../../../helpers/SmartPrint';
-
+import date from '../../../helpers/Date/date';
 
 class ChannelHead extends Component {
   constructor(props) {
@@ -14,7 +14,7 @@ class ChannelHead extends Component {
     this.state = {
       channel: props.channel,
       channelKey: props.channelKey,
-      subStatus: false,
+      subStatus: props.channel.subscription.is_active,
     };
     this.backend = RequestResolver.getBackend();
   }
@@ -70,7 +70,7 @@ class ChannelHead extends Component {
               <br />
               Создан:
               {' '}
-              {channel.created}
+              {date(channel.created)}
               <br />
             </Typography>
             <Typography component="p" align="center">

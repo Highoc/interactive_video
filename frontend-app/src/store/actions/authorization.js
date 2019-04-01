@@ -1,5 +1,5 @@
 import { RequestResolver } from '../../helpers/RequestResolver';
-
+import { pprint } from '../../helpers/SmartPrint';
 import * as actionTypes from '../actionTypes';
 
 
@@ -7,9 +7,9 @@ export const loginStart = () => ({
   type: actionTypes.LOGIN_START,
 });
 
-export const loginSuccess = (token, username) => ({
+export const loginSuccess = (token, user) => ({
   type: actionTypes.LOGIN_SUCCESS,
-  payload: { token, username },
+  payload: { token, user },
 });
 
 export const loginFailed = error => ({
@@ -30,8 +30,9 @@ export const login = (username, password) => (dispatch) => {
   RequestResolver.getGuest()().post('auth/login/', { username, password })
     .then((result) => {
       const { token, user } = result.data;
+      pprint('login', user);
       localStorage.setItem('jwt-token', token);
-      dispatch(loginSuccess(token, user.username));
+      dispatch(loginSuccess(token, user));
     })
     .catch((error) => {
       console.log(error);
@@ -45,8 +46,8 @@ export const loginCheckState = () => (dispatch) => {
   if (token) {
     RequestResolver.getBackend()().get('core/user/current/')
       .then((result) => {
-        const { username } = result.data;
-        dispatch(loginSuccess(token, username));
+        const user = result.data;
+        dispatch(loginSuccess(token, user));
       })
       .catch((error) => {
         console.log(error);

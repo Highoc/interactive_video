@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles/index';
 import Fab from '@material-ui/core/Fab/index';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import Input from '../../../components/Input/Input';
-import { RequestResolver } from '../../../helpers/RequestResolver';
+import { json, RequestResolver } from '../../../helpers/RequestResolver';
 import styles from './CreateChannel.styles';
 import { perror } from '../../../helpers/SmartPrint';
 
@@ -14,42 +14,28 @@ class CreateChannel extends Component {
     this.state = {
       isLoaded: false,
       isValid: false,
-      inputs: [
-        {
-          type: 'text',
-          name: 'name',
-          value: '',
-          description: 'Название канала',
-          rules: {
-            max_length: 64,
-            required: true,
-          },
-        },
-        {
-          type: 'textarea',
-          name: 'description',
-          value: '',
-          description: 'Описание канала',
-          rules: {
-            max_length: 4096,
-            required: false,
-          },
-        }],
+      inputs: [],
     };
     this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     try {
-      await this.backend().get('channel/update/');
-      this.setState({ isLoaded: true });
+      const result = await this.backend().get('channel/update/');
+      this.setState({ isLoaded: true, inputs: result.data });
     } catch (error) {
       perror('CreateChannel', error);
     }
   }
 
+  getData() {
+    const { inputs } = this.state;
+    const result = {};
+    inputs.map((input) => { result[input.name] = input.value; return 0; });
+    return result;
+  }
 
-  submitHandler(event) {
+  async submitHandler() {
     const { inputs } = this.state;
     let isValid = true;
     for (const key in inputs) {
@@ -57,11 +43,16 @@ class CreateChannel extends Component {
     }
 
     if (isValid) {
-      console.log('Отправить можно');
+      try {
+        const data = this.getData();
+        await this.backend(json).post('channel/update/', data);
+        this.setState({ isSent: true });
+      } catch (error) {
+        perror('CreateChannel', error);
+      }
     } else {
       console.log('Invalid input');
     }
-    event.preventDefault();
   }
 
   callbackInput(state) {
@@ -103,7 +94,7 @@ class CreateChannel extends Component {
             aria-label="Add"
             className={classes.margin}
             style={styles.button}
-            onClick={event => this.submitHandler(event)}
+            onClick={event => this.submitHandler()}
           >
             <NavigationIcon className={classes.extendedIcon} />
             Создать
