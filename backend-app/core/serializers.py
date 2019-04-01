@@ -8,9 +8,23 @@ import re
 
 
 class UserSerializer(serializers.ModelSerializer):
+    channel = serializers.SerializerMethodField()
+
+    def get_channel(self, obj):
+        channel = {}
+        if hasattr(obj, 'channel'):
+            channel['key'] = obj.channel.key
+            channel['is_exist'] = True
+        else:
+            channel['key'] = ''
+            channel['is_exist'] = False
+        return channel
+
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'email')
+        fields = ('id', 'username', 'is_superuser', 'channel')
+        read_only_fields = ('is_superuser',)
 
 
 class UserSerializerWithToken(serializers.ModelSerializer):
