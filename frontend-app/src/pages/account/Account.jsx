@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { RequestResolver, json } from '../../helpers/RequestResolver';
+import { RequestResolver } from '../../helpers/RequestResolver';
 import { perror, pprint } from '../../helpers/SmartPrint';
 import { Card, CardActionArea, CardMedia } from "@material-ui/core";
 
@@ -7,7 +7,7 @@ class Account extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      image: null,
+      info: {},
       isSent: false,
     };
     this.backend = RequestResolver.getBackend();
@@ -17,7 +17,7 @@ class Account extends Component {
     try {
       const result = await this.backend().get('core/profile/current/');
       pprint('Account', result.data);
-      this.setState({ image: result.data.avatar_url, isLoaded: true });
+      this.setState({ info: result.data, isLoaded: true });
     } catch (error) {
       perror('PlaylistEdit', error);
     }
@@ -54,19 +54,19 @@ class Account extends Component {
   }
 
   render() {
-    const { image } = this.state;
+    const { info } = this.state;
 
 
     return (
       <div>
         <h2>Ваш аккаунт</h2>
-        <Card style={{ width: '500px', height: '500px' }}>
+        <Card style={{ width: '100%', height: '500px' }}>
           <CardActionArea>
             <CardMedia
-              style={{height: '500px', width: '500px' }}
-              image={image}
+              style={{height: '500px', width: '100%' }}
+              image={info.avatar_url}
             />
-          </CardActionArea>
+          </CardActionArea>ч
         </Card>
       </div>
     );
