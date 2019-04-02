@@ -20,7 +20,7 @@ class ChannelPlaylist extends Component {
     const { playlist, channelKey } = this.state;
     return (
       <div>
-        <GridList cellHeight="auto" spacing={10} className={classes.gridList}>
+        <GridList cellHeight="auto" spacing={10} classes={classes.gridList}>
           <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
             <ListSubheader component="div">{playlist.name}</ListSubheader>
           </GridListTile>

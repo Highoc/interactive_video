@@ -20,4 +20,5 @@ export const OPENDRAWER = 'OPEN_DRAWER';
 export const CLOSEDRAWER = 'CLOSE_DRAWER';
 
 export const UPLOADFILE = 'UPLOAD_FILE';
+export const ADD_CHANNEL = 'ADD_CHANNEL';
 
