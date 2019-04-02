@@ -70,7 +70,8 @@ class CommentCreateView(APIView):
         video = video[0]
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
-            if 'parent_id' not in request.data:
+            print(request.data)
+            if 'parent_id' not in request.data or not request.data['parent_id']:
                 parent = None
             else:
                 parents = video.comments.filter(id=request.data['parent_id'])
