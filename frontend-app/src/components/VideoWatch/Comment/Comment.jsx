@@ -16,12 +16,10 @@ const Comment = (props) => {
   } = props;
 
   const {
-    id, author, created, text, children,
+    id, author, created, text, children, hide_children: hideChildren,
   } = comment;
 
-  const hideChildren = children.length && children[0] === '...';
   let subComments = null;
-
   if (!hideChildren) {
     subComments = (
       <div>

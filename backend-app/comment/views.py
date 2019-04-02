@@ -88,11 +88,13 @@ class CommentCreateView(APIView):
             client = Client(settings.CENTRIFUGO_URL, api_key=settings.CENTRIFUGO_API_KEY, timeout=1)
             channel = f"video/{video_key}/comments"
             data = {
+                'id': comment.id,
                 'author': comment.author.username,
                 'text': comment.text,
-                'created': comment.created.__str__(),
+                'created': str(comment.created),
+                'hide_children': False,
                 'children': [],
-                'parent_id': parent.id,
+                'parent_id': parent.id if parent else None,
             }
 
             client.publish(channel, data)
@@ -113,22 +115,23 @@ class CommentTree(APIView):
 
         comment = comments[0]
 
+        children, hide_children = self.get_children_comments(comment, level - 1)
+
         return {
             'id': comment.id,
             'author': comment.author.username,
             'text': comment.text,
             'created': comment.created,
-            'children': self.get_children_comments(comment, level - 1)
+            'hide_children': hide_children,
+            'children': children,
         }
+
 
     def get_children_comments(self, comment, level):
         if level == 0:
-            if comment.children.all():
-                return [ '...' ]
-            else:
-                return []
+            return [], bool(comment.children.all())
 
-        return [self.get_comment(child.id, level) for child in comment.children.all()]
+        return [self.get_comment(child.id, level) for child in comment.children.all()], False
 
 
     def get(self, request, comment_id, level):

@@ -78,10 +78,8 @@ class CommentBox extends Component {
   onUpdate(data) {
     const { comments } = this.state;
     const comment = this.findCommentById(comments, data.parent_id);
-    if (comment != null) {
-      if (!comment.children.length || comment.children[0] !== '...') {
-        comment.children.push(data);
-      }
+    if (comment != null && !comment.hide_children) {
+      comment.children.push(data);
     }
     this.setState({ comments });
   }
@@ -97,6 +95,7 @@ class CommentBox extends Component {
 
     const comment = this.findCommentById(comments, commentId);
     if (comment != null) {
+      comment.hide_children = false;
       comment.children = result.data.children;
     }
 
@@ -191,6 +190,7 @@ class CommentBox extends Component {
             ))
           }
         </div>
+
         <Dialog dialogOpen={dialogOpen} callback={() => this.onSubmit()} title="Ответ на комментарий">
           <DialogContent>
             {Inputs}

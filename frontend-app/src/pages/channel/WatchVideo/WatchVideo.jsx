@@ -144,7 +144,7 @@ class WatchVideo extends Component {
             <CommentBox
               channelKey={channelKey}
               videoKey={videoKey}
-              level={2}
+              level={3}
               commentsId={video.head_comments}
             />
           </ExpansionPanel>
