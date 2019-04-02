@@ -7,6 +7,7 @@ import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import classes from './ChannelHead.module.css';
 import { perror } from '../../../helpers/SmartPrint';
 import date from '../../../helpers/Date/date';
+import {connect} from "react-redux";
 
 class ChannelHead extends Component {
   constructor(props) {
@@ -44,11 +45,15 @@ class ChannelHead extends Component {
 
   render() {
     const { channel, channelKey, subStatus } = this.state;
+    const { myChannelKey } = this.props;
     const MyLink = props => <Link to={`${channelKey}/playlist/all`} {...props} />;
     const Settings = props => <Link to={`${channelKey}/edit`} {...props} />;
     let subscribed = <Typography> Не подписан </Typography>;
     let button = <Button size="small" color="primary" onClick={event => this.handleSubscribe(event)}>Подписаться</Button>;
-
+    let settings = <Button size="small" color="primary" component={Settings}>Настройки канала</Button>;
+    if (myChannelKey !== channelKey){
+      settings = <div />;
+    }
     if (subStatus) {
       subscribed = <Typography> Подписан </Typography>;
       button = <Button size="small" color="primary" onClick={event => this.handleUnsubscribe(event)}>Отписаться</Button>;
@@ -82,9 +87,7 @@ class ChannelHead extends Component {
           <Button size="small" color="primary" component={MyLink}>
             Посмотреть все плейлисты
           </Button>
-          <Button size="small" color="primary" component={Settings}>
-            Настройки канала
-          </Button>
+          {settings}
           {button}
           {subscribed}
         </CardActions>
@@ -93,5 +96,8 @@ class ChannelHead extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  myChannelKey: state.authorization.channelKey,
+});
 
-export default ChannelHead;
+export default connect(mapStateToProps)(ChannelHead);

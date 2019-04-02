@@ -18,6 +18,7 @@ import ConstructPanelLeft from './components/VideoConstructor/ConstructPanelLeft
 import Header from './components/Interface/Header';
 import Homepage from './pages/homepage/Homepage';
 import Account from './pages/account/Account';
+import EditAccount from './pages/account/Edit/EditAccount';
 import { Channel } from './pages/channel';
 import SignIn from './pages/login/SignIn';
 import Register from './pages/register/Register';
@@ -55,6 +56,7 @@ class App extends Component {
       routes = (
         <Switch>
           <Route path="/" exact component={Homepage} />
+          <Route exact path="/account/edit" component={EditAccount} />
           <Route path="/account" component={Account} />
           <Route path="/channel" component={Channel} />
           <Redirect to="/" />
