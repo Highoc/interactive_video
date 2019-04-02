@@ -54,9 +54,9 @@ class Playlist extends Component {
             <Typography component="p" align="center">
               {playlist.description}
             </Typography>
+            <ChannelPlaylist playlist={playlist} channelKey={channelKey} />
           </CardContent>
         </Card>
-        <ChannelPlaylist playlist={playlist} channelKey={channelKey} />
       </div>
 
     );
