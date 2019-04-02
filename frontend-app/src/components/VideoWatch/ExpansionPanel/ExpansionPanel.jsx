@@ -2,11 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles/index';
 import {
-  ExpansionPanel, ExpansionPanelActions, ExpansionPanelDetails, ExpansionPanelSummary, Typography, Button, Divider,
+  ExpansionPanel,  ExpansionPanelDetails, ExpansionPanelSummary, Typography, Button,
 } from '@material-ui/core';
-import Input from '../../Input/Input';
-import { RequestResolver, json } from '../../../helpers/RequestResolver';
-import { perror } from '../../../helpers/SmartPrint';
+import { RequestResolver } from '../../../helpers/RequestResolver';
 import date from '../../../helpers/Date/date';
 import styles from './ExpansionPanel.styles';
 import RatingViews from './RatingViews';
@@ -15,49 +13,10 @@ class ExpansionPanelVideo extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoaded: false,
-      isValid: false,
-      inputs: props.inputs,
-      isSent: false,
-      channelKey: props.keyChannel,
       videoKey: props.keyVideo,
       expanded: false,
     };
     this.backend = RequestResolver.getBackend();
-  }
-
-  getData() {
-    const { inputs } = this.state;
-    const result = {};
-    inputs.map((input) => { result[input.name] = input.value; return 0; });
-    return result;
-  }
-
-  async submitHandler() {
-    const { inputs, channelKey, videoKey } = this.state;
-    let isValid = true;
-    for (const key in inputs) {
-      isValid = isValid && inputs[key].isValid;
-    }
-    if (isValid) {
-      try {
-        const data = this.getData();
-        await this.backend(json).post(`channel/${channelKey}/video/${videoKey}/comment/add/`, data);
-        this.setState({ isSent: true });
-      } catch (error) {
-        perror('ExpansionPanel', error);
-      }
-    } else {
-      console.log('Invalid input');
-    }
-  }
-
-  callbackInput(state) {
-    const { inputs } = this.state;
-    const input = inputs.find(elem => elem.name === state.name);
-    input.value = state.value;
-    input.isValid = state.isValid;
-    this.setState({ inputs });
   }
 
   handleChange(expanded) {
@@ -74,24 +33,9 @@ class ExpansionPanelVideo extends Component {
 
   render() {
     const {
-      classes, created, author,
+      classes, created, author, description,
     } = this.props;
-    const { inputs, expanded, videoKey } = this.state;
-
-    const Inputs = Object.keys(inputs).map((key) => {
-      const inputElement = inputs[key];
-      return (
-        <Input
-          key={key}
-          type={inputElement.type}
-          name={inputElement.name}
-          description={inputElement.description}
-          value={inputElement.value}
-          rules={inputElement.rules}
-          callback={state => this.callbackInput(state)}
-        />
-      );
-    });
+    const { expanded, videoKey } = this.state;
 
     return (
       <div className={classes.root}>
@@ -124,14 +68,8 @@ class ExpansionPanelVideo extends Component {
 
           </ExpansionPanelSummary>
           <ExpansionPanelDetails className={classes.details}>
-            {Inputs}
+            {description}
           </ExpansionPanelDetails>
-          <Divider />
-          <ExpansionPanelActions>
-            <Button size="small" color="primary" onClick={(event) => { event.preventDefault(); this.submitHandler(); }}>
-              Оставить комментарий
-            </Button>
-          </ExpansionPanelActions>
         </ExpansionPanel>
       </div>
     );
@@ -143,3 +81,4 @@ ExpansionPanelVideo.propTypes = {
 };
 
 export default withStyles(styles)(ExpansionPanelVideo);
+

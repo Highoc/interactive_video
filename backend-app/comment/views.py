@@ -1,3 +1,5 @@
+from application import settings
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,8 +12,6 @@ from .serializers import CommentSerializer
 
 from cent import Client
 
-CENTRIFUGO_URL = "http://centrifugo:9000"
-CENTRIFUGO_API_KEY = "1erj444h-9fhj-pasd-oas4-988f33d33d21"
 
 class CommentView(APIView):
     def get(self, request, comment_id):
@@ -85,13 +85,16 @@ class CommentCreateView(APIView):
             comment.parent = parent
             comment.save()
 
-            client = Client(CENTRIFUGO_URL, api_key=CENTRIFUGO_API_KEY, timeout=1)
+            client = Client(settings.CENTRIFUGO_URL, api_key=settings.CENTRIFUGO_API_KEY, timeout=1)
             channel = f"video/{video_key}/comments"
             data = {
+                'id': comment.id,
                 'author': comment.author.username,
                 'text': comment.text,
-                'created': comment.created,
-                'children': []
+                'created': str(comment.created),
+                'hide_children': False,
+                'children': [],
+                'parent_id': parent.id if parent else None,
             }
 
             client.publish(channel, data)
@@ -99,3 +102,42 @@ class CommentCreateView(APIView):
             return Response({ 'key': comment.id }, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CommentTree(APIView):
+    def get_comment(self, comment_id, level):
+        if level == 0:
+            return {}
+
+        comments = Comment.objects.filter(id=comment_id)
+        if not comments:
+            return {}
+
+        comment = comments[0]
+
+        children, hide_children = self.get_children_comments(comment, level - 1)
+
+        return {
+            'id': comment.id,
+            'author': comment.author.username,
+            'text': comment.text,
+            'created': comment.created,
+            'hide_children': hide_children,
+            'children': children,
+        }
+
+
+    def get_children_comments(self, comment, level):
+        if level == 0:
+            return [], bool(comment.children.all())
+
+        return [self.get_comment(child.id, level) for child in comment.children.all()], False
+
+
+    def get(self, request, comment_id, level):
+        comment = self.get_comment(comment_id, int(level))
+
+        if comment == {}:
+            return Response('Comment doesn\'t exist.', status=status.HTTP_404_NOT_FOUND)
+
+        return Response(comment, status=status.HTTP_200_OK)
