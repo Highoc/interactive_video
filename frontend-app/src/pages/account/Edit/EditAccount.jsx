@@ -5,7 +5,7 @@ import Fab from '@material-ui/core/Fab/index';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import { Redirect } from 'react-router-dom';
 import Input from '../../../components/Input/Input';
-import { RequestResolver, json } from '../../../helpers/RequestResolver';
+import { RequestResolver, multipart } from '../../../helpers/RequestResolver';
 import { perror, pprint } from '../../../helpers/SmartPrint';
 import styles from './EditAccount.styles';
 
@@ -33,7 +33,7 @@ class EditAccount extends Component {
   getData() {
     const { inputs } = this.state;
     const result = {};
-    inputs.map((input) => { result[input.name] = input.avatarUrl; return 0; });
+    inputs.map((input) => { result[input.name] = input.url; return 0; });
     return result;
   }
 
@@ -47,7 +47,7 @@ class EditAccount extends Component {
       try {
         const data = this.getData();
         console.log(data);
-        await this.backend(json).post('core/profile/update/', data);
+        await this.backend(multipart).post('core/profile/update/', data);
         this.setState({ isSent: true });
       } catch (error) {
         perror('EditAccount', error);
@@ -62,7 +62,9 @@ class EditAccount extends Component {
     const input = inputs.find(elem => elem.name === state.name);
     input.value = state.value;
     input.isValid = state.isValid;
-    input.avatarUrl = state.file;
+    if (state.file !== null){
+      input.url = state.file;
+    }
     this.setState({ inputs });
   }
 

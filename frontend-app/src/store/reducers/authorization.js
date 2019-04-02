@@ -21,6 +21,13 @@ const loginStart = (state, action) => ({
   error: null,
 });
 
+const addChannel = (state, action) => ({
+  ...state,
+
+  channelExists: true,
+  channelKey: action.payload.channelKey,
+});
+
 const loginSuccess = (state, action) => ({
   ...state,
   token: action.payload.token,
@@ -62,6 +69,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.LOGIN_SUCCESS: return loginSuccess(state, action);
     case actionTypes.LOGIN_FAILED: return loginFail(state, action);
     case actionTypes.LOGOUT: return logout(state, action);
+    case actionTypes.ADD_CHANNEL: return addChannel(state,action);
     default: return state;
   }
 };
