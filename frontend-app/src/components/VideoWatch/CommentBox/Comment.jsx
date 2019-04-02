@@ -3,11 +3,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  Card, CardHeader, CardContent, Typography, Avatar, Button,
+  Typography, Avatar, Button, Card, CardHeader, CardContent,
 } from '@material-ui/core';
 
 import date from '../../../helpers/Date/date';
-import classes from './Comment.module.css';
+import classes from './styles/Comment.module.css';
 
 
 const Comment = (props) => {
@@ -48,28 +48,32 @@ const Comment = (props) => {
   }
 
   return (
-    <Card>
-      <CardHeader
-        title={author}
-        subheader={date(created)}
-        avatar={
-          <Avatar src="https://hb.bizmrg.com/interactive_video/public_pic/1.jpg" />
-        }
-      />
-      <CardContent>
-        <Typography>
-          {text}
-          <Button
-            onClick={() => onReply(id)}
-            color="primary"
-            className={classes.container}
-          >
-            Ответить
-          </Button>
-        </Typography>
+    <div className={classes.container}>
+      <Card>
+        <CardHeader
+          title={author}
+          subheader={date(created)}
+          avatar={
+            <Avatar src="https://hb.bizmrg.com/interactive_video/public_pic/1.jpg" />
+          }
+        />
+        <CardContent>
+          <Typography>
+            {text}
+            <Button
+              onClick={() => onReply(id)}
+              color="primary"
+              className={classes.button}
+            >
+              Ответить
+            </Button>
+          </Typography>
+        </CardContent>
+      </Card>
+      <div className={classes.children}>
         {subComments}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

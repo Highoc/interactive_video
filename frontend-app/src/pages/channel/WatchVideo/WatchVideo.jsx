@@ -9,7 +9,7 @@ import Input from '../../../components/Input/Input';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import classes from './WatchVideo.module.css';
 import { perror } from '../../../helpers/SmartPrint';
-import CommentBox from "../../../components/VideoWatch/Comment/CommentBox";
+import CommentBox from "../../../components/VideoWatch/CommentBox/CommentBox";
 
 const statuses = {
   LOADED: 1,

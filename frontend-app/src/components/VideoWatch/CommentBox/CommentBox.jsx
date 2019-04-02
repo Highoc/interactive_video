@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import PropTypes from 'prop-types';
 
-import { DialogContent } from '@material-ui/core';
+import { Button, DialogContent, Divider } from '@material-ui/core';
 import Comment from './Comment';
 
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
@@ -17,6 +17,7 @@ import {
 
 import Dialog from '../../Dialog';
 import Input from '../../Input/Input';
+import classes from './styles/CommentBox.module.css';
 
 
 class CommentBox extends Component {
@@ -30,9 +31,11 @@ class CommentBox extends Component {
       commentsId: props.commentsId,
       comments: [],
       level: props.level,
+      currentId: 0,
 
       dialogOpen: false,
       inputs: [],
+      inputsReady: false,
     };
 
     this.backend = RequestResolver.getBackend();
@@ -61,7 +64,7 @@ class CommentBox extends Component {
         elem => comments.push(elem.data),
       );
 
-      this.setState({ comments, inputs: result.data });
+      this.setState({ comments, inputs: result.data, inputsReady: true });
 
       subscribeToChannel(`video/${videoKey}/comments`, comment => this.onUpdate(comment));
     } catch (error) {
@@ -77,15 +80,23 @@ class CommentBox extends Component {
 
   onUpdate(data) {
     const { comments } = this.state;
-    const comment = this.findCommentById(comments, data.parent_id);
-    if (comment != null && !comment.hide_children) {
-      comment.children.push(data);
+    if (!data.parent_id) {
+      comments.push(data);
+    } else {
+      const comment = this.findCommentById(comments, data.parent_id);
+      if (comment != null && !comment.hide_children) {
+        comment.children.push(data);
+      }
     }
     this.setState({ comments });
   }
 
   onReply(commentId) {
     this.setState({ dialogOpen: true, currentId: commentId });
+  }
+
+  onRootReply() {
+    this.onSubmit();
   }
 
   async onLoad(commentId) {
@@ -132,12 +143,8 @@ class CommentBox extends Component {
   }
 
   findCommentById(comments, id) {
-    let comment = null;
+    let comment;
     for (const elem of comments) {
-      if (elem === '...') {
-        break;
-      }
-
       if (elem.id === id) {
         return elem;
       }
@@ -159,25 +166,40 @@ class CommentBox extends Component {
   }
 
   render() {
-    const { comments, inputs, dialogOpen } = this.state;
-
-    const Inputs = Object.keys(inputs).map((key) => {
-      const inputElement = inputs[key];
-      return (
-        <Input
-          key={key}
-          type={inputElement.type}
-          name={inputElement.name}
-          description={inputElement.description}
-          value={inputElement.value}
-          rules={inputElement.rules}
-          callback={data => this.callbackInput(data)}
-        />
-      );
-    });
+    const {
+      comments, inputs, dialogOpen, inputsReady,
+    } = this.state;
+    let Inputs = <div />;
+    if (inputsReady) {
+      Inputs = Object.keys(inputs).map((key) => {
+        const inputElement = inputs[key];
+        return (
+          <Input
+            key={key}
+            type={inputElement.type}
+            name={inputElement.name}
+            description={inputElement.description}
+            value={inputElement.value}
+            rules={inputElement.rules}
+            callback={data => this.callbackInput(data)}
+          />
+        );
+      });
+    }
 
     return (
       <div>
+        <div className={classes.commentRoot}>
+          {Inputs}
+          <Button
+            onClick={() => this.onRootReply()}
+            color="primary"
+            className={classes.containerButton}
+          >
+            Оставить комментарий
+          </Button>
+        </div>
+        <Divider />
         <div>
           {
             comments.map(comment => (
