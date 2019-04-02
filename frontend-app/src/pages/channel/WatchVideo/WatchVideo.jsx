@@ -3,14 +3,13 @@ import {
   DialogContent, ExpansionPanel, ExpansionPanelSummary, CardContent, Typography, Card,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { Comment } from '../../../components/VideoWatch/Comment/Comment';
 import InteractivePlayer from '../../../components/VideoWatch/InteractivePlayer/InteractivePlayer';
 import ExpansionPanelVideo from '../../../components/VideoWatch/ExpansionPanel';
 import Input from '../../../components/Input/Input';
-import Dialog from '../../../components/Dialog';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import classes from './WatchVideo.module.css';
 import { perror } from '../../../helpers/SmartPrint';
+import CommentBox from "../../../components/VideoWatch/Comment/CommentBox";
 
 const statuses = {
   LOADED: 1,
@@ -82,11 +81,6 @@ class WatchVideo extends Component {
     return result;
   }
 
-  callbackDialog(state) {
-    this.setState({ dialogOpen: state });
-    this.submitHandler();
-  }
-
   callbackInput(state) {
     const { inputs } = this.state;
     const input = inputs.find(elem => elem.name === state.name);
@@ -95,15 +89,10 @@ class WatchVideo extends Component {
     this.setState({ inputs });
   }
 
-
-  callbackComment(state) {
-    this.setState({ dialogOpen: true, parentId: state.commentId });
-  }
-
   render() {
     const {
       video, viewsCounter, ratingCounter, yourChoice,
-      isLoaded, dialogOpen, channelKey, videoKey, inputs, author,
+      isLoaded, channelKey, videoKey, inputs, author,
     } = this.state;
     const Inputs = Object.keys(inputs).map((key) => {
       const inputElement = inputs[key];
@@ -152,14 +141,13 @@ class WatchVideo extends Component {
             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="h5">Ко всем комментариям:</Typography>
             </ExpansionPanelSummary>
-            { video.head_comments.map(commentId => <Comment commentId={commentId} callback={state => this.callbackComment(state)} key={commentId} />)}
+            <CommentBox
+              channelKey={channelKey}
+              videoKey={videoKey}
+              level={2}
+              commentsId={video.head_comments}
+            />
           </ExpansionPanel>
-
-          <Dialog dialogOpen={dialogOpen} callback={state => this.callbackDialog(state)} title="Ответ на комментарий">
-            <DialogContent>
-              {Inputs}
-            </DialogContent>
-          </Dialog>
         </div>
       );
     } else {

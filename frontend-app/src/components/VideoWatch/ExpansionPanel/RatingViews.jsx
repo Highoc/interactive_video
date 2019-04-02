@@ -44,7 +44,6 @@ class RatingViews extends Component {
       this.setState({ status: statuses.LOADED });
 
       const { subscribeToChannel } = this.props;
-      subscribeToChannel(`video/${videoKey}/comments`, data => console.log(data));
       subscribeToChannel(`video/${videoKey}/rating`, data => this.updateRatingCounter(data));
       subscribeToChannel(`video/${videoKey}/views`, data => this.updateViewsCounter(data));
     } catch (error) {
@@ -56,7 +55,6 @@ class RatingViews extends Component {
   componentWillUnmount() {
     const { unsubscribeFromChannel } = this.props;
     const { videoKey } = this.state;
-    unsubscribeFromChannel(`video/${videoKey}/comments`);
     unsubscribeFromChannel(`video/${videoKey}/rating`);
     unsubscribeFromChannel(`video/${videoKey}/views`);
   }

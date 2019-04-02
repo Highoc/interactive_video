@@ -1,67 +1,84 @@
-import React, { Component } from 'react';
+import React from 'react';
+
+import PropTypes from 'prop-types';
+
 import {
   Card, CardHeader, CardContent, Typography, Avatar, Button,
 } from '@material-ui/core';
-import { RequestResolver } from '../../../helpers/RequestResolver';
-import { perror } from '../../../helpers/SmartPrint';
+
 import date from '../../../helpers/Date/date';
 import classes from './Comment.module.css';
 
-export class Comment extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      commentId: props.commentId,
-      isLoaded: false,
-    };
-    this.backend = RequestResolver.getBackend();
-  }
 
-  async componentDidMount() {
-    try {
-      const { commentId } = this.state;
-      const result = await this.backend().get(`comment/get/${commentId}/`);
-      this.setState({ isLoaded: true, comment: result.data });
-    } catch (error) {
-      perror('Comment', error);
-    }
-  }
+const Comment = (props) => {
+  const {
+    onReply, onLoad, comment,
+  } = props;
 
-  onReply(event) {
-    const { callback } = this.props;
-    callback(this.state);
-    event.preventDefault();
-  }
+  const {
+    id, author, created, text, children,
+  } = comment;
 
-  render() {
-    const { isLoaded } = this.state;
-    if (!isLoaded) {
-      return <div> Еще не загружено </div>;
-    }
+  const hideChildren = children.length && children[0] === '...';
+  let subComments = null;
 
-    const { comment } = this.state;
-
-    return (
+  if (!hideChildren) {
+    subComments = (
       <div>
-        <Card>
-          <CardHeader
-            title={comment.author}
-            subheader={date(comment.created)}
-            avatar={
-              <Avatar src="https://hb.bizmrg.com/interactive_video/public_pic/1.jpg" />
-            }
-          />
-          <CardContent>
-            <Typography>
-              {comment.text}
-              <Button onClick={(event) => this.onReply(event)} color="primary" className={classes.container}>
-                Ответить
-              </Button>
-            </Typography>
-            {comment.children.map(childId => <Comment commentId={childId} callback={this.props.callback} key={childId} />)}
-          </CardContent>
-        </Card>
+        {
+          children.map(child => (
+            <Comment
+              key={child.id}
+              comment={child}
+              onReply={onReply}
+              onLoad={onLoad}
+            />
+          ))
+        }
       </div>
     );
+  } else {
+    subComments = (
+      <Button
+        onClick={() => onLoad(id)}
+        color="primary"
+        className={classes.container}
+      >
+        Больше комментариев
+      </Button>
+    );
   }
-}
+
+  return (
+    <Card>
+      <CardHeader
+        title={author}
+        subheader={date(created)}
+        avatar={
+          <Avatar src="https://hb.bizmrg.com/interactive_video/public_pic/1.jpg" />
+        }
+      />
+      <CardContent>
+        <Typography>
+          {text}
+          <Button
+            onClick={() => onReply(id)}
+            color="primary"
+            className={classes.container}
+          >
+            Ответить
+          </Button>
+        </Typography>
+        {subComments}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default Comment;
+
+Comment.propTypes = {
+  comment: PropTypes.object.isRequired,
+  onLoad: PropTypes.func.isRequired,
+  onReply: PropTypes.func.isRequired,
+};
