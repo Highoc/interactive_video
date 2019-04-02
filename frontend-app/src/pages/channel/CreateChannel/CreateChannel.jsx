@@ -6,7 +6,10 @@ import NavigationIcon from '@material-ui/icons/Navigation';
 import Input from '../../../components/Input/Input';
 import { json, RequestResolver } from '../../../helpers/RequestResolver';
 import styles from './CreateChannel.styles';
-import { perror } from '../../../helpers/SmartPrint';
+import { perror, pprint } from '../../../helpers/SmartPrint';
+import { Redirect } from "react-router-dom";
+import { addChannel } from '../../../store/actions/authorization';
+import {connect} from "react-redux";
 
 class CreateChannel extends Component {
   constructor(props) {
@@ -15,6 +18,8 @@ class CreateChannel extends Component {
       isLoaded: false,
       isValid: false,
       inputs: [],
+      channelKey: '',
+      isSent: false,
     };
     this.backend = RequestResolver.getBackend();
   }
@@ -37,6 +42,7 @@ class CreateChannel extends Component {
 
   async submitHandler() {
     const { inputs } = this.state;
+    const { addChannel } = this.props;
     let isValid = true;
     for (const key in inputs) {
       isValid = isValid && inputs[key].isValid;
@@ -45,8 +51,10 @@ class CreateChannel extends Component {
     if (isValid) {
       try {
         const data = this.getData();
-        await this.backend(json).post('channel/update/', data);
-        this.setState({ isSent: true });
+        const result = await this.backend(json).post('channel/update/', data);
+        pprint('CreateChannel', result.data);
+        addChannel(result.data.key);
+        this.setState({ isSent: true, channelKey: result.data.key });
       } catch (error) {
         perror('CreateChannel', error);
       }
@@ -64,8 +72,13 @@ class CreateChannel extends Component {
   }
 
   render() {
-    const { inputs, isLoaded } = this.state;
+    const { inputs, isLoaded, isSent, channelKey } = this.state;
     const { classes } = this.props;
+
+    if (isSent) {
+      return <Redirect to={`/channel/${channelKey}`} />;
+    }
+
     if (!isLoaded) {
       return <div>Загружается</div>;
     }
@@ -109,4 +122,12 @@ CreateChannel.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(CreateChannel);
+const mapStateToProps = state => ({
+  isAuthorized: state.authorization.isAuthorized,
+});
+
+const mapDispatchToProps = dispatch => ({
+  addChannel: channelKey => dispatch(addChannel(channelKey)),
+});
+
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(CreateChannel));

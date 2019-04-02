@@ -4,9 +4,10 @@ import { withStyles } from '@material-ui/core/styles/index';
 import Fab from '@material-ui/core/Fab/index';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import Input from '../../../components/Input/Input';
-import { RequestResolver } from '../../../helpers/RequestResolver';
+import {json, RequestResolver} from '../../../helpers/RequestResolver';
 import styles from './ChannelEdit.styles';
-import { perror } from '../../../helpers/SmartPrint';
+import {perror, pprint} from '../../../helpers/SmartPrint';
+import {Redirect} from "react-router-dom";
 
 class ChannelEdit extends Component {
   constructor(props) {
@@ -15,6 +16,8 @@ class ChannelEdit extends Component {
       isLoaded: false,
       isValid: false,
       inputs: [],
+      channelKey: '',
+      isSent: false,
     };
     this.backend = RequestResolver.getBackend();
   }
@@ -28,8 +31,14 @@ class ChannelEdit extends Component {
     }
   }
 
+  getData() {
+    const { inputs } = this.state;
+    const result = {};
+    inputs.map((input) => { result[input.name] = input.value; return 0; });
+    return result;
+  }
 
-  submitHandlerChange(event) {
+  async submitHandlerChange() {
     const { inputs } = this.state;
     let isValid = true;
     for (const key in inputs) {
@@ -37,12 +46,17 @@ class ChannelEdit extends Component {
     }
 
     if (isValid) {
-      console.log('Отправить можно');
-    }
-    else {
+      try {
+        const data = this.getData();
+        const result = await this.backend(json).post('channel/update/', data);
+        pprint('ChannelEdit', result.data);
+        this.setState({ isSent: true, channelKey: result.data.key });
+      } catch (error) {
+        perror('ChannelEdit', error);
+      }
+    } else {
       console.log('Invalid input');
     }
-    event.preventDefault();
   };
 
   submitHandlerDelete(event) {
@@ -59,8 +73,13 @@ class ChannelEdit extends Component {
   }
 
   render() {
-    const { inputs, isLoaded } = this.state;
+    const { inputs, isLoaded, isSent, channelKey } = this.state;
     const { classes } = this.props;
+
+    if (isSent) {
+      return <Redirect to={`/channel/${channelKey}`} />;
+    }
+
     let status = <div>Загружается</div>;
     if (isLoaded) {
       status = <div>Загрузилось</div>;

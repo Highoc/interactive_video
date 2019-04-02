@@ -24,6 +24,11 @@ export const logout = () => {
   };
 };
 
+export const addChannel = channelKey => ({
+  type: actionTypes.ADD_CHANNEL,
+  payload: { channelKey },
+});
+
 export const login = (username, password) => (dispatch) => {
   dispatch(loginStart());
 
