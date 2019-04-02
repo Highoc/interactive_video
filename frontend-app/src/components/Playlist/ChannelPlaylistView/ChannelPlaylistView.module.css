@@ -7,6 +7,10 @@
 }
 
 .content {
-    height: 80%;
+    height: 68px;
     width: 90%;
+}
+
+.button {
+    height: 50px;
 }

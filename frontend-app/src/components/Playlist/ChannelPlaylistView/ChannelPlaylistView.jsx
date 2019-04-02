@@ -35,7 +35,7 @@ class ChannelPlaylistView extends Component {
               {playlist.name}
             </Typography>
           </CardContent>
-          <CardActions>
+          <CardActions className={classes.button}>
             <Button size="small" color="primary" component={Edit}>
               Изменить
             </Button>
