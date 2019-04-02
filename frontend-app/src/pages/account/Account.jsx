@@ -6,6 +6,7 @@ import {
   Card, CardActionArea, CardMedia, CardContent, Typography, CardActions, Button,
 } from "@material-ui/core";
 import {Link} from "react-router-dom";
+import classes from './Account.module.css';
 
 class Account extends Component {
   constructor(props) {
@@ -31,26 +32,47 @@ class Account extends Component {
   render() {
     const { info, avatar } = this.state;
     const EditAccount = props => <Link to="/account/edit" {...props} />;
+    let name = `Имя: ${info.first_name}`;
+    let surname = `Фамилия: ${info.last_name}`;
+    let email = `Почта:${info.email}`;
+    let created = `Создан: ${date(info.date_joined)}`;
+    if (info.first_name === ''){
+      name = '';
+    }
+    if (info.last_name === ''){
+      surname = '';
+    }
+    if (info.email === '') {
+      email = '';
+    }
+    if (info.date_joined === '') {
+      created = '';
+    }
 
     return (
-      <div>
-        <h2>Ваш аккаунт</h2>
-        <Card style={{ width: '100%', height: '700px' }}>
+      <div className={classes.root}>
+        <Card className={classes.card}>
           <CardActionArea>
             <CardMedia
-              style={{height: '500px', width: '100%' }}
+              className={classes.image}
               image={avatar}
             />
             <CardContent>
-              <Typography gutterBottom variant="h5" component="h2">
-                {`Имя:${info.first_name}, ${info.last_name}  ` }
+              <Typography gutterBottom variant="h4" align="center">
+                {name}
               </Typography>
-              <Typography component="p">
-                {`Почта:${info.email} Создан: ${date(info.date_joined)} `}
+              <Typography gutterBottom variant="h4" align="center">
+                {surname}
+              </Typography>
+              <Typography variant="h5" align="center">
+                {email}
+              </Typography>
+              <Typography variant="h5" align="center">
+                {created}
               </Typography>
             </CardContent>
           </CardActionArea>
-          <CardActions>
+          <CardActions className={classes.button}>
             <Button size="small" color="primary" component={EditAccount}>
               Изменить
             </Button>

@@ -47,7 +47,7 @@ class Input extends Component {
       isValid: checkValidity(props.value, props.rules),
       isTouched: false,
       name: props.name,
-      avatarUrl: props.avatar,
+      imageUrl: props.imageUrl,
       file: null,
     };
   }
@@ -64,13 +64,13 @@ class Input extends Component {
 
   fileChangedHandler(url, file) {
     const isValid = checkValidity(file, this.state.rules);
-    this.setState({ isValid, avatarUrl: url, isTouched: true, file });
+    this.setState({ isValid, imageUrl: url, isTouched: true, file });
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const { value, avatarUrl } = this.state;
+    const { value, imageUrl } = this.state;
     const { callback } = this.props;
-    if (prevState.value !== value || prevState.avatarUrl !== avatarUrl) {
+    if (prevState.value !== value || prevState.imageUrl !== imageUrl) {
       callback(this.state);
     }
   }
@@ -79,7 +79,7 @@ class Input extends Component {
     let inputElement = null;
     let labelValue = 'Not-required';
     const {
-      rules, value, isValid, isTouched, avatarUrl,
+      rules, value, isValid, isTouched, imageUrl,
     } = this.state;
     const isCorrect = !isTouched || isValid;
     if (rules.required) {
@@ -106,7 +106,7 @@ class Input extends Component {
       case ('image'):
         inputElement = (
           <FileInput
-            avatar={avatarUrl}
+            imageUrl={imageUrl}
             callback={(url, file) => this.fileChangedHandler(url, file)}
           />
         );

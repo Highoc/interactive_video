@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   Card, CardMedia, CardContent, CardActionArea, Typography, Button, CardActions,
 } from '@material-ui/core';
+import { connect } from 'react-redux';
 import classes from './ChannelPlaylistView.module.css';
 
 class ChannelPlaylistView extends Component {
@@ -14,11 +15,27 @@ class ChannelPlaylistView extends Component {
     };
   }
 
+  onDelete() {
+    const { playlist } = this.state;
+    const { onDelete } = this.props;
+    onDelete(playlist.key);
+  }
+
   render() {
     const { playlist, channelKey } = this.state;
+    const { myChannelKey } = this.props;
     const Edit = props => <Link to={`/channel/${channelKey}/playlist/${playlist.key}/update`} {...props} />;
     const chosenPlaylist = props => <Link to={`/channel/${channelKey}/playlist/${playlist.key}`} {...props} />;
 
+    let deleteButton = <Button size="small" color="primary" onClick={() => this.onDelete()}>Удалить</Button>;
+    let changeButton = <Button size="small" color="primary" component={Edit}>Изменить</Button>;
+    if (myChannelKey !== channelKey) {
+      deleteButton = <div />;
+      changeButton = <div />;
+    }
+    if (playlist.status !== 0){
+      deleteButton = <div />;
+    }
     return (
       <Card className={classes.card}>
         <CardActionArea>
@@ -36,9 +53,8 @@ class ChannelPlaylistView extends Component {
             </Typography>
           </CardContent>
           <CardActions className={classes.button}>
-            <Button size="small" color="primary" component={Edit}>
-              Изменить
-            </Button>
+            {changeButton}
+            {deleteButton}
           </CardActions>
         </CardActionArea>
       </Card>
@@ -46,4 +62,8 @@ class ChannelPlaylistView extends Component {
   }
 }
 
-export default ChannelPlaylistView;
+const mapStateToProps = state => ({
+  myChannelKey: state.authorization.channelKey,
+});
+
+export default connect(mapStateToProps)(ChannelPlaylistView);

@@ -6,7 +6,7 @@ export default class FileInput extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      url: props.avatar,
+      url: props.imageUrl,
       name: '',
       file: null,
     };
@@ -38,12 +38,14 @@ export default class FileInput extends Component {
     }
     return (
       <div>
-        <img
-          alt="Ваш аватар"
-          src={url}
-          onLoad={this.handleLoad}
-          className={classes.preview}
-        />
+        <div className={classes.previewContainer}>
+          <img
+            alt="Ваш аватар"
+            src={url}
+            onLoad={this.handleLoad}
+            className={classes.image}
+          />
+        </div>
         <div className={classes.file_upload}>
           <Button size="small" color="primary" type="button">Выбрать</Button>
           <div>{nameFile}</div>

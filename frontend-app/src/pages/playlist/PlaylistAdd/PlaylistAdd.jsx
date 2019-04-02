@@ -5,7 +5,7 @@ import Fab from '@material-ui/core/Fab/index';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import { Redirect } from 'react-router-dom';
 import Input from '../../../components/Input/Input';
-import { RequestResolver, json } from '../../../helpers/RequestResolver';
+import { RequestResolver, multipart } from '../../../helpers/RequestResolver';
 import styles from './PlaylistAdd.styles';
 import { perror } from '../../../helpers/SmartPrint';
 
@@ -35,8 +35,8 @@ class PlaylistAdd extends Component {
 
   getData() {
     const { inputs } = this.state;
-    const result = {};
-    inputs.map((input) => { result[input.name] = input.value; return 0; });
+    const result = new FormData();
+    inputs.map((input) => { result.append(input.name, input.value); return 0; });
     return result;
   }
 
@@ -50,7 +50,7 @@ class PlaylistAdd extends Component {
     if (isValid) {
       try {
         const data = this.getData();
-        await this.backend(json).post(`channel/${channelKey}/playlist/create/`, data);
+        await this.backend(multipart).post(`channel/${channelKey}/playlist/create/`, data);
         this.setState({ isSent: true });
       } catch (error) {
         perror('PlaylistAdd', error);
@@ -65,6 +65,9 @@ class PlaylistAdd extends Component {
     const input = inputs.find(elem => elem.name === state.name);
     input.value = state.value;
     input.isValid = state.isValid;
+    if (state.file !== null) {
+      input.value = state.file;
+    }
     this.setState({ inputs });
   }
 

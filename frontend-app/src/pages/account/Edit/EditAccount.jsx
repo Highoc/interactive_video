@@ -22,7 +22,7 @@ class EditAccount extends Component {
 
   async componentDidMount() {
     try {
-      const result = await this.backend().get('core/profile//update/');
+      const result = await this.backend().get('core/profile/update/');
       pprint('EditAccount', result.data);
       this.setState({ inputs: result.data, isLoaded: true });
     } catch (error) {
@@ -32,8 +32,8 @@ class EditAccount extends Component {
 
   getData() {
     const { inputs } = this.state;
-    const result = {};
-    inputs.map((input) => { result[input.name] = input.url; return 0; });
+    const result = new FormData();
+    inputs.map((input) => { result.append(input.name, input.value); return 0; });
     return result;
   }
 
@@ -46,7 +46,6 @@ class EditAccount extends Component {
     if (isValid) {
       try {
         const data = this.getData();
-        console.log(data);
         await this.backend(multipart).post('core/profile/update/', data);
         this.setState({ isSent: true });
       } catch (error) {
@@ -62,8 +61,8 @@ class EditAccount extends Component {
     const input = inputs.find(elem => elem.name === state.name);
     input.value = state.value;
     input.isValid = state.isValid;
-    if (state.file !== null){
-      input.url = state.file;
+    if (state.file !== null) {
+      input.value = state.file;
     }
     this.setState({ inputs });
   }
@@ -85,7 +84,7 @@ class EditAccount extends Component {
           value={inputElement.value}
           rules={inputElement.rules}
           callback={state => this.callbackInput(state)}
-          avatar={inputElement.url}
+          imageUrl={inputElement.url}
         />
       );
     });
