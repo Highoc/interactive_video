@@ -9,9 +9,10 @@ from .serializers import SourceSerializer, VideoPartSerializer, VideoSerializer
 from .models import Source, VideoPart, Video
 from .helpers.video import is_supported_mime_type, get_file_url, get_mime_type, get_codec, get_duration, get_short_key, get_image_url
 
+from channel.models import Playlist
 from rating.models import Rating
 from views.models import Views
-from core.helpers import check_image_size, check_image_mime_type, convert_to_byte_length, get_file_url
+from core.helpers import check_image_size, check_image_mime_type, convert_to_byte_length, get_file_url as test
 
 import io, tempfile
 
@@ -129,8 +130,8 @@ class SourceUploadView(APIView):
             response = {
                 'key': source.key.hex,
                 'name': source.name,
-                'content_url': get_file_url(source.content.name),
-                'preview_url': get_file_url(source.preview_picture.name)
+                'content_url': test(source.content.name),
+                'preview_url': test(source.preview_picture.name)
             }
 
             return Response(response, status=status.HTTP_201_CREATED)
@@ -147,8 +148,8 @@ class SourceListView(APIView):
         responce = [{
             'key': source.key.hex,
             'name': source.name,
-            'content_url': get_file_url(source.content.name),
-            'preview_url': get_file_url(source.preview_picture.name)
+            'content_url': test(source.content.name),
+            'preview_url': test(source.preview_picture.name)
         } for source in sources ]
         return Response(responce, status=status.HTTP_200_OK)
 
@@ -193,10 +194,10 @@ class VideoUploadView(APIView):
 
             #print(video_parts)
             #print(request.data)
-
+            video.playlist = request.user.channel.playlists.get(status=Playlist.UPLOADED)
             video.save()
 
-            for part in video_parts: 
+            for part in video_parts:
                 if part.parent_ref is None:
                     part.parent = None
                 else:
@@ -209,6 +210,7 @@ class VideoUploadView(APIView):
             video.key = get_short_key(video.id)
             video.head_video_part = head
             video.codec = head.source.codec
+
             video.save()
 
             Views(video=video).save()
