@@ -14,7 +14,8 @@ class ChannelSerializer(serializers.ModelSerializer):
 class PlaylistSerializer(serializers.ModelSerializer):
     class Meta():
         model = Playlist
-        fields = ('name', 'description')
+        fields = ('name', 'description', 'preview_picture')
 
     def create(self):
-        return Playlist(**self.validated_data)
+        data = self.validated_data
+        return Playlist(name=data['name'], description=data['description'])

@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '192.168.0.113',
-    'backend-app',
+    '95.163.215.60',
     'localhost',
 ]
 
@@ -82,6 +82,7 @@ JWT_AUTH = {
 
 CORS_ORIGIN_WHITELIST = (
     '192.168.1.187',
+    '95.163.215.60',
     'localhost:3000'
 )
 
