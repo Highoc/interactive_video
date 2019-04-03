@@ -27,7 +27,7 @@ class Source(models.Model):
     )
 
     preview_picture = models.ImageField(
-        upload_to='preview_video',
+        upload_to='preview_source',
         null=True,
         verbose_name='Превью источника'
     )

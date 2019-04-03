@@ -7,7 +7,7 @@ from application import settings
 
 from .models import Profile
 from .serializers import UserSerializer, ProfileSerializer, UserSerializerWithToken
-from .helpers import get_avatar_url, convert_to_byte_length, check_avatar_mime_type, check_avatar_size
+from .helpers import get_avatar_url, convert_to_byte_length, check_image_mime_type, check_image_size
 
 import jwt, time
 
@@ -53,7 +53,8 @@ class ProfileUpdateView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def get(self, request):
-        profile = Profile.objects.get(user=request.user)
+        user = request.user
+        profile = Profile.objects.get(user=user)
 
         form = [{
             'type': 'image',
@@ -64,7 +65,33 @@ class ProfileUpdateView(APIView):
                 'mime_type': ['image/png'],
                 'max_size': convert_to_byte_length(MB=10),
                 'required': False,
-            },
+            }
+        }, {
+            'type': 'text',
+            'name': 'first_name',
+            'value': f'{user.first_name}',
+            'description': 'Имя',
+            'rules': {
+                'max_length': 16,
+                'required': True,
+            }
+        }, {
+            'type': 'text',
+            'name': 'last_name',
+            'value': f'{user.last_name}',
+            'description': 'Фамилия',
+            'rules': {
+                'max_length': 16,
+                'required': True,
+            }
+        }, {
+            'type': 'email',
+            'name': 'email',
+            'value': f'{user.email}',
+            'description': 'Электронная почта',
+            'rules': {
+                'required': False,
+            }
         }]
 
         return Response(form, status.HTTP_200_OK)
@@ -75,17 +102,27 @@ class ProfileUpdateView(APIView):
         if profile_serializer.is_valid():
             user = request.user
             profile = Profile.objects.get(user=user)
+            data = profile_serializer.validated_data
 
-            avatar = request.data['avatar']
-            if avatar != '':
-                if not check_avatar_mime_type(avatar.content_type):
+            avatar = data.get('avatar', None)
+            if avatar != '' or not avatar:
+                if not check_image_mime_type(avatar.content_type):
                     return Response('Wrong avatar mime type.', status=status.HTTP_400_BAD_REQUEST)
 
-                if not check_avatar_size(avatar.size):
+                if not check_image_size(avatar.size):
                     return Response('Size of avatar must be less than 10MB.', status=status.HTTP_400_BAD_REQUEST)
 
                 profile.avatar.save(f'{profile.key.hex}', avatar)
             profile.save()
+
+            first_name = data.get('first_name')
+            last_name = data.get('last_name')
+            email = data.get('email', '')
+
+            user.first_name = first_name
+            user.last_name = last_name
+            user.email = email
+            user.save()
 
             return Response({ 'key': profile.key.hex }, status=status.HTTP_201_CREATED)
         else:
