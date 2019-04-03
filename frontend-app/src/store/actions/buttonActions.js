@@ -12,3 +12,8 @@ export const uploadFile = (files) => ({
   type: actionTypes.UPLOADFILE,
   payload: { files },
 });
+
+export const buttonChoice = (choice) => ({
+  type: actionTypes.BUTTONCHOICE,
+  payload: { choice },
+});

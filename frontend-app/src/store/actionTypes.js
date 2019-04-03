@@ -18,6 +18,7 @@ export const REGISTRATION_FAILED = 'REGISTRATION_FAILED';
 
 export const OPENDRAWER = 'OPEN_DRAWER';
 export const CLOSEDRAWER = 'CLOSE_DRAWER';
+export const BUTTONCHOICE = 'BUTTON_CHOICE';
 
 export const UPLOADFILE = 'UPLOAD_FILE';
 export const ADD_CHANNEL = 'ADD_CHANNEL';

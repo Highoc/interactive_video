@@ -4,13 +4,18 @@ import {
 } from '@material-ui/core';
 import classes from './Input.module.css';
 import FileInput from './FileInput/FileInput';
-
+import VideoInput from './VideoInput/VideoInput';
+import { pprint } from "../../helpers/SmartPrint";
 
 function checkValidity(value, rules) {
   let isValid = true;
 
   if (rules.required) {
-    isValid = value.trim() !== '' && isValid;
+    if (value !== undefined) {
+      if (!value.type){
+        isValid = value.trim() !== '' && isValid;
+      }
+    }
   }
 
   if (rules.min_length) {
@@ -28,7 +33,7 @@ function checkValidity(value, rules) {
   if (rules.mime_type && value !== undefined) {
     let appropriateFormat = false;
     for (const type in rules.mime_type) {
-      if (rules.mime_type[type] === value.type){
+      if (rules.mime_type[type] === value.type) {
         appropriateFormat = true;
       }
     }
@@ -49,6 +54,7 @@ class Input extends Component {
       name: props.name,
       imageUrl: props.imageUrl,
       file: null,
+      source: null,
     };
   }
 
@@ -67,10 +73,15 @@ class Input extends Component {
     this.setState({ isValid, imageUrl: url, isTouched: true, file });
   }
 
+  videoChangedHandler(file) {
+    const isValid = checkValidity(file, this.state.rules);
+    this.setState({ isValid, isTouched: true, source: file });
+  }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const { value, imageUrl } = this.state;
+    const { value, imageUrl, source } = this.state;
     const { callback } = this.props;
-    if (prevState.value !== value || prevState.imageUrl !== imageUrl) {
+    if (prevState.value !== value || prevState.imageUrl !== imageUrl || prevState.source !== source) {
       callback(this.state);
     }
   }
@@ -108,6 +119,13 @@ class Input extends Component {
           <FileInput
             imageUrl={imageUrl}
             callback={(url, file) => this.fileChangedHandler(url, file)}
+          />
+        );
+        break;
+      case ('video'):
+        inputElement = (
+          <VideoInput
+            callback={file => this.videoChangedHandler(file)}
           />
         );
         break;
