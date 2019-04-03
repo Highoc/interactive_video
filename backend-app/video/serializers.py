@@ -5,7 +5,7 @@ from .models import Source, Video, VideoPart
 class SourceSerializer(serializers.ModelSerializer):
     class Meta():
         model = Source
-        fields = ('name', 'description', 'content')
+        fields = ('name', 'description', 'preview_picture', 'content')
 
 
 class VideoSerializer(serializers.ModelSerializer):
