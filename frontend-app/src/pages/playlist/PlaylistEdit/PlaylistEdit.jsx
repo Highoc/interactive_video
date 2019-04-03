@@ -5,7 +5,7 @@ import Fab from '@material-ui/core/Fab/index';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import { Redirect } from 'react-router-dom';
 import Input from '../../../components/Input/Input';
-import { RequestResolver, json } from '../../../helpers/RequestResolver';
+import {RequestResolver, multipart} from '../../../helpers/RequestResolver';
 import { perror, pprint } from '../../../helpers/SmartPrint';
 import styles from './PlaylistEdit.styles';
 
@@ -36,8 +36,8 @@ class PlaylistEdit extends Component {
 
   getData() {
     const { inputs } = this.state;
-    const result = {};
-    inputs.map((input) => { result[input.name] = input.value; return 0; });
+    const result = new FormData();
+    inputs.map((input) => { result.append(input.name, input.value); return 0; });
     return result;
   }
 
@@ -51,7 +51,7 @@ class PlaylistEdit extends Component {
     if (isValid) {
       try {
         const data = this.getData();
-        await this.backend(json).post(`channel/${channelKey}/playlist/${playlistKey}/update/`, data);
+        await this.backend(multipart).post(`channel/${channelKey}/playlist/${playlistKey}/update/`, data);
         this.setState({ isSent: true });
       } catch (error) {
         perror('PlaylistEdit', error);
@@ -66,6 +66,9 @@ class PlaylistEdit extends Component {
     const input = inputs.find(elem => elem.name === state.name);
     input.value = state.value;
     input.isValid = state.isValid;
+    if (state.file !== null) {
+      input.value = state.file;
+    }
     this.setState({ inputs });
   }
 
@@ -87,6 +90,7 @@ class PlaylistEdit extends Component {
           value={inputElement.value}
           rules={inputElement.rules}
           callback={state => this.callbackInput(state)}
+          imageUrl={inputElement.url}
         />
       );
     });
@@ -105,7 +109,7 @@ class PlaylistEdit extends Component {
             onClick={event => this.submitHandler(event)}
           >
             <NavigationIcon className={classes.extendedIcon} />
-            Создать
+            Редактировать
           </Fab>
         </form>
       </div>

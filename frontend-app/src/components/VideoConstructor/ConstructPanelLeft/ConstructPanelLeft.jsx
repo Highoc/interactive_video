@@ -11,11 +11,11 @@ import {
 import { connect } from 'react-redux';
 import SourceList from '../SourceList';
 import Dialog from '../../Dialog';
-import DropBox from '../../Drop';
 import { uploadFile } from '../../../store/actions/buttonActions';
-import { RequestResolver } from '../../../helpers/RequestResolver';
-import { perror } from '../../../helpers/SmartPrint';
+import {multipart, RequestResolver} from '../../../helpers/RequestResolver';
+import {perror, pprint} from '../../../helpers/SmartPrint';
 import leftStyles from './ConstructPanelLeft.styles';
+import Input from '../../Input/Input';
 
 class ConstructPanelLeft extends Component {
   constructor(props) {
@@ -23,16 +23,24 @@ class ConstructPanelLeft extends Component {
     this.state = {
       sources: [],
       dialogOpen: false,
+      inputs: [],
     };
     this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
     try {
-      const result = await this.backend().get('video/source/list/');
-      this.setState({ sources: result.data });
+      const result = await this.backend().get('video/source/upload/');
+      pprint('CreateVIdeo', result.data);
+      this.setState({ inputs: result.data });
     } catch (error) {
       perror('ConstructPanelLeft', error);
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.files !== this.props.files) {
+      this.setState({ sources: this.props.files });
     }
   }
 
@@ -40,20 +48,67 @@ class ConstructPanelLeft extends Component {
     this.setState({ dialogOpen: true });
   };
 
-  callbackFiles(files) {
-    const { sources } = this.state;
-    sources.push(files[0]);
-    this.props.onFileUpload(files[0]);
-    this.setState({ sources });
+  callbackInput(state) {
+    const { inputs } = this.state;
+    const input = inputs.find(elem => elem.name === state.name);
+    input.value = state.value;
+    input.isValid = state.isValid;
+    if (state.file !== null) {
+      input.value = state.file;
+    }
+    if (state.source !== null) {
+      input.value = state.source;
+    }
+    this.setState({ inputs });
   }
 
-  callbackDialog(state) {
-    this.setState({ dialogOpen: state });
+  getData() {
+    const { inputs } = this.state;
+    const result = new FormData();
+    inputs.map((input) => { result.append(input.name, input.value); return 0; });
+    return result;
+  }
+
+  async callbackDialog(state) {
+    const { inputs } = this.state;
+    const { onFileUpload } = this.props;
+    const filePush = [];
+    let isValid = true;
+    for (const key in inputs) {
+      isValid = isValid && inputs[key].isValid;
+    }
+    if (isValid) {
+      try {
+        const data = this.getData();
+        const result = await this.backend(multipart).post('video/source/upload/', data);
+        filePush[0] = result.data;
+        filePush.map(source => onFileUpload(source));
+        this.setState({ isSent: true, dialogOpen: state });
+      } catch (error) {
+        perror('ConstructPanelRIght', error);
+      }
+    } else {
+      console.log('Invalid input');
+    }
   }
 
   render() {
     const { classes } = this.props;
-    const { sources, dialogOpen } = this.state;
+    const { sources, dialogOpen, inputs } = this.state;
+    const Inputs = Object.keys(inputs).map((key) => {
+      const inputElement = inputs[key];
+      return (
+        <Input
+          key={key}
+          type={inputElement.type}
+          name={inputElement.name}
+          description={inputElement.description}
+          value={inputElement.value}
+          rules={inputElement.rules}
+          callback={state => this.callbackInput(state)}
+        />
+      );
+    });
 
     return (
       <div className={classes.root}>
@@ -69,7 +124,7 @@ class ConstructPanelLeft extends Component {
           </Typography>
           <Divider className={classes.divider} />
           {sources.map((video, key) => (
-            <SourceList name={video.name} keyVideo={key} key={key} />
+            <SourceList name={video.name} keyVideo={key} key={key} previewUrl={video.preview_url} />
           ))}
           <Divider className={classes.divider} />
           <Card className={classes.card}>
@@ -88,7 +143,7 @@ class ConstructPanelLeft extends Component {
             </CardActionArea>
           </Card>
           <Dialog dialogOpen={dialogOpen} callback={state => this.callbackDialog(state)} title="Загрузите видео">
-            <DropBox callback={droppedFiles => this.callbackFiles(droppedFiles)} />
+            {Inputs}
           </Dialog>
         </Drawer>
       </div>

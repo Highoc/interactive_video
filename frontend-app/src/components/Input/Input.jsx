@@ -4,13 +4,18 @@ import {
 } from '@material-ui/core';
 import classes from './Input.module.css';
 import FileInput from './FileInput/FileInput';
-
+import VideoInput from './VideoInput/VideoInput';
+import { pprint } from "../../helpers/SmartPrint";
 
 function checkValidity(value, rules) {
   let isValid = true;
 
   if (rules.required) {
-    isValid = value.trim() !== '' && isValid;
+    if (value !== undefined) {
+      if (!value.type){
+        isValid = value.trim() !== '' && isValid;
+      }
+    }
   }
 
   if (rules.min_length) {
@@ -28,7 +33,7 @@ function checkValidity(value, rules) {
   if (rules.mime_type && value !== undefined) {
     let appropriateFormat = false;
     for (const type in rules.mime_type) {
-      if (rules.mime_type[type] === value.type){
+      if (rules.mime_type[type] === value.type) {
         appropriateFormat = true;
       }
     }
@@ -47,8 +52,9 @@ class Input extends Component {
       isValid: checkValidity(props.value, props.rules),
       isTouched: false,
       name: props.name,
-      avatarUrl: props.avatar,
+      imageUrl: props.imageUrl,
       file: null,
+      source: null,
     };
   }
 
@@ -64,13 +70,18 @@ class Input extends Component {
 
   fileChangedHandler(url, file) {
     const isValid = checkValidity(file, this.state.rules);
-    this.setState({ isValid, avatarUrl: url, isTouched: true, file });
+    this.setState({ isValid, imageUrl: url, isTouched: true, file });
+  }
+
+  videoChangedHandler(file) {
+    const isValid = checkValidity(file, this.state.rules);
+    this.setState({ isValid, isTouched: true, source: file });
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const { value, avatarUrl } = this.state;
+    const { value, imageUrl, source } = this.state;
     const { callback } = this.props;
-    if (prevState.value !== value || prevState.avatarUrl !== avatarUrl) {
+    if (prevState.value !== value || prevState.imageUrl !== imageUrl || prevState.source !== source) {
       callback(this.state);
     }
   }
@@ -79,7 +90,7 @@ class Input extends Component {
     let inputElement = null;
     let labelValue = 'Not-required';
     const {
-      rules, value, isValid, isTouched, avatarUrl,
+      rules, value, isValid, isTouched, imageUrl,
     } = this.state;
     const isCorrect = !isTouched || isValid;
     if (rules.required) {
@@ -106,8 +117,15 @@ class Input extends Component {
       case ('image'):
         inputElement = (
           <FileInput
-            avatar={avatarUrl}
+            imageUrl={imageUrl}
             callback={(url, file) => this.fileChangedHandler(url, file)}
+          />
+        );
+        break;
+      case ('video'):
+        inputElement = (
+          <VideoInput
+            callback={file => this.videoChangedHandler(file)}
           />
         );
         break;

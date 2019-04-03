@@ -3,8 +3,14 @@ import * as actionTypes from '../actionTypes';
 const initialState = {
   openDrawer: false,
   filesUpload: [],
+  buttonChoice: 0,
 };
 
+const buttonChoice = (state, action) => ({
+  ...state,
+
+  buttonChoice: action.payload.choice,
+});
 
 const uploadFile = (state, action) => {
   const { files } = action.payload;
@@ -29,6 +35,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.OPENDRAWER: return openDrawer(state, action);
     case actionTypes.CLOSEDRAWER: return closeDrawer(state, action);
     case actionTypes.UPLOADFILE: return uploadFile(state, action);
+    case actionTypes.BUTTONCHOICE: return buttonChoice(state, action);
     default: return state;
   }
 };

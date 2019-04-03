@@ -6,7 +6,7 @@ export default class FileInput extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      url: props.avatar,
+      url: props.imageUrl,
       name: '',
       file: null,
     };
@@ -38,37 +38,20 @@ export default class FileInput extends Component {
     }
     return (
       <div>
-        <img
-          alt="Ваш аватар"
-          src={url}
-          onLoad={this.handleLoad}
-          className={classes.preview}
-        />
+        <div className={classes.previewContainer}>
+          <img
+            alt="Ваш аватар"
+            src={url}
+            onLoad={this.handleLoad}
+            className={classes.image}
+          />
+        </div>
         <div className={classes.file_upload}>
           <Button size="small" color="primary" type="button">Выбрать</Button>
           <div>{nameFile}</div>
-          <input type="file" onChange={this.handleChange} accept="image/*" />
+          <input type="file" onChange={this.handleChange} accept="image/png" />
         </div>
       </div>
     );
   }
 }
-
-/*
-  <div className={classes.contentColumn}>
-          <div className={classes.preview} />
-          <div className={classes.row}>
-            <label className={classes.file_upload}>
-              <mark>Файл не выбран</mark>
-              <button type="button">Выбрать</button>
-              <input type="file" />
-            </label>
-          </div>
-      </div>
-
-  <div className="file-drop">
-        <p>Upload file with the file dialog </p>
-        <img onLoad={this.handleLoad} src={this.state.url}/>
-        <input name="file"  type="file" onChange={ this.handleChange } />
-      </div>
- */

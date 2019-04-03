@@ -6,14 +6,14 @@ import classes from './SourceList.module.css';
 
 class SourceList extends Component {
   render() {
-    const { name } = this.props;
+    const { name, previewUrl } = this.props;
     return (
       <Card className={classes.card}>
         <CardActionArea>
           <CardMedia
             className={classes.media}
             title={name}
-            image="https://image.freepik.com/free-icon/no-translate-detected_318-40191.jpg"
+            image={previewUrl}
           />
           <CardContent className={classes.content}>
             <Typography gutterBottom variant="h6" component="h2" align="center">

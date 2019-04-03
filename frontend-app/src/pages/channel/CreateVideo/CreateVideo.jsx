@@ -9,16 +9,17 @@ import { connect } from 'react-redux';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import Input from '../../../components/Input/Input';
 import Dialog from '../../../components/Dialog';
-import { perror } from '../../../helpers/SmartPrint';
+import {perror, pprint} from '../../../helpers/SmartPrint';
 import classes from './CreateVideo.module.css';
 import { activeSvgShape, deactiveSvgShape, NodeImage } from './CreateVideo.styles';
+import { buttonChoice, uploadFile } from "../../../store/actions/buttonActions";
 
 class CreateVideo extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      sources: props.files,
+      sources: [],
       tree: new TreeData(),
       nodeChosen: null,
       dialogOpen: false,
@@ -67,9 +68,13 @@ class CreateVideo extends Component {
   }
 
   async componentDidMount() {
+    const { onFileUpload } = this.props;
     try {
       const result = await this.backend().get('video/source/list/');
+      pprint('CreateVIdeoSources', result.data);
       this.setState({ sources: result.data });
+      console.log(result.data);
+      result.data.map(source => onFileUpload(source));
     } catch (error) {
       perror('CreateVideo', error);
     }
@@ -80,8 +85,10 @@ class CreateVideo extends Component {
   };
 
   handleChange = (event) => {
-    const { inputData } = this.state;
-    inputData.sourceKey = event.target.value;
+    const { inputData, sources } = this.state;
+    const keySource = sources[event.target.value].key;
+    inputData.sourceKey = keySource;
+    pprint('InputData', inputData);
     this.setState({ inputData });
   };
 
@@ -98,9 +105,9 @@ class CreateVideo extends Component {
 
   getVideoData() {
     return {
-      name: this.state.inputs.find(elem => elem.name === 'name'),
-      description: this.state.inputs.find(elem => elem.name === 'description'),
-      main: this.getVideoPart(this.state.tree),
+      name: this.state.inputs.find(elem => elem.name === 'name').value,
+      description: this.state.inputs.find(elem => elem.name === 'description').value,
+      main: this.getVideoPart(this.state.tree.getTreeData()),
     };
   }
 
@@ -118,7 +125,8 @@ class CreateVideo extends Component {
     for (const child of node.children) {
       obj.children.push(this.getVideoPart(child));
     }
-
+    pprint('tree', this.state.tree);
+    pprint('obj', obj);
     return obj;
   }
 
@@ -127,19 +135,20 @@ class CreateVideo extends Component {
     const input = inputs.find(elem => elem.name === state.name);
     input.value = state.value;
     input.isValid = state.isValid;
-    this.setState({ inputs });
   }
 
   async uploadVideo() {
-    const { inputs } = this.state;
+    const { inputsVideo } = this.state;
     let isValid = true;
-    for (const key in inputs) {
-      isValid = isValid && inputs[key].isValid;
+    for (const key in inputsVideo) {
+      isValid = isValid && inputsVideo[key].isValid;
     }
 
     if (isValid) {
       try {
         const data = this.getVideoData();
+        console.log(data);
+        pprint('CreateVIdeo', data);
         const result = await this.backend(json).post('video/upload/', data);
         this.setState({ videoKey: result.data.key });
       } catch (error) {
@@ -161,6 +170,8 @@ class CreateVideo extends Component {
     node.sourceKey = inputData.sourceKey;
     node.text = inputData.text;
     node.isReady = true;
+    pprint('node', node);
+
     this.onUpdateTree();
   }
 
@@ -170,9 +181,15 @@ class CreateVideo extends Component {
     this.setState({ tree });
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.choice !== this.props.choice) {
+      this.handleButtonChoice(this.props.choice);
+    }
+  }
+
   handleButtonChoice(choice) {
     const { nodeChosen, tree } = this.state;
-
+    const { onChoice } = this.props;
     if (choice === 1) {
       tree.addChildNode(nodeChosen);
       this.setState({ nodeChosen });
@@ -186,11 +203,12 @@ class CreateVideo extends Component {
     if (choice === 3) {
       this.uploadVideo();
     }
+    onChoice(0);
   }
 
   render() {
     const {
-      tree, dialogOpen, inputData, inputs,
+      tree, dialogOpen, inputData, inputs, sources,
     } = this.state;
     const { files } = this.props;
     const Inputs = Object.keys(inputs).map((key) => {
@@ -210,10 +228,7 @@ class CreateVideo extends Component {
 
     return (
       <div className={classes.container}>
-        <h2>
-Создание видео
-          {this.state.videoKey}
-        </h2>
+        <h2>Создание видео {this.state.videoKey}</h2>
         <div id="treeWrapper" style={{ width: '100%', height: '60%' }}>
           <Tree
             data={tree.tree}
@@ -256,10 +271,15 @@ class CreateVideo extends Component {
 
 const mapStateToProps = state => ({
   files: state.buttonsAct.filesUpload,
+  choice: state.buttonsAct.buttonChoice,
 });
 
+const mapDispatchToProps = dispatch => ({
+  onFileUpload: files => dispatch(uploadFile(files)),
+  onChoice: choice => dispatch(buttonChoice(choice)),
+});
 
-export default connect(mapStateToProps)(CreateVideo);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateVideo);
 
 class TreeData {
   constructor() {
