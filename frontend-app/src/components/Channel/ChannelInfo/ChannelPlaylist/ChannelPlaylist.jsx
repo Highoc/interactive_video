@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import InfoIcon from '@material-ui/icons/Info';
 import {
-  GridListTile, GridListTileBar, ListSubheader, IconButton, GridList,
+  GridListTile, GridListTileBar, IconButton, GridList,
 } from '@material-ui/core';
-import classes from './ChannelPlaylist.module.css';
+import { withStyles } from '@material-ui/core/styles';
+import styles from './ChannelPlaylist.styles';
+import "./ChannelPlaylist.module.css";
 
 
 class ChannelPlaylist extends Component {
@@ -18,15 +20,13 @@ class ChannelPlaylist extends Component {
 
   render() {
     const { playlist, channelKey } = this.state;
+    const { classes } = this.props;
     return (
-      <div>
-        <GridList cellHeight="auto" spacing={10} classes={classes.gridList}>
-          <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
-            <ListSubheader component="div">{playlist.name}</ListSubheader>
-          </GridListTile>
+      <div className="root">
+        <GridList className={classes.gridList} cols={4.5}>
           {playlist.video.map(video => (
-            <GridListTile key={video.name} cols={0.4} rows={1} component={props => <Link to={`/channel/${channelKey}/watch/${video.key}`} {...props} />}>
-              <img src={video.preview_url} alt={video.name} width="22%" height="100%" />
+            <GridListTile key={video.name} component={props => <Link to={`/channel/${channelKey}/watch/${video.key}`} {...props} />}>
+              <img src={video.preview_url} alt={video.name} height="200px" width="280px" />
               <GridListTileBar
                 title={video.name}
                 actionIcon={(
@@ -44,4 +44,4 @@ class ChannelPlaylist extends Component {
 }
 
 
-export default ChannelPlaylist;
+export default withStyles(styles)(ChannelPlaylist);

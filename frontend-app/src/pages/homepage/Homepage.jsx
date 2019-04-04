@@ -42,21 +42,17 @@ class Homepage extends Component {
 
     if (isLoaded) {
       result = (
-        <div className={classes.root}>
+        <div>
           <Typography variant="h4">
             Тренды:
           </Typography>
-          <div>
-            <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
-          </div>
-          <div>
+          <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
+          <div >
             <Typography variant="h4">
               Подписки:
             </Typography>
           </div>
-          <div>
-            <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
-          </div>
+          <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
         </div>
       );
     }

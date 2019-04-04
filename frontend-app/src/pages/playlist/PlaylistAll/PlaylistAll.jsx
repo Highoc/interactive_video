@@ -60,7 +60,7 @@ class PlaylistAll extends Component {
               component={AddPlaylist}
               className={classes.media}
               title="Добавить плейлист"
-              image="http://www.clipartbest.com/cliparts/xcg/LA8/xcgLA8a7i.jpg"
+              image="https://get.wallhere.com/photo/red-cross-cross-red-hospital-1231489.jpg"
             />
             <CardContent className={classes.newContent}>
               <Typography gutterBottom variant="h6" component="h2" align="center">

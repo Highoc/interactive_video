@@ -23,7 +23,7 @@ class MainListItems extends Component {
           button
           component={Home}
         >
-          <ListItemIcon><Page /></ListItemIcon>
+          <ListItemIcon><Page color="error" /></ListItemIcon>
           <ListItemText
             primary="На главную"
           />
@@ -33,7 +33,7 @@ class MainListItems extends Component {
           button
           component={CreateChannel}
         >
-          <ListItemIcon><CreateIcon /></ListItemIcon>
+          <ListItemIcon><CreateIcon color="error" /></ListItemIcon>
           <ListItemText
             primary="Создать канал"
           />
@@ -48,7 +48,7 @@ class MainListItems extends Component {
             button
             component={Home}
           >
-            <ListItemIcon><Page /></ListItemIcon>
+            <ListItemIcon><Page color="error" /></ListItemIcon>
             <ListItemText
               primary="На главную"
             />
@@ -58,7 +58,7 @@ class MainListItems extends Component {
             button
             component={MyChannel}
           >
-            <ListItemIcon><HomeIcon /></ListItemIcon>
+            <ListItemIcon><HomeIcon color="error" /></ListItemIcon>
             <ListItemText
               primary="My channel"
             />
@@ -68,7 +68,7 @@ class MainListItems extends Component {
             button
             component={CreateVideo}
           >
-            <ListItemIcon><VideoCamera /></ListItemIcon>
+            <ListItemIcon><VideoCamera color="error" /></ListItemIcon>
             <ListItemText
               primary="Create Video"
             />

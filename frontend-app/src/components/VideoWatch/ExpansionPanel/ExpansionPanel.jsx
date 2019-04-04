@@ -55,8 +55,8 @@ class ExpansionPanelVideo extends Component {
             </div>
             <div className={classes.row}>
               <Button
-                variant="contained"
-                color="secondary"
+                variant="outlined"
+                color="primary"
                 className={classes.columnButton}
                 onClick={(event) => { event.preventDefault(); this.handleChange(expanded); }}
               >

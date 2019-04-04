@@ -16,6 +16,7 @@ const styles = ({
   },
   root: {
     marginLeft: '10%',
+    marginRight: '1px',
   },
 });
 

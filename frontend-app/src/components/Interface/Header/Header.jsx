@@ -31,26 +31,25 @@ class Header extends Component {
     const authorization = (
       <div className={classes.buttonContainer}>
         <div className={classes.buttonPlace}>
-          <Button component={LoginPage} color="inherit" size="medium">Войти</Button>
-          <Button component={RegisterPage} color="inherit" size="medium">Регистрация</Button>
+          <Button component={LoginPage} color="inherit" size="medium" variant="outlined">Войти</Button>
+          <Button component={RegisterPage} color="inherit" size="medium" variant="outlined">Регистрация</Button>
         </div>
       </div>
     );
 
     return (
       <div className={classes.root}>
-        <AppBar position="static">
+        <AppBar position="static" color="primary">
           <Toolbar>
             <IconButton
               className={classes.menuButton}
-              color="inherit"
               aria-label="Open drawer"
               onClick={(event) => { openDrawerStatus ? onCloseDrawer(event) : onOpenDrawer(event); }}
             >
-              <MenuIcon />
+              <MenuIcon color="error" />
             </IconButton>
 
-            <Button component={HomePage} color="inherit" size="large">InteractiveVideo</Button>
+            <Button component={HomePage} size="large" color="inherit" variant="outlined">InteractiveVideo</Button>
 
             <SearchField />
 

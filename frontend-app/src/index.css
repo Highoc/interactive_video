@@ -16,6 +16,11 @@ code {
 
 html {
   height: 100%;
+  background-color: rgb(6, 6, 6);
+
+}
+html::-webkit-scrollbar {
+  width: 0;
 }
 
 #root {

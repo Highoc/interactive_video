@@ -48,19 +48,17 @@ class ChannelHead extends Component {
     const { myChannelKey } = this.props;
     const MyLink = props => <Link to={`${channelKey}/playlist/all`} {...props} />;
     const Settings = props => <Link to={`${channelKey}/edit`} {...props} />;
-    let subscribed = <Typography> Не подписан </Typography>;
-    let button = <Button size="small" color="primary" onClick={event => this.handleSubscribe(event)}>Подписаться</Button>;
-    let settings = <Button size="small" color="primary" component={Settings}>Настройки канала</Button>;
+    let button = <Button size="small" color="error" onClick={event => this.handleSubscribe(event)}>Подписаться</Button>;
+    let settings = <Button size="small" color="error" component={Settings}>Настройки канала</Button>;
     if (myChannelKey !== channelKey){
       settings = <div />;
     }
     if (subStatus) {
-      subscribed = <Typography> Подписан </Typography>;
-      button = <Button size="small" color="primary" onClick={event => this.handleUnsubscribe(event)}>Отписаться</Button>;
+      button = <Button size="small" color="error" onClick={event => this.handleUnsubscribe(event)}>Отписаться</Button>;
     }
 
     return (
-      <Card className={classes.card}>
+      <Card className={classes.card} color="primary">
         <CardActionArea>
           <CardMedia
             className={classes.media}
@@ -68,7 +66,7 @@ class ChannelHead extends Component {
             title={channel.name}
           />
           <CardContent>
-            <Typography gutterBottom variant="h5" component="h2" align="center">
+            <Typography gutterBottom variant="h5" align="center">
               Создатель:
               {' '}
               {channel.owner.username}
@@ -84,12 +82,11 @@ class ChannelHead extends Component {
           </CardContent>
         </CardActionArea>
         <CardActions>
-          <Button size="small" color="primary" component={MyLink}>
+          <Button size="small" color="error" component={MyLink}>
             Посмотреть все плейлисты
           </Button>
           {settings}
           {button}
-          {subscribed}
         </CardActions>
       </Card>
     );

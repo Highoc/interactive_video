@@ -6,6 +6,7 @@ import {
   BrowserRouter as Router, Switch, Route, Redirect,
 } from 'react-router-dom';
 
+import { MuiThemeProvider } from '@material-ui/core/styles';
 import HeaderLayout from './components/Layouts/Header';
 import { Main } from './components/Layouts/Main';
 import { Left } from './components/Layouts/Left';
@@ -27,6 +28,10 @@ import Centrifugo from './components/Centrifugo';
 
 import { loginCheckState } from './store/actions/authorization';
 import ConstructPanelRight from './components/VideoConstructor/ConctructPanelRight';
+
+import theme from './helpers/theme/theme';
+import 'typeface-roboto';
+
 
 const Guest = props => <div> Гостевая страница </div>;
 
@@ -82,23 +87,25 @@ class App extends Component {
 
     return (
       <Router>
-        <div className="content-column">
-          <HeaderLayout>
-            <Header />
-          </HeaderLayout>
-          <div className="content-row">
-            <Left>
-              {componentLeft}
-            </Left>
-            <Main>
-              {routes}
-              {centrifuge}
-            </Main>
-            <Right>
-              {componentRight}
-            </Right>
+        <MuiThemeProvider theme={theme}>
+          <div className="content-column">
+            <HeaderLayout>
+              <Header />
+            </HeaderLayout>
+            <div className="content-row">
+              <Left>
+                {componentLeft}
+              </Left>
+              <Main>
+                {routes}
+                {centrifuge}
+              </Main>
+              <Right>
+                {componentRight}
+              </Right>
+            </div>
           </div>
-        </div>
+        </MuiThemeProvider>
       </Router>
     );
   }
