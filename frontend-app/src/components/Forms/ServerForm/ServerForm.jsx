@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { Button } from '@material-ui/core';
 
-import Input from '../../Input/Input';
+import Input from '../../Inputs/Input';
 import { perror } from '../../../helpers/SmartPrint';
 import { RequestResolver, json, multipart } from '../../../helpers/RequestResolver';
 
@@ -69,6 +69,15 @@ class ServerForm extends Component {
     }
   }
 
+  onInputStateChange(state) {
+    const { inputs } = this.state;
+    const input = inputs.find(elem => elem.name === state.name);
+    input.value = state.value;
+    input.isValid = state.isValid;
+    const isValid = ServerForm.checkValidity(inputs);
+    this.setState({ inputs, isValid });
+  }
+
   getFormData() {
     const { inputs, inputsHidden, name } = this.state;
     const { enctype } = this.props;
@@ -80,13 +89,17 @@ class ServerForm extends Component {
       case ENCTYPE.JSON:
         formData = {};
         for (const input of inputsAll) {
-          formData[input.name] = input.value;
+          if (input.value) {
+            formData[input.name] = input.value;
+          }
         }
         break;
       case ENCTYPE.MULTIPART:
         formData = new FormData();
         for (const input of inputsAll) {
-          formData.append(input.name, input.value);
+          if (input.value) {
+            formData.append(input.name, input.value);
+          }
         }
         break;
       default:
@@ -95,15 +108,6 @@ class ServerForm extends Component {
     }
 
     return formData;
-  }
-
-  callbackInput(data) {
-    const { inputs } = this.state;
-    const input = inputs.find(elem => elem.name === data.name);
-    input.value = data.value;
-    input.isValid = data.isValid;
-    const isValid = ServerForm.checkValidity(inputs);
-    this.setState({ inputs, isValid });
   }
 
   render() {
@@ -116,12 +120,8 @@ class ServerForm extends Component {
       inputList = inputs.map(input => (
         <Input
           key={input.name}
-          type={input.type}
-          name={input.name}
-          description={input.description}
-          value={input.value}
-          rules={input.rules}
-          callback={data => this.callbackInput(data)}
+          {...input}
+          onStateChange={data => this.onInputStateChange(data)}
         />
       ));
     }
