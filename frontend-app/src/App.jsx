@@ -22,6 +22,7 @@ import EditAccount from './pages/account/Edit/EditAccount';
 import { Channel } from './pages/channel';
 import SignIn from './pages/login/SignIn';
 import Register from './pages/register/Register';
+import Test from './pages/test/Test';
 
 import Centrifugo from './components/Centrifugo';
 
@@ -56,10 +57,11 @@ class App extends Component {
       routes = (
         <Switch>
           <Route path="/" exact component={Homepage} />
+          <Route path="/test" exact component={Test} />
           <Route exact path="/account/edit" component={EditAccount} />
           <Route path="/account" component={Account} />
           <Route path="/channel" component={Channel} />
-          <Redirect to="/" />
+          <Redirect to="/test" />
         </Switch>
       );
 
