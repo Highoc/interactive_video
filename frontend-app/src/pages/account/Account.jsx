@@ -73,7 +73,7 @@ class Account extends Component {
             </CardContent>
           </CardActionArea>
           <CardActions className={classes.button}>
-            <Button size="small" color="primary" component={EditAccount}>
+            <Button size="small" color="secondary" component={EditAccount}>
               Изменить
             </Button>
           </CardActions>

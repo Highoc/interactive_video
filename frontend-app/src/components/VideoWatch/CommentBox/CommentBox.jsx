@@ -193,7 +193,7 @@ class CommentBox extends Component {
           {Inputs}
           <Button
             onClick={() => this.onRootReply()}
-            color="primary"
+            color="error"
             className={classes.containerButton}
           >
             Оставить комментарий

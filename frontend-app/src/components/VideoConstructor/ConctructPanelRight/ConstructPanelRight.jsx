@@ -25,17 +25,17 @@ export class ConstructPanelRight extends Component {
           open
         >
           <div className={classes.buttonContainer}>
-            <Button color="primary" variant="outlined" className={classes.button} size="large" onClick={() => onChoice(1)}>
+            <Button color="secondary" variant="outlined" className={classes.button} size="large" onClick={() => onChoice(1)}>
               Добавить узел
             </Button>
           </div>
           <div className={classes.buttonContainer}>
-            <Button color="primary" variant="outlined" className={classes.button} size="large" onClick={() => onChoice(2)}>
+            <Button color="secondary" variant="outlined" className={classes.button} size="large" onClick={() => onChoice(2)}>
               Удалить узел
             </Button>
           </div>
           <div className={classes.buttonContainer}>
-            <Button color="primary" variant="outlined" className={classes.button} onClick={() => onChoice(3)}>
+            <Button color="secondary" variant="outlined" className={classes.button} onClick={() => onChoice(3)}>
               Создать видео
               <VideoCamera fontSize="large" />
             </Button>

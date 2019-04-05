@@ -46,7 +46,7 @@ class Header extends Component {
               aria-label="Open drawer"
               onClick={(event) => { openDrawerStatus ? onCloseDrawer(event) : onOpenDrawer(event); }}
             >
-              <MenuIcon color="error" />
+              <MenuIcon color="secondary" />
             </IconButton>
 
             <Button component={HomePage} size="large" color="inherit" variant="outlined">InteractiveVideo</Button>

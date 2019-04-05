@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import PermMediaOutlinedIcon from '@material-ui/icons/PhotoSizeSelectActual';
-import classes from './ChannelList.module.css';
 
 class ChannelList extends Component {
   constructor(props) {
@@ -15,7 +14,7 @@ class ChannelList extends Component {
 
   render() {
     const { name, keyChannel } = this.state;
-    const icon = <PermMediaOutlinedIcon color="error" />;
+    const icon = <PermMediaOutlinedIcon color="secondary" />;
     const ChannelKey = props => <Link to={`/channel/${keyChannel}`} params={{ channelKey: keyChannel }} {...props} />;
 
     return (

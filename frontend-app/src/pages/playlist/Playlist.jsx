@@ -47,12 +47,7 @@ class Playlist extends Component {
         <Card className={classes.card}>
           <CardContent>
             <Typography gutterBottom variant="h5" component="h2" align="center">
-              Название плейлиста:
-              {' '}
               {playlist.name}
-            </Typography>
-            <Typography component="p" align="center">
-              {playlist.description}
             </Typography>
             <ChannelPlaylist playlist={playlist} channelKey={channelKey} />
           </CardContent>

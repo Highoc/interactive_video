@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles/index';
-import Fab from '@material-ui/core/Fab/index';
 import NavigationIcon from '@material-ui/icons/Navigation';
+import { Redirect } from 'react-router-dom';
+import {
+  Typography, Fab,
+} from '@material-ui/core';
 import Input from '../../../components/Input/Input';
-import {json, RequestResolver} from '../../../helpers/RequestResolver';
+import { json, RequestResolver } from '../../../helpers/RequestResolver';
 import styles from './ChannelEdit.styles';
-import {perror, pprint} from '../../../helpers/SmartPrint';
-import {Redirect} from "react-router-dom";
+import { perror, pprint } from '../../../helpers/SmartPrint';
 
 class ChannelEdit extends Component {
   constructor(props) {
@@ -57,12 +59,12 @@ class ChannelEdit extends Component {
     } else {
       console.log('Invalid input');
     }
-  };
+  }
 
   submitHandlerDelete(event) {
     console.log('Удаляю');
     event.preventDefault();
-  };
+  }
 
   callbackInput(state) {
     const { inputs } = this.state;
@@ -73,7 +75,9 @@ class ChannelEdit extends Component {
   }
 
   render() {
-    const { inputs, isLoaded, isSent, channelKey } = this.state;
+    const {
+      inputs, isLoaded, isSent, channelKey,
+    } = this.state;
     const { classes } = this.props;
 
     if (isSent) {
@@ -102,7 +106,9 @@ class ChannelEdit extends Component {
     return (
       <div>
         <form>
-          <h2>Настройки канала</h2>
+          <Typography>
+            Настройки канала
+          </Typography>
           {Inputs}
           <Fab
             variant="extended"
@@ -127,7 +133,6 @@ class ChannelEdit extends Component {
             Удалить канал
           </Fab>
         </form>
-        {status}
       </div>
     );
   }
@@ -138,4 +143,3 @@ ChannelEdit.propTypes = {
 };
 
 export default withStyles(styles)(ChannelEdit);
-

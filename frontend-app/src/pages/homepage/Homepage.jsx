@@ -42,17 +42,37 @@ class Homepage extends Component {
 
     if (isLoaded) {
       result = (
-        <div>
-          <Typography variant="h4">
-            Тренды:
-          </Typography>
-          <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
-          <div >
-            <Typography variant="h4">
-              Подписки:
+        <div className={classes.root}>
+          <div className={classes.container}>
+            <Typography variant="display1" color="secondary">
+              Тренды
             </Typography>
+            <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
           </div>
-          <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
+          <div className={classes.container}>
+            <Typography variant="display1" color="secondary">
+              Подписки
+            </Typography>
+            <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
+          </div>
+          <div className={classes.container}>
+            <Typography variant="display1" color="secondary">
+              Истории
+            </Typography>
+            <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
+          </div>
+          <div className={classes.container}>
+            <Typography variant="display1" color="secondary">
+              Подборка
+            </Typography>
+            <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
+          </div>
+          <div>
+            <Typography variant="display1" color="secondary">
+              Ваши
+            </Typography>
+            <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
+          </div>
         </div>
       );
     }

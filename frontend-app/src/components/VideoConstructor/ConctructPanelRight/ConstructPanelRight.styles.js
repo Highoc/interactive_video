@@ -16,6 +16,7 @@ const styles = ({
   },
   root: {
     marginLeft: '5%',
+    marginRight: '1px',
   },
 
   buttonContainer: {

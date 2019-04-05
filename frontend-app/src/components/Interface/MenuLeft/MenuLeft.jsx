@@ -73,7 +73,7 @@ class MenuLeft extends Component {
             </Typography>
             {channels.map(({ name, key }) => (
               <div key={`Channel${key}`}>
-                <Divider color="primary" />
+                <Divider variant="secondary" />
                 <ChannelList name={name} keyChannel={key} />
               </div>
             ))}

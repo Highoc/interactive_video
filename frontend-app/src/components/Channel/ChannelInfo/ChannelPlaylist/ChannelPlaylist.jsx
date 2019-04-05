@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import InfoIcon from '@material-ui/icons/Info';
+import VideoIcon from '@material-ui/icons/OndemandVideo';
 import {
   GridListTile, GridListTileBar, IconButton, GridList,
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import styles from './ChannelPlaylist.styles';
-import "./ChannelPlaylist.module.css";
+import date from "../../../../helpers/Date/date";
 
 
 class ChannelPlaylist extends Component {
@@ -22,16 +22,17 @@ class ChannelPlaylist extends Component {
     const { playlist, channelKey } = this.state;
     const { classes } = this.props;
     return (
-      <div className="root">
-        <GridList className={classes.gridList} cols={4.5}>
+      <div className={classes.root}>
+        <GridList className={classes.gridList} cols={5}>
           {playlist.video.map(video => (
             <GridListTile key={video.name} component={props => <Link to={`/channel/${channelKey}/watch/${video.key}`} {...props} />}>
-              <img src={video.preview_url} alt={video.name} height="200px" width="280px" />
+              <img src={video.preview_url} alt={video.name} height="280px" width="160px" />
               <GridListTileBar
                 title={video.name}
+                subtitle={<span>создано:{date(video.created)}</span>}
                 actionIcon={(
                   <IconButton className={classes.icon}>
-                    <InfoIcon />
+                    <VideoIcon color="secondary" />
                   </IconButton>
 )}
               />

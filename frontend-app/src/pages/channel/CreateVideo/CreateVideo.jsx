@@ -3,16 +3,16 @@ import 'react-tree-graph/dist/style.css';
 import Tree from 'react-d3-tree';
 import clone from 'clone';
 import {
-  MenuItem, Select, DialogContent,
+  MenuItem, Select, DialogContent, Typography,
 } from '@material-ui/core';
 import { connect } from 'react-redux';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import Input from '../../../components/Input/Input';
 import Dialog from '../../../components/Dialog';
-import {perror, pprint} from '../../../helpers/SmartPrint';
+import { perror, pprint } from '../../../helpers/SmartPrint';
 import classes from './CreateVideo.module.css';
 import { activeSvgShape, deactiveSvgShape, NodeImage } from './CreateVideo.styles';
-import { buttonChoice, uploadFile } from "../../../store/actions/buttonActions";
+import { buttonChoice, uploadFile } from '../../../store/actions/buttonActions';
 
 class CreateVideo extends Component {
   constructor(props) {
@@ -228,7 +228,9 @@ class CreateVideo extends Component {
 
     return (
       <div className={classes.container}>
-        <h2>Создание видео {this.state.videoKey}</h2>
+        <Typography variant="title">
+          Создание видео{this.state.videoKey}
+        </Typography>
         <div id="treeWrapper" style={{ width: '100%', height: '60%' }}>
           <Tree
             data={tree.tree}

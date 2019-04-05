@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles/index';
-import Fab from '@material-ui/core/Fab/index';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import { Redirect } from 'react-router-dom';
+import {
+  Typography, Fab,
+} from '@material-ui/core';
 import Input from '../../../components/Input/Input';
 import { RequestResolver, multipart } from '../../../helpers/RequestResolver';
 import { perror, pprint } from '../../../helpers/SmartPrint';
@@ -91,7 +93,9 @@ class EditAccount extends Component {
 
     return (
       <div>
-        <h2>Редактирование аккаунта</h2>
+        <Typography variant="title">
+          Редактирование аккаунта
+        </Typography>
         {Inputs}
         <Fab
           variant="extended"

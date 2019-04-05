@@ -8,6 +8,7 @@ import { RequestResolver } from '../../../helpers/RequestResolver';
 import date from '../../../helpers/Date/date';
 import styles from './ExpansionPanel.styles';
 import RatingViews from './RatingViews';
+import ExpandMoreIcon from "@material-ui/core/SvgIcon/SvgIcon";
 
 class ExpansionPanelVideo extends Component {
   constructor(props) {
@@ -17,6 +18,14 @@ class ExpansionPanelVideo extends Component {
       expanded: false,
     };
     this.backend = RequestResolver.getBackend();
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    const { expanded } = this.state;
+    const { openComments } = this.props;
+    if (prevState.expanded !== expanded) {
+      openComments(this.state);
+    }
   }
 
   handleChange(expanded) {
@@ -39,7 +48,7 @@ class ExpansionPanelVideo extends Component {
 
     return (
       <div className={classes.root}>
-        <ExpansionPanel expanded={expanded}>
+        <ExpansionPanel expandIcon={<ExpandMoreIcon color="secondary" />}>
           <ExpansionPanelSummary>
             <div className={classes.row}>
               <div className={classes.columnContainer}>
@@ -56,7 +65,7 @@ class ExpansionPanelVideo extends Component {
             <div className={classes.row}>
               <Button
                 variant="outlined"
-                color="primary"
+                color="secondary"
                 className={classes.columnButton}
                 onClick={(event) => { event.preventDefault(); this.handleChange(expanded); }}
               >
@@ -68,7 +77,9 @@ class ExpansionPanelVideo extends Component {
 
           </ExpansionPanelSummary>
           <ExpansionPanelDetails className={classes.details}>
-            {description}
+            <Typography color="secondary">
+              {description}
+            </Typography>
           </ExpansionPanelDetails>
         </ExpansionPanel>
       </div>

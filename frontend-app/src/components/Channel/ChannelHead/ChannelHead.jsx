@@ -48,13 +48,13 @@ class ChannelHead extends Component {
     const { myChannelKey } = this.props;
     const MyLink = props => <Link to={`${channelKey}/playlist/all`} {...props} />;
     const Settings = props => <Link to={`${channelKey}/edit`} {...props} />;
-    let button = <Button size="small" color="error" onClick={event => this.handleSubscribe(event)}>Подписаться</Button>;
-    let settings = <Button size="small" color="error" component={Settings}>Настройки канала</Button>;
+    let button = <Button size="small" color="error" variant="outlined" onClick={event => this.handleSubscribe(event)}>Подписаться</Button>;
+    let settings = <Button size="small" color="error" variant="outlined" component={Settings}>Настройки канала</Button>;
     if (myChannelKey !== channelKey){
       settings = <div />;
     }
     if (subStatus) {
-      button = <Button size="small" color="error" onClick={event => this.handleUnsubscribe(event)}>Отписаться</Button>;
+      button = <Button size="small" color="error" variant="outlined" onClick={event => this.handleUnsubscribe(event)}>Отписаться</Button>;
     }
 
     return (
@@ -82,7 +82,7 @@ class ChannelHead extends Component {
           </CardContent>
         </CardActionArea>
         <CardActions>
-          <Button size="small" color="error" component={MyLink}>
+          <Button size="small" color="error" variant="outlined" component={MyLink}>
             Посмотреть все плейлисты
           </Button>
           {settings}

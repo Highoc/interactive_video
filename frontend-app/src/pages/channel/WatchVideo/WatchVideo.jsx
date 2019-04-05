@@ -20,6 +20,7 @@ class WatchVideo extends Component {
       videoKey,
       channelKey,
       isLoaded: false,
+      openComments: false,
     };
     this.backend = RequestResolver.getBackend();
   }
@@ -34,9 +35,14 @@ class WatchVideo extends Component {
     }
   }
 
+
+  openComments(state) {
+    this.setState({ openComments: state.expanded });
+  }
+
   render() {
     const {
-      video, isLoaded, channelKey, videoKey, author,
+      video, isLoaded, channelKey, videoKey, author, openComments
     } = this.state;
 
     let result = null;
@@ -46,9 +52,7 @@ class WatchVideo extends Component {
 
           <Card className={classes.card}>
             <CardContent>
-              <Typography gutterBottom variant="h5" component="h2" align="center">
-                Название:
-                {' '}
+              <Typography gutterBottom variant="title" component="h2" align="center">
                 {video.name}
               </Typography>
             </CardContent>
@@ -62,10 +66,11 @@ class WatchVideo extends Component {
             description={video.description}
             keyVideo={videoKey}
             keyChannel={channelKey}
+            openComments={state => (this.openComments(state))}
           />
 
-          <ExpansionPanel>
-            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+          <ExpansionPanel expanded={openComments}>
+            <ExpansionPanelSummary>
               <Typography variant="h5">Ко всем комментариям:</Typography>
             </ExpansionPanelSummary>
             <CommentBox
