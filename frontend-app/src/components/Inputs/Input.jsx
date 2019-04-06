@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  ImageInput, TextInput, VideoInput,
+  HiddenInput, ImageInput, TextInput, VideoInput,
 } from '.';
 
 
@@ -67,6 +67,13 @@ class Input extends Component {
           placeholder={placeholder}
           rules={rules}
           onStateChange={onStateChange}
+        />
+      ); break;
+
+      case ('hidden'): inputElement = (
+        <HiddenInput
+          name={name}
+          value={value}
         />
       ); break;
 

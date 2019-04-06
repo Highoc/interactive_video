@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { Button, Card } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 
-import classes from './ImageInput.module.css';
+import { withStyles } from '@material-ui/core/styles';
+import styles from './styles';
 
 
 class ImageInput extends Component {
@@ -12,6 +13,10 @@ class ImageInput extends Component {
     previewUrl: '',
     value: null,
   };
+
+  static generateId() {
+    return `_${Math.random().toString(36).substr(2, 9)}`;
+  }
 
   static checkValidity(value, rules) {
     const result = {
@@ -51,6 +56,8 @@ class ImageInput extends Component {
     super(props);
     const validation = ImageInput.checkValidity(props.value, props.rules);
     this.state = {
+      inputId: ImageInput.generateId(),
+
       name: props.name,
       value: props.value,
 
@@ -93,35 +100,49 @@ class ImageInput extends Component {
   }
 
   render() {
-    const { label, placeholder } = this.props;
     const {
-      previewUrl, isValid, isTouched, error,
+      label, rules, classes,
+    } = this.props;
+
+    const {
+      inputId, previewUrl, placeholder, isValid, isTouched, error,
     } = this.state;
 
     const isCorrect = !isTouched || isValid;
 
     return (
-      <Card className={classes.imageInput}>
-        {label}
-        <div className={classes.previewContainer}>
-          <img
-            alt=""
-            src={previewUrl}
-            onLoad={event => this.onLoad(event)}
-            className={classes.image}
-          />
-        </div>
-        <div className={classes.file_upload}>
-          <Button size="small" color="primary" type="button">Выбрать</Button>
-          <div>{placeholder}</div>
-          <input type="file" onChange={event => this.onChange(event)} accept="image/*" />
-        </div>
-      </Card>
+      <div className={classes.root}>
+        <fieldset error={`${!isCorrect}`} className={classes.body}>
+          <legend error={`${!isCorrect}`} className={classes.legend}>
+            {`${label}${rules.required ? ' *' : ''}`}
+          </legend>
+          <div className={classes.preview}>
+            <img
+              alt=""
+              src={previewUrl}
+              onLoad={event => this.onLoad(event)}
+              className={classes.image}
+            />
+          </div>
+          <label htmlFor={inputId} className={classes.uploadArea}>
+            <div className={classes.button} color="primary">Выбрать</div>
+            <div className={classes.placeholder}>{placeholder}</div>
+            <input
+              id={inputId}
+              type="file"
+              className={classes.input}
+              accept="image/*"
+              onChange={event => this.onChange(event)}
+            />
+          </label>
+        </fieldset>
+        <div error={`${!isCorrect}`} className={classes.error}>{error}</div>
+      </div>
     );
   }
 }
 
-export default ImageInput;
+export default withStyles(styles)(ImageInput);
 
 ImageInput.propTypes = {
   name: PropTypes.string.isRequired,
@@ -131,4 +152,5 @@ ImageInput.propTypes = {
   rules: PropTypes.object.isRequired,
   previewUrl: PropTypes.string,
   onStateChange: PropTypes.func.isRequired,
+  classes: PropTypes.object.isRequired,
 };

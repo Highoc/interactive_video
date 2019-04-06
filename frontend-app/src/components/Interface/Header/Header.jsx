@@ -10,7 +10,7 @@ import {
 
 import { Menu as MenuIcon } from '@material-ui/icons';
 
-import { withStyles } from '@material-ui/core/styles/index';
+import { withStyles } from '@material-ui/core/styles';
 
 import headerStyles from './styles/Header.styles';
 

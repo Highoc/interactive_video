@@ -5,15 +5,15 @@ import { ClientForm, ServerForm } from '../../components/Forms';
 const inputs = [{
   type: 'image',
   name: 'avatar',
-  previewUrl: 'http://hb.bizmrg.com/interactive_video/profile_avatars/7cf1886021d846ed82d2ec85a1ee5d61?AWSAccessKeyId=quZTPp3V28P7V1SGJRXxvs&Signature=2pNPw6DvF8cMjMaNLW%2BHToKPVR4%3D&Expires=1554410048',
-  label: 'Аватар профиля',
+  previewUrl: '',
+  label: 'Аватар пользователя',
   placeholder: 'Выберите аватар пользователя',
   rules: {
     mimetypes: [
       'image/png',
     ],
     max_size: 10485760,
-    required: false,
+    required: true,
   },
 },
 {
