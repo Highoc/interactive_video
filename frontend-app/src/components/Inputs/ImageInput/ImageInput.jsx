@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { Button } from '@material-ui/core';
-
 import { withStyles } from '@material-ui/core/styles';
 import styles from './styles';
 
@@ -125,7 +123,7 @@ class ImageInput extends Component {
             />
           </div>
           <label htmlFor={inputId} className={classes.uploadArea}>
-            <div className={classes.button} color="primary">Выбрать</div>
+            <div className={classes.button}>Выбрать</div>
             <div className={classes.placeholder}>{placeholder}</div>
             <input
               id={inputId}

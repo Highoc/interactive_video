@@ -15,8 +15,19 @@ const inputs = [{
     max_size: 10485760,
     required: true,
   },
-},
-{
+}, {
+  type: 'video',
+  name: 'content',
+  label: 'Видеофрагмент пользователя',
+  placeholder: 'Выберите видеофрагмент',
+  rules: {
+    mimetypes: [
+      'video/mp4',
+    ],
+    max_size: 10485760,
+    required: true,
+  },
+}, {
   type: 'text',
   name: 'first_name',
   value: 'hacker',
