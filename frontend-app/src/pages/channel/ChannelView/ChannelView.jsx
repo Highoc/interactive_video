@@ -1,9 +1,21 @@
 import React, { Component } from 'react';
+import { Typography } from '@material-ui/core';
 import ChannelPlaylist from '../../../components/Channel/ChannelInfo/ChannelPlaylist';
 import { RequestResolver } from '../../../helpers/RequestResolver';
 import ChannelHead from '../../../components/Channel/ChannelHead';
 import classes from './ChannelView.module.css';
 import { perror } from '../../../helpers/SmartPrint';
+import date from '../../../helpers/Date/date';
+import PlaylistAll from '../../playlist/PlaylistAll/PlaylistAll';
+import { ListHeader, MovieList } from '../../../components/Channel/ChannelInfo/presentations';
+
+function TabContainer(props) {
+  return (
+    <div style={{ padding: 8 * 3 }}>
+      {props.children}
+    </div>
+  );
+}
 
 class ChannelView extends Component {
   constructor(props) {
@@ -12,6 +24,7 @@ class ChannelView extends Component {
       channelKey: props.match.params.channelKey,
       channel: null,
       isLoaded: false,
+      value: 0,
     };
     this.backend = RequestResolver.getBackend();
   }
@@ -33,7 +46,6 @@ class ChannelView extends Component {
   }
 
   async componentWillUpdate(nextProps, nextState, snapshot) {
-
     if (nextProps.match.params.channelKey !== this.props.match.params.channelKey) {
       try {
         const result = await this.backend().get(`channel/get/${nextProps.match.params.channelKey}/`);
@@ -44,19 +56,43 @@ class ChannelView extends Component {
     }
   }
 
+  handleValue(value) {
+    this.setState({ value });
+  }
+
   render() {
     const { isLoaded } = this.state;
+
     if (!isLoaded) {
       return <div> Еще не загружено </div>;
     }
-    /*
-    * Создать / Изменить / Удалить канал
-    * */
-    const { channel, channelKey } = this.state;
+    const { channel, channelKey, value } = this.state;
+    const info = (
+      <Typography>
+Создатель:
+        {channel.owner.username}
+        <br />
+Создан:
+        {date(channel.created)}
+        <br />
+        {channel.description}
+      </Typography>
+    );
+
     return (
       <div className={classes.root}>
-        <ChannelHead channel={channel} channelKey={channelKey} />
-        <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
+        <ChannelHead channel={channel} channelKey={channelKey} callbackValue={valueChoice => this.handleValue(valueChoice)}>
+          {value === 0 && (
+          <TabContainer>
+            <div>
+              <ListHeader header="Загруженные" />
+              <MovieList movieList={channel.uploaded_playlist} channelKey={channelKey} />
+            </div>
+          </TabContainer>
+          )}
+          {value === 1 && <TabContainer><PlaylistAll channelKey={channelKey} /></TabContainer>}
+          {value === 2 && <TabContainer>{info}</TabContainer>}
+        </ChannelHead>
       </div>
     );
   }

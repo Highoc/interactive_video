@@ -1,13 +1,20 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Card, CardActionArea, CardActions, CardContent, CardMedia, Button, Typography,
+  Card, CardActionArea, CardMedia, Typography, AppBar, Tab, Tabs,
 } from '@material-ui/core';
-import { RequestResolver, json } from '../../../helpers/RequestResolver';
-import classes from './ChannelHead.module.css';
-import { perror } from '../../../helpers/SmartPrint';
+
+import VideoIcon from '@material-ui/icons/OndemandVideo';
+import PlaylistIcon from '@material-ui/icons/PlaylistPlay';
+import SettingsIcon from '@material-ui/icons/Settings';
+import HelpIcon from '@material-ui/icons/Help';
+import ThumbUp from '@material-ui/icons/ThumbUp';
+import ThumbDown from '@material-ui/icons/ThumbDown';
+import { connect } from 'react-redux';
 import date from '../../../helpers/Date/date';
-import {connect} from "react-redux";
+import { perror } from '../../../helpers/SmartPrint';
+import classes from './ChannelHead.module.css';
+import { RequestResolver, json } from '../../../helpers/RequestResolver';
 
 class ChannelHead extends Component {
   constructor(props) {
@@ -16,6 +23,7 @@ class ChannelHead extends Component {
       channel: props.channel,
       channelKey: props.channelKey,
       subStatus: props.channel.subscription.is_active,
+      value: 0,
     };
     this.backend = RequestResolver.getBackend();
   }
@@ -31,6 +39,9 @@ class ChannelHead extends Component {
     }
   }
 
+  handleChange = (event, value) => {
+    this.setState({ value });
+  };
 
   async handleUnsubscribe(event) {
     event.preventDefault();
@@ -43,18 +54,27 @@ class ChannelHead extends Component {
     }
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    const { value } = this.state;
+    const { callbackValue } = this.props;
+    if (prevState.value !== value) {
+      callbackValue(value);
+    }
+  }
+
   render() {
-    const { channel, channelKey, subStatus } = this.state;
+    const {
+      channel, channelKey, subStatus, value,
+    } = this.state;
     const { myChannelKey } = this.props;
-    const MyLink = props => <Link to={`${channelKey}/playlist/all`} {...props} />;
     const Settings = props => <Link to={`${channelKey}/edit`} {...props} />;
-    let button = <Button size="small" color="error" variant="outlined" onClick={event => this.handleSubscribe(event)}>Подписаться</Button>;
-    let settings = <Button size="small" color="error" variant="outlined" component={Settings}>Настройки канала</Button>;
-    if (myChannelKey !== channelKey){
+    let subscribe = <Tab label="Подписаться" icon={<ThumbUp />} onClick={event => this.handleSubscribe(event)} />;
+    let settings = <Tab label="Настройки" icon={<SettingsIcon />} component={Settings} />;
+    if (myChannelKey !== channelKey) {
       settings = <div />;
     }
     if (subStatus) {
-      button = <Button size="small" color="error" variant="outlined" onClick={event => this.handleUnsubscribe(event)}>Отписаться</Button>;
+      subscribe = <Tab label="Отписаться" icon={<ThumbDown />} onClick={event => this.handleUnsubscribe(event)} />;
     }
 
     return (
@@ -62,32 +82,27 @@ class ChannelHead extends Component {
         <CardActionArea>
           <CardMedia
             className={classes.media}
-            image="https://sun1-14.userapi.com/c855220/v855220546/3c4f/peP6UFrBniE.jpg"
+            image="http://sonoiocazzo.altervista.org/wp-content/uploads/2017/04/cropped-697297-1.jpg"
             title={channel.name}
           />
-          <CardContent>
-            <Typography gutterBottom variant="h5" align="center">
-              Создатель:
-              {' '}
-              {channel.owner.username}
-              <br />
-              Создан:
-              {' '}
-              {date(channel.created)}
-              <br />
-            </Typography>
-            <Typography component="p" align="center">
-              {channel.description}
-            </Typography>
-          </CardContent>
+          <AppBar position="static" color="primary">
+            <Tabs
+              value={value}
+              onChange={this.handleChange}
+              variant="fullWidth"
+              indicatorColor="secondary"
+              textColor="secondary"
+              centered
+            >
+              <Tab label="Видео" icon={<VideoIcon />} />
+              <Tab label="Плейлисты" icon={<PlaylistIcon />} />
+              <Tab label="О канале" icon={<HelpIcon />} />
+              {settings}
+              {subscribe}
+            </Tabs>
+          </AppBar>
+          {this.props.children}
         </CardActionArea>
-        <CardActions>
-          <Button size="small" color="error" variant="outlined" component={MyLink}>
-            Посмотреть все плейлисты
-          </Button>
-          {settings}
-          {button}
-        </CardActions>
       </Card>
     );
   }

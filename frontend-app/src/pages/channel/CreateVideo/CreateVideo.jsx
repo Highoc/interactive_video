@@ -13,10 +13,13 @@ import { perror, pprint } from '../../../helpers/SmartPrint';
 import classes from './CreateVideo.module.css';
 import { activeSvgShape, deactiveSvgShape, NodeImage } from './CreateVideo.styles';
 import { buttonChoice, uploadFile } from '../../../store/actions/buttonActions';
+import {Redirect} from "react-router-dom";
 
 class CreateVideo extends Component {
   constructor(props) {
     super(props);
+
+    const { channelKey } = props.match.params;
 
     this.state = {
       sources: [],
@@ -24,12 +27,14 @@ class CreateVideo extends Component {
       nodeChosen: null,
       dialogOpen: false,
       uploadStatus: false,
+      channelKey,
       videoKey: '',
       inputData: {
         text: '',
         sourceKey: '',
       },
       isValid: false,
+      isSent: false,
       inputs: [
         {
           type: 'text',
@@ -73,7 +78,6 @@ class CreateVideo extends Component {
       const result = await this.backend().get('video/source/list/');
       pprint('CreateVIdeoSources', result.data);
       this.setState({ sources: result.data });
-      console.log(result.data);
       result.data.map(source => onFileUpload(source));
     } catch (error) {
       perror('CreateVideo', error);
@@ -111,6 +115,8 @@ class CreateVideo extends Component {
     };
   }
 
+
+
   getVideoPart(node) {
     const obj = {
       text: node.text,
@@ -147,10 +153,9 @@ class CreateVideo extends Component {
     if (isValid) {
       try {
         const data = this.getVideoData();
-        console.log(data);
         pprint('CreateVIdeo', data);
         const result = await this.backend(json).post('video/upload/', data);
-        this.setState({ videoKey: result.data.key });
+        this.setState({ videoKey: result.data.key, isSent: true });
       } catch (error) {
         this.setState({ videoKey: 'error' });
         perror('CreateVideo', error);
@@ -160,8 +165,8 @@ class CreateVideo extends Component {
     }
   }
 
-  callbackDialog(state) {
-    this.setState({ dialogOpen: state });
+  callbackDialog() {
+    this.setState({ dialogOpen: false });
     const { inputData, inputs } = this.state;
     inputData.text = inputs.find(elem => elem.name === 'Dialog').value;
     const { tree, nodeChosen } = this.state;
@@ -208,9 +213,12 @@ class CreateVideo extends Component {
 
   render() {
     const {
-      tree, dialogOpen, inputData, inputs, sources,
+      tree, dialogOpen, inputData, inputs, sources, isSent, channelKey, videoKey,
     } = this.state;
-    const { files } = this.props;
+
+    if (isSent) {
+      return <Redirect to={`/channel/${channelKey}/watch/${videoKey}`} />;
+    }
     const Inputs = Object.keys(inputs).map((key) => {
       const inputElement = inputs[key];
       return (
@@ -234,7 +242,7 @@ class CreateVideo extends Component {
         <div id="treeWrapper" style={{ width: '100%', height: '60%' }}>
           <Tree
             data={tree.tree}
-            translate={{ x: 25, y: 350 }}
+            translate={{ x: 25, y: 270 }}
             collapsible={false}
             zoomable={false}
             allowForeignObjects
@@ -249,7 +257,7 @@ class CreateVideo extends Component {
             onClick={(nodeData, event) => { this.handleClick(nodeData.key); this.onUpdateTree(); }}
           />
         </div>
-        <Dialog dialogOpen={dialogOpen} callback={state => this.callbackDialog(state)} title="Выберите фрагмент">
+        <Dialog dialogOpen={dialogOpen} callback={() => this.callbackDialog()} title="Выберите фрагмент">
           <DialogContent>
             {Inputs[2]}
             <Select
@@ -258,7 +266,7 @@ class CreateVideo extends Component {
               fullWidth
               onChange={this.handleChange}
             >
-              { files.map((source, i) => (
+              { sources.map((source, i) => (
                 <MenuItem key={i} value={i}>{source.name}</MenuItem>
               ))}
             </Select>

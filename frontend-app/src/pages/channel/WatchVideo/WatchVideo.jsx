@@ -42,7 +42,7 @@ class WatchVideo extends Component {
 
   render() {
     const {
-      video, isLoaded, channelKey, videoKey, author, openComments
+      video, isLoaded, channelKey, videoKey, author, openComments,
     } = this.state;
 
     let result = null;
@@ -70,9 +70,6 @@ class WatchVideo extends Component {
           />
 
           <ExpansionPanel expanded={openComments}>
-            <ExpansionPanelSummary>
-              <Typography variant="h5">Ко всем комментариям:</Typography>
-            </ExpansionPanelSummary>
             <CommentBox
               channelKey={channelKey}
               videoKey={videoKey}

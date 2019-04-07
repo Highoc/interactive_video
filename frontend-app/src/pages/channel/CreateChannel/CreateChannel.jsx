@@ -10,6 +10,7 @@ import { perror, pprint } from '../../../helpers/SmartPrint';
 import { Redirect } from "react-router-dom";
 import { addChannel } from '../../../store/actions/authorization';
 import {connect} from "react-redux";
+import {Typography} from "@material-ui/core";
 
 class CreateChannel extends Component {
   constructor(props) {
@@ -55,11 +56,18 @@ class CreateChannel extends Component {
         pprint('CreateChannel', result.data);
         addChannel(result.data.key);
         this.setState({ isSent: true, channelKey: result.data.key });
+
       } catch (error) {
         perror('CreateChannel', error);
       }
     } else {
       console.log('Invalid input');
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState, prevContext) {
+    if (prevProps.files !== this.props.files) {
+      this.setState({sources: this.props.files});
     }
   }
 
@@ -99,7 +107,7 @@ class CreateChannel extends Component {
     return (
       <div>
         <form>
-          <h2>Создание канала</h2>
+          <Typography variant="title">Создание канала</Typography>
           {Inputs}
           <Fab
             variant="extended"

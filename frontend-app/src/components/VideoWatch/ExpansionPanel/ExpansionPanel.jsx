@@ -48,7 +48,7 @@ class ExpansionPanelVideo extends Component {
 
     return (
       <div className={classes.root}>
-        <ExpansionPanel expandIcon={<ExpandMoreIcon color="secondary" />}>
+        <ExpansionPanel expanded={true} expandIcon={<ExpandMoreIcon color="secondary" />}>
           <ExpansionPanelSummary>
             <div className={classes.row}>
               <div className={classes.columnContainer}>

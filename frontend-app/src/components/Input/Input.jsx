@@ -5,7 +5,7 @@ import {
 import classes from './Input.module.css';
 import FileInput from './FileInput/FileInput';
 import VideoInput from './VideoInput/VideoInput';
-import { pprint } from "../../helpers/SmartPrint";
+import { Typography } from "@material-ui/core";
 
 function checkValidity(value, rules) {
   let isValid = true;
@@ -14,6 +14,10 @@ function checkValidity(value, rules) {
     if (value !== undefined) {
       if (!value.type){
         isValid = value.trim() !== '' && isValid;
+      }
+      if (value.type === 'video' && value.file === null){
+        console.log('+');
+        isValid = false;
       }
     }
   }
@@ -167,7 +171,7 @@ class Input extends Component {
 
     return (
       <div className={classes.Input}>
-        <label className={classes.Label}>{this.props.description}</label>
+        <Typography variant="title">{this.props.description}</Typography>
         {inputElement}
       </div>
     );

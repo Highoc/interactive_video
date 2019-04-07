@@ -38,9 +38,14 @@ class ConstructPanelLeft extends Component {
     }
   }
 
-  componentDidUpdate(prevProps) {
+
+
+  componentDidUpdate(prevProps, prevState, prevContext) {
     if (prevProps.files !== this.props.files) {
       this.setState({ sources: this.props.files });
+    }
+    if (prevState.dialogOpen !== this.state.dialogOpen){
+      this.setState({dialogOpen: this.state.dialogOpen});
     }
   }
 
@@ -69,10 +74,9 @@ class ConstructPanelLeft extends Component {
     return result;
   }
 
-  async callbackDialog(state) {
+  async callbackDialog() {
     const { inputs } = this.state;
     const { onFileUpload } = this.props;
-    const filePush = [];
     let isValid = true;
     for (const key in inputs) {
       isValid = isValid && inputs[key].isValid;
@@ -81,9 +85,8 @@ class ConstructPanelLeft extends Component {
       try {
         const data = this.getData();
         const result = await this.backend(multipart).post('video/source/upload/', data);
-        filePush[0] = result.data;
-        filePush.map(source => onFileUpload(source));
-        this.setState({ isSent: true, dialogOpen: state });
+        onFileUpload(result.data);
+        this.setState({ isSent: true, dialogOpen: false });
       } catch (error) {
         perror('ConstructPanelRIght', error);
       }
@@ -142,7 +145,7 @@ class ConstructPanelLeft extends Component {
               </CardContent>
             </CardActionArea>
           </Card>
-          <Dialog dialogOpen={dialogOpen} callback={state => this.callbackDialog(state)} title="Загрузите видео">
+          <Dialog dialogOpen={dialogOpen} callback={() => this.callbackDialog()} title="Загрузите видео">
             {Inputs}
           </Dialog>
         </Drawer>

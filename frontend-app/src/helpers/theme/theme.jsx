@@ -24,6 +24,14 @@ const theme = createMuiTheme({
       fontFamily: 'fantasy',
       lineHeight: 3,
     },
+    display2: {
+      fontSize: 15,
+      fontFamily: 'Roboto',
+    },
+    display3: {
+      fontSize: 12,
+      fontFamily: 'Roboto',
+    },
   },
   palette: {
     common: {
@@ -32,7 +40,7 @@ const theme = createMuiTheme({
     },
     background: {
       paper: 'rgb(31,31,31)',
-      default: 'rgb(255,9,0)',
+      default: 'rgb(38,38,38)',
     },
     primary: {
       light: 'rgb(255,9,0)',

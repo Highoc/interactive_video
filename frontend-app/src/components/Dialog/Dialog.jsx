@@ -29,7 +29,7 @@ class DialogSmart extends Component {
 
   submitHandler() {
     const { callback } = this.props;
-    callback(false);
+    callback();
     this.setState({ dialogOpen: false });
   }
 
@@ -48,7 +48,7 @@ class DialogSmart extends Component {
         </DialogTitle>
         {this.props.children}
         <DialogActions>
-          <Button onClick={(event) => { event.preventDefault(); this.submitHandler(); }} color="primary">
+          <Button onClick={(event) => { event.preventDefault(); this.submitHandler(); }} color="secondary">
             Отправить
           </Button>
         </DialogActions>

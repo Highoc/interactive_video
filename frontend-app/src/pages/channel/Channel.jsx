@@ -19,7 +19,6 @@ export const Channel = () => (
       <Route exact path="/channel/:channelKey/edit" component={ChannelEdit} />
       <Route exact path="/channel/:channelKey/create" component={CreateVideo} />
       <Route exact path="/channel/:channelKey/playlist/create" component={PlaylistAdd} />
-      <Route exact path="/channel/:channelKey/playlist/all" component={PlaylistAll} />
       <Route exact path="/channel/:channelKey/playlist/:playlistKey/update" component={PlaylistEdit} />
       <Route exact path="/channel/:channelKey/playlist/:playlistKey" component={Playlist} />
       <Route exact path="/channel/:channelKey/watch/:videoKey" component={WatchVideo} />

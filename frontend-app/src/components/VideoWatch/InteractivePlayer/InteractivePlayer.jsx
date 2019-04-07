@@ -149,7 +149,7 @@ class InteractivePlayer extends Component {
 
     let buttons = <div />;
     const d = timeFrame.end - currentTime;
-    if (d > 0 && d < 5) {
+    if (d > 0 && d < 5 && questions.length === 2) {
       buttons = (
         <div className={classes.buttonStyles}>
           {questions.map(elem => (
@@ -161,8 +161,8 @@ class InteractivePlayer extends Component {
             >
               <Typography
                 component="span"
-                variant="subtitle1"
-                color="primary"
+                variant="title"
+                color="secondary"
                 className={classes.textContainer}
               >
                 {elem.text}
@@ -174,9 +174,9 @@ class InteractivePlayer extends Component {
     }
 
     return (
-      <div>
+      <div className={classes.videoStyles}>
         {buttons}
-        <Player ref="player" src={url} fluid>
+        <Player ref="player" src={url}>
           <BigPlayButton position="center" />
           <ControlBar>
             <ReplayControl seconds={10} order={2} />

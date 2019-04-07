@@ -6,15 +6,14 @@ import {
 import { connect } from 'react-redux';
 import ChannelPlaylistView from '../../../components/Playlist/ChannelPlaylistView';
 import classes from './PlaylistAll.module.css';
-import {json, RequestResolver} from '../../../helpers/RequestResolver';
+import { json, RequestResolver } from '../../../helpers/RequestResolver';
 import { perror, pprint } from '../../../helpers/SmartPrint';
 
 class PlaylistAll extends Component {
   constructor(props) {
     super(props);
-    const { channelKey } = props.match.params;
     this.state = {
-      channelKey,
+      channelKey: props.channelKey,
       isLoaded: false,
       playlists: null,
     };
@@ -24,6 +23,7 @@ class PlaylistAll extends Component {
   async componentDidMount() {
     try {
       const { channelKey } = this.state;
+      console.log(channelKey);
       const result = await this.backend().get(`channel/${channelKey}/playlist/all/`);
       pprint('PlaylistAll', result.data);
       this.setState({ isLoaded: true, playlists: result.data });
@@ -47,7 +47,7 @@ class PlaylistAll extends Component {
     const { isLoaded, playlists, channelKey } = this.state;
     const { myChannelKey } = this.props;
     if (!isLoaded) {
-      return <div> Еще не загружено </div>;
+      return <div />;
     }
 
     const AddPlaylist = props => <Link to={`/channel/${channelKey}/playlist/create`} {...props} />;
@@ -76,7 +76,6 @@ class PlaylistAll extends Component {
       addPlaylist = <div />;
     }
 
-
     return (
       <div>
         {playlists.map((playlist, i) => (
@@ -92,7 +91,6 @@ class PlaylistAll extends Component {
         }
         {addPlaylist}
       </div>
-
     );
   }
 }
