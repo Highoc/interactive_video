@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import { ClientForm, ServerForm } from '../../components/Forms';
+import PropTypes from "prop-types";
 
 const inputs = [{
   type: 'image',
@@ -13,6 +14,15 @@ const inputs = [{
       'image/png',
     ],
     max_size: 10485760,
+    required: true,
+  },
+}, {
+  type: 'choice',
+  name: 'playlist',
+  value: '11',
+  choices: [{ text: 'Playlist A', value: '1' }, { text: 'Playlist B', value: '11' }, { text: 'Playlist C', value: '21' }],
+  label: 'Плейлист интерактивного видео',
+  rules: {
     required: true,
   },
 }, {
@@ -56,7 +66,7 @@ const inputs = [{
   label: 'Почтовый адрес',
   placeholder: 'Напишите почтовый адрес',
   rules: {
-    required: false,
+    required: true,
   },
 }];
 
@@ -75,8 +85,6 @@ class Test extends Component {
           action="/test/"
           enctype="application/json"
         />
-        <hr />
-        <ClientForm />
       </div>
     );
   }

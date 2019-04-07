@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  HiddenInput, ImageInput, TextInput, VideoInput,
+  ChoiceInput, HiddenInput, ImageInput, TextInput, VideoInput,
 } from '.';
 
 
@@ -11,6 +11,7 @@ class Input extends Component {
     value: null,
     previewUrl: '',
     placeholder: '',
+    choices: null,
   };
 
   constructor(props) {
@@ -21,7 +22,7 @@ class Input extends Component {
   render() {
     let inputElement;
     const {
-      type, name, value, rules, label, placeholder, previewUrl, onStateChange,
+      type, name, value, rules, label, placeholder, previewUrl, choices, onStateChange,
     } = this.props;
 
     switch (type) {
@@ -45,6 +46,18 @@ class Input extends Component {
           rules={rules}
           multiline
           rows="6"
+          onStateChange={onStateChange}
+        />
+      ); break;
+
+      case ('email'): inputElement = (
+        <TextInput
+          type="email"
+          name={name}
+          value={value}
+          label={label}
+          placeholder={placeholder}
+          rules={rules}
           onStateChange={onStateChange}
         />
       ); break;
@@ -74,6 +87,19 @@ class Input extends Component {
         <HiddenInput
           name={name}
           value={value}
+          onStateChange={onStateChange}
+        />
+      ); break;
+
+      case ('choice'): inputElement = (
+        <ChoiceInput
+          name={name}
+          value={value}
+          choices={choices}
+          label={label}
+          placeholder={placeholder}
+          rules={rules}
+          onStateChange={onStateChange}
         />
       ); break;
 
@@ -94,5 +120,6 @@ Input.propTypes = {
   rules: PropTypes.object.isRequired,
   placeholder: PropTypes.string,
   previewUrl: PropTypes.string,
+  choices: PropTypes.array,
   onStateChange: PropTypes.func.isRequired,
 };

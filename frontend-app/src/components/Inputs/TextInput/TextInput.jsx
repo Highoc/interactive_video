@@ -5,7 +5,9 @@ import { TextField } from '@material-ui/core';
 
 class TextInput extends Component {
   static defaultProps = {
+    type: 'text',
     value: '',
+    placeholder: '',
     multiline: false,
     rows: '1',
   };
@@ -85,13 +87,15 @@ class TextInput extends Component {
     } = this.state;
 
     const {
-      rules, label, placeholder, multiline, rows,
+      type, rules, label, placeholder, multiline, rows,
     } = this.props;
 
     const isCorrect = !isTouched || isValid;
 
     return (
       <TextField
+        type={type}
+
         name={name}
         value={value}
 
@@ -120,12 +124,13 @@ TextInput.propTypes = {
   name: PropTypes.string.isRequired,
   value: PropTypes.string,
   label: PropTypes.string.isRequired,
-  placeholder: PropTypes.string.isRequired,
+  placeholder: PropTypes.string,
 
   rules: PropTypes.object.isRequired,
 
   onStateChange: PropTypes.func.isRequired,
 
+  type: PropTypes.string,
   multiline: PropTypes.bool,
   rows: PropTypes.string,
 };

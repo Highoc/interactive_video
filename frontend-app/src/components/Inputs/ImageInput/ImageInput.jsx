@@ -69,6 +69,11 @@ class ImageInput extends Component {
     };
   }
 
+  componentDidMount() {
+    const { onStateChange } = this.props;
+    onStateChange(this.state);
+  }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
     const { value } = this.state;
     const { onStateChange } = this.props;
