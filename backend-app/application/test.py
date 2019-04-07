@@ -5,8 +5,9 @@ from channel.serializers import ChannelSerializer
 
 class TestView(APIView):
     def post(self, request):
+        return Response('Работает', status=status.HTTP_200_OK)
         serializer = ChannelSerializer(data=request.data)
         if serializer.is_valid():
             pass
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response('Работает', status=status.HTTP_200_OK)

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import clone from 'clone';
+
 import { Button } from '@material-ui/core';
 
 import Input from '../../Inputs/Input';
@@ -28,8 +30,8 @@ class ServerForm extends Component {
     this.state = {
       name: props.name,
 
-      inputs: props.inputs,
-      inputsHidden: props.inputsHidden,
+      inputs: clone(props.inputs),
+      inputsHidden: clone(props.inputsHidden),
 
       isReady: true,
       isValid: false,
@@ -61,6 +63,7 @@ class ServerForm extends Component {
     try {
       const formData = this.getFormData();
       const response = await this.backend(type).post(action, formData);
+      this.reloadForm();
       onSubmitSuccess(response.data);
     } catch (error) {
       this.setState({ errors: JSON.parse(error.request.response) });
@@ -108,6 +111,18 @@ class ServerForm extends Component {
     }
 
     return formData;
+  }
+
+  reloadForm() {
+    const { inputs, inputsHidden } = this.props;
+    this.setState({
+      inputs: clone(inputs),
+      inputsHidden: clone(inputsHidden),
+      isReady: true,
+      isValid: false,
+
+      errors: {},
+    });
   }
 
   render() {

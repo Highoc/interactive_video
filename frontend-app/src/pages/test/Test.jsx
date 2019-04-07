@@ -86,6 +86,11 @@ class Test extends Component {
     this.setState({ dialogOpen: false });
   }
 
+  onSubmitSuccess(data) {
+    console.log(data);
+    this.setState({ dialogOpen: false });
+  }
+
   render() {
     return (
       <div>
@@ -96,6 +101,7 @@ class Test extends Component {
             inputs={inputs}
             action="/test/"
             enctype="application/json"
+            onSubmitSuccess={(data => this.onSubmitSuccess(data))}
           />
         </Dialog>
       </div>
