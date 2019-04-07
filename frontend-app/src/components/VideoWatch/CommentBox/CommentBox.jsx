@@ -4,10 +4,10 @@ import { connect } from 'react-redux';
 
 import PropTypes from 'prop-types';
 
-import { Button, DialogContent, Divider } from '@material-ui/core';
+import { Divider } from '@material-ui/core';
 import Comment from './Comment';
 
-import { RequestResolver, json } from '../../../helpers/RequestResolver';
+import { RequestResolver } from '../../../helpers/RequestResolver';
 import { pprint, perror } from '../../../helpers/SmartPrint';
 
 import {
@@ -16,7 +16,8 @@ import {
 } from '../../../store/actions/centrifugo';
 
 import { Dialog } from '../../Dialog';
-import Input from '../../Input/Input';
+import { ServerForm } from '../../Forms';
+
 import classes from './styles/CommentBox.module.css';
 
 
@@ -31,7 +32,7 @@ class CommentBox extends Component {
       commentsId: props.commentsId,
       comments: [],
       level: props.level,
-      currentId: 0,
+      currentId: null,
 
       dialogOpen: false,
       inputs: [],
@@ -91,14 +92,6 @@ class CommentBox extends Component {
     this.setState({ comments });
   }
 
-  onReply(commentId) {
-    this.setState({ dialogOpen: true, currentId: commentId });
-  }
-
-  onRootReply() {
-    this.onSubmit();
-  }
-
   async onLoad(commentId) {
     const { comments, level } = this.state;
     const result = await this.backend().get(`comment/list/${commentId}/level/${level}/`);
@@ -113,33 +106,12 @@ class CommentBox extends Component {
     this.setState({ comments });
   }
 
-  async onSubmit() {
-    const { inputs, channelKey, videoKey } = this.state;
-    let isValid = true;
-    for (const key in inputs) {
-      isValid = isValid && inputs[key].isValid;
-    }
-
-    if (isValid) {
-      this.setState({ dialogOpen: false });
-      try {
-        const data = this.getData();
-        await this.backend(json).post(`channel/${channelKey}/video/${videoKey}/comment/add/`, data);
-      } catch (error) {
-        perror('CommentBox', error);
-      }
-      this.setState({ currentId: null });
-    } else {
-      perror('CommentBox', 'Invalid inputs');
-    }
+  onReply(commentId) {
+    this.setState({ dialogOpen: true, currentId: commentId });
   }
 
-  getData() {
-    const { inputs, currentId } = this.state;
-    const result = {};
-    inputs.map((input) => { result[input.name] = input.value; });
-    result.parent_id = currentId;
-    return result;
+  onDialogClose() {
+    this.setState({ dialogOpen: false, currentId: null });
   }
 
   findCommentById(comments, id) {
@@ -157,47 +129,40 @@ class CommentBox extends Component {
     return comment;
   }
 
-  callbackInput(data) {
-    const { inputs } = this.state;
-    const input = inputs.find(elem => elem.name === data.name);
-    input.value = data.value;
-    input.isValid = data.isValid;
-    this.setState({ inputs });
-  }
-
   render() {
     const {
-      comments, inputs, dialogOpen, inputsReady,
+      comments, inputs, dialogOpen, inputsReady, currentId,
     } = this.state;
-    let Inputs = <div />;
+    const { channelKey, videoKey } = this.props;
+
+    let rootCommentForm = <div />;
+    let childCommentForm = <div />;
     if (inputsReady) {
-      Inputs = Object.keys(inputs).map((key) => {
-        const inputElement = inputs[key];
-        return (
-          <Input
-            key={key}
-            type={inputElement.type}
-            name={inputElement.name}
-            description={inputElement.description}
-            value={inputElement.value}
-            rules={inputElement.rules}
-            callback={data => this.callbackInput(data)}
-          />
-        );
-      });
+      rootCommentForm = (
+        <ServerForm
+          action={`channel/${channelKey}/video/${videoKey}/comment/add/`}
+          enctype="application/json"
+          name="root-comment"
+          inputs={inputs}
+          inputsHidden={[{ name: 'parent_id', value: null }]}
+        />
+      );
+      childCommentForm = (
+        <ServerForm
+          action={`channel/${channelKey}/video/${videoKey}/comment/add/`}
+          enctype="application/json"
+          name="child-comment"
+          inputs={inputs}
+          inputsHidden={[{ name: 'parent_id', value: currentId }]}
+          onSubmitSuccess={() => this.onDialogClose()}
+        />
+      );
     }
 
     return (
       <div>
         <div className={classes.commentRoot}>
-          {Inputs}
-          <Button
-            onClick={() => this.onRootReply()}
-            color="primary"
-            className={classes.containerButton}
-          >
-            Оставить комментарий
-          </Button>
+          {rootCommentForm}
         </div>
         <Divider />
         <div>
@@ -213,10 +178,8 @@ class CommentBox extends Component {
           }
         </div>
 
-        <Dialog dialogOpen={dialogOpen} callback={() => this.onSubmit()} title="Ответ на комментарий">
-          <DialogContent>
-            {Inputs}
-          </DialogContent>
+        <Dialog open={dialogOpen} onClose={() => this.onDialogClose()} title="Ответ на комментарий">
+          {childCommentForm}
         </Dialog>
       </div>
     );

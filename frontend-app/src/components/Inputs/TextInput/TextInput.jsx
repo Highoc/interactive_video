@@ -64,6 +64,11 @@ class TextInput extends Component {
     onStateChange(this.state);
   }
 
+  componentWillReceiveProps(nextProps, nextContext) {
+    const { value } = nextProps;
+    this.setState({ value });
+  }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
     const { value } = this.state;
     const { onStateChange } = this.props;

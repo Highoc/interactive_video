@@ -43,7 +43,7 @@ class ServerForm extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ inputsHidden: nextProps.inputsHidden });
+    this.setState({ inputsHidden: clone(nextProps.inputsHidden) });
   }
 
   async onSubmit() {
