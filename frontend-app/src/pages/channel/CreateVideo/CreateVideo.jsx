@@ -8,8 +8,8 @@ import {
 import { connect } from 'react-redux';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import Input from '../../../components/Input/Input';
-import Dialog from '../../../components/Dialog';
-import {perror, pprint} from '../../../helpers/SmartPrint';
+import { Dialog } from '../../../components/Dialog';
+import { perror, pprint } from '../../../helpers/SmartPrint';
 import classes from './CreateVideo.module.css';
 import { activeSvgShape, deactiveSvgShape, NodeImage } from './CreateVideo.styles';
 import { buttonChoice, uploadFile } from "../../../store/actions/buttonActions";

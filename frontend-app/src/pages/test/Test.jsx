@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
-import { ClientForm, ServerForm } from '../../components/Forms';
-import PropTypes from "prop-types";
+import { ServerForm } from '../../components/Forms';
+import { Dialog } from '../../components/Dialog';
 
 const inputs = [{
   type: 'image',
@@ -73,18 +73,31 @@ const inputs = [{
 class Test extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      dialogOpen: false,
+    };
+  }
+
+  onDialogOpen() {
+    this.setState({ dialogOpen: true });
+  }
+
+  onDialogClose() {
+    this.setState({ dialogOpen: false });
   }
 
   render() {
     return (
       <div>
-        <ServerForm
-          name="test-server-form"
-          inputs={inputs}
-          action="/test/"
-          enctype="application/json"
-        />
+        <button onClick={() => this.onDialogOpen()}>Открыть</button>
+        <Dialog title="Тестим серверную форму" open={this.state.dialogOpen} onClose={() => this.onDialogClose()}>
+          <ServerForm
+            name="test-server-form"
+            inputs={inputs}
+            action="/test/"
+            enctype="application/json"
+          />
+        </Dialog>
       </div>
     );
   }

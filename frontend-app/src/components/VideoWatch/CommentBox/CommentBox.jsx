@@ -15,7 +15,7 @@ import {
   unsubscribeFromChannel as unsubscribe,
 } from '../../../store/actions/centrifugo';
 
-import Dialog from '../../Dialog';
+import { Dialog } from '../../Dialog';
 import Input from '../../Input/Input';
 import classes from './styles/CommentBox.module.css';
 
