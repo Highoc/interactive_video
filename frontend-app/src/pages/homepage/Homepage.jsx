@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import ChannelPlaylist from '../../components/Channel/ChannelInfo/ChannelPlaylist';
-import Typography from '@material-ui/core/Typography';
 import { RequestResolver } from '../../helpers/RequestResolver';
 import { pprint, perror } from '../../helpers/SmartPrint';
 import classes from './Homepage.module.css';
