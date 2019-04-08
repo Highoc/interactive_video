@@ -6,6 +6,7 @@ import {
   MenuItem, Select, DialogContent, Typography,
 } from '@material-ui/core';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import Input from '../../../components/Input/Input';
 import Dialog from '../../../components/Dialog';
@@ -13,7 +14,6 @@ import { perror, pprint } from '../../../helpers/SmartPrint';
 import classes from './CreateVideo.module.css';
 import { activeSvgShape, deactiveSvgShape, NodeImage } from './CreateVideo.styles';
 import { buttonChoice, uploadFile } from '../../../store/actions/buttonActions';
-import {Redirect} from "react-router-dom";
 
 class CreateVideo extends Component {
   constructor(props) {
@@ -116,7 +116,6 @@ class CreateVideo extends Component {
   }
 
 
-
   getVideoPart(node) {
     const obj = {
       text: node.text,
@@ -190,6 +189,9 @@ class CreateVideo extends Component {
     if (prevProps.choice !== this.props.choice) {
       this.handleButtonChoice(this.props.choice);
     }
+    if (prevProps.files !== this.props.files) {
+      this.setState({ sources: this.props.files });
+    }
   }
 
   handleButtonChoice(choice) {
@@ -237,14 +239,15 @@ class CreateVideo extends Component {
     return (
       <div className={classes.container}>
         <Typography variant="title">
-          Создание видео{this.state.videoKey}
+          Создание видео
+          {this.state.videoKey}
         </Typography>
         <div id="treeWrapper" style={{ width: '100%', height: '60%' }}>
           <Tree
             data={tree.tree}
             translate={{ x: 25, y: 270 }}
             collapsible={false}
-            zoomable={false}
+            zoomable
             allowForeignObjects
             nodeSvgShape={deactiveSvgShape}
             nodeLabelComponent={{

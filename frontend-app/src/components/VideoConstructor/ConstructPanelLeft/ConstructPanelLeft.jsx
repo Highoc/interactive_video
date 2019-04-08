@@ -38,8 +38,6 @@ class ConstructPanelLeft extends Component {
     }
   }
 
-
-
   componentDidUpdate(prevProps, prevState, prevContext) {
     if (prevProps.files !== this.props.files) {
       this.setState({ sources: this.props.files });
@@ -84,8 +82,11 @@ class ConstructPanelLeft extends Component {
     if (isValid) {
       try {
         const data = this.getData();
+        console.log('1');
         const result = await this.backend(multipart).post('video/source/upload/', data);
+        console.log('2');
         onFileUpload(result.data);
+        console.log('3');
         this.setState({ isSent: true, dialogOpen: false });
       } catch (error) {
         perror('ConstructPanelRIght', error);

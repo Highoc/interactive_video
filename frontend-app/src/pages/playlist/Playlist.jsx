@@ -6,6 +6,7 @@ import ChannelPlaylist from '../../components/Channel/ChannelInfo/ChannelPlaylis
 import { RequestResolver } from '../../helpers/RequestResolver';
 import classes from './Playlist.module.css';
 import { perror } from '../../helpers/SmartPrint';
+import {ListHeader, MovieList} from "../../components/Channel/ChannelInfo/presentations";
 
 
 class Playlist extends Component {
@@ -46,10 +47,8 @@ class Playlist extends Component {
       <div>
         <Card className={classes.card}>
           <CardContent>
-            <Typography gutterBottom variant="h5" component="h2" align="center">
-              {playlist.name}
-            </Typography>
-            <ChannelPlaylist playlist={playlist} channelKey={channelKey} />
+            <ListHeader header={playlist.name} />
+            <MovieList movieList={playlist} channelKey={channelKey} />
           </CardContent>
         </Card>
       </div>
