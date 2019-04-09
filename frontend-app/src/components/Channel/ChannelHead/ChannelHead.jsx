@@ -11,10 +11,10 @@ import HelpIcon from '@material-ui/icons/Help';
 import ThumbUp from '@material-ui/icons/ThumbUp';
 import ThumbDown from '@material-ui/icons/ThumbDown';
 import { connect } from 'react-redux';
-import date from '../../../helpers/Date/date';
 import { perror } from '../../../helpers/SmartPrint';
 import classes from './ChannelHead.module.css';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
+
 
 class ChannelHead extends Component {
   constructor(props) {
@@ -67,9 +67,8 @@ class ChannelHead extends Component {
       channel, channelKey, subStatus, value,
     } = this.state;
     const { myChannelKey } = this.props;
-    const Settings = props => <Link to={`${channelKey}/edit`} {...props} />;
     let subscribe = <Tab label="Подписаться" icon={<ThumbUp />} onClick={event => this.handleSubscribe(event)} />;
-    let settings = <Tab label="Настройки" icon={<SettingsIcon />} component={Settings} />;
+    let settings = <Tab label="Настройки" icon={<SettingsIcon />} />;
     if (myChannelKey !== channelKey) {
       settings = <div />;
     }

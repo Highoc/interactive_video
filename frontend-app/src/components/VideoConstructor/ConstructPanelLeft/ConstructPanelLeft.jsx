@@ -51,6 +51,7 @@ class ConstructPanelLeft extends Component {
     this.setState({ dialogOpen: true });
   };
 
+
   callbackInput(state) {
     const { inputs } = this.state;
     const input = inputs.find(elem => elem.name === state.name);
@@ -72,6 +73,7 @@ class ConstructPanelLeft extends Component {
     return result;
   }
 
+
   async callbackDialog() {
     const { inputs } = this.state;
     const { onFileUpload } = this.props;
@@ -82,14 +84,12 @@ class ConstructPanelLeft extends Component {
     if (isValid) {
       try {
         const data = this.getData();
-        console.log('1');
+        pprint('hello', data);
         const result = await this.backend(multipart).post('video/source/upload/', data);
-        console.log('2');
         onFileUpload(result.data);
-        console.log('3');
         this.setState({ isSent: true, dialogOpen: false });
       } catch (error) {
-        perror('ConstructPanelRIght', error);
+        perror('ConstructPanelLeft', error);
       }
     } else {
       console.log('Invalid input');
@@ -154,6 +154,7 @@ class ConstructPanelLeft extends Component {
     );
   }
 }
+
 
 ConstructPanelLeft.propTypes = {
   classes: PropTypes.object.isRequired,

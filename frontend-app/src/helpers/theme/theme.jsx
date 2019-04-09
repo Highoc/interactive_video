@@ -15,22 +15,27 @@ const theme = createMuiTheme({
     },
   },
   typography: {
+    useNextVariants: true,
     fontFamily: 'Roboto',
-    title: {
+    h6: {
       fontSize: 26,
     },
-    display1: {
+    h1: {
       fontSize: 30,
       fontFamily: 'fantasy',
       lineHeight: 3,
     },
-    display2: {
+    h2: {
       fontSize: 15,
       fontFamily: 'Roboto',
     },
-    display3: {
+    h3: {
       fontSize: 12,
       fontFamily: 'Roboto',
+    },
+    h4: {
+      fontSize: 25,
+      fontFamily: 'fantasy',
     },
   },
   palette: {
@@ -62,7 +67,7 @@ const theme = createMuiTheme({
     },
     text: {
       primary: 'rgb(255,255,255)',
-      secondary: 'rgb(255,255,255)',
+      secondary: 'rgb(156,156,156)',
       disabled: 'rgba(255, 255, 255, 1)',
       hint: 'rgba(255, 255, 255, 0.38)',
     },

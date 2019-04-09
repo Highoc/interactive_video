@@ -27,6 +27,7 @@ class CreateVideo extends Component {
       nodeChosen: null,
       dialogOpen: false,
       uploadStatus: false,
+      nameSource: '',
       channelKey,
       videoKey: '',
       inputData: {
@@ -91,9 +92,9 @@ class CreateVideo extends Component {
   handleChange = (event) => {
     const { inputData, sources } = this.state;
     const keySource = sources[event.target.value].key;
+    const nameSource = sources[event.target.value].name;
     inputData.sourceKey = keySource;
-    pprint('InputData', inputData);
-    this.setState({ inputData });
+    this.setState({ inputData, nameSource });
   };
 
   handleClick(key) {
@@ -215,7 +216,7 @@ class CreateVideo extends Component {
 
   render() {
     const {
-      tree, dialogOpen, inputData, inputs, sources, isSent, channelKey, videoKey,
+      tree, dialogOpen, inputs, sources, isSent, channelKey, videoKey, nameSource,
     } = this.state;
 
     if (isSent) {
@@ -238,7 +239,7 @@ class CreateVideo extends Component {
 
     return (
       <div className={classes.container}>
-        <Typography variant="title">
+        <Typography variant="h6">
           Создание видео
           {this.state.videoKey}
         </Typography>
@@ -264,11 +265,14 @@ class CreateVideo extends Component {
           <DialogContent>
             {Inputs[2]}
             <Select
-              value={inputData.sourceKey}
+              value={nameSource}
               name="sourceKey"
               fullWidth
               onChange={this.handleChange}
             >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
               { sources.map((source, i) => (
                 <MenuItem key={i} value={i}>{source.name}</MenuItem>
               ))}

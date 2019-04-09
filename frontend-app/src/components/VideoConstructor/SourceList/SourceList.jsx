@@ -16,7 +16,7 @@ class SourceList extends Component {
             image={previewUrl}
           />
           <CardContent className={classes.content}>
-            <Typography gutterBottom variant="h6" component="h2" align="center">
+            <Typography gutterBottom variant="h1" align="center">
               {name}
             </Typography>
           </CardContent>

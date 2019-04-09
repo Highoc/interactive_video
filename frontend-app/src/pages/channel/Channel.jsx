@@ -5,9 +5,7 @@ import CreateChannel from './CreateChannel/CreateChannel';
 import ChannelView from './ChannelView/ChannelView';
 import CreateVideo from './CreateVideo/CreateVideo';
 import WatchVideo from './WatchVideo/WatchVideo';
-import ChannelEdit from './ChannelEdit/ChannelEdit';
 import PlaylistAdd from '../playlist/PlaylistAdd/PlaylistAdd';
-import PlaylistAll from '../playlist/PlaylistAll/PlaylistAll';
 import Playlist from '../playlist/Playlist';
 import PlaylistEdit from '../playlist/PlaylistEdit/PlaylistEdit';
 
@@ -16,7 +14,6 @@ export const Channel = () => (
     <Switch>
       <Route exact path="/channel/create" component={CreateChannel} />
       <Route exact path="/channel/:channelKey" component={ChannelView} />
-      <Route exact path="/channel/:channelKey/edit" component={ChannelEdit} />
       <Route exact path="/channel/:channelKey/create" component={CreateVideo} />
       <Route exact path="/channel/:channelKey/playlist/create" component={PlaylistAdd} />
       <Route exact path="/channel/:channelKey/playlist/:playlistKey/update" component={PlaylistEdit} />

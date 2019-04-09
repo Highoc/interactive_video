@@ -14,7 +14,7 @@ class MovieList extends React.Component {
     };
   }
 
-  renderMovieList = movieList => movieList.video.map(movie => <ListItem key={movie.id} movie={movie} channelKey={this.props.channelKey} />);
+  renderMovieList = movieList => movieList.video.map(movie => <ListItem key={movie.key} movie={movie} channelKey={this.props.channelKey} />);
 
   handleLeftClick = (e) => {
     e.preventDefault();
@@ -54,11 +54,10 @@ class MovieList extends React.Component {
     const { movieList } = this.state;
     return (
       <div className="list-container">
-        <span
-          onClick={this.handleLeftClick}
-          className="left-controls"
-          role="button"
-        />
+        <div className="arrow-left" onClick={this.handleLeftClick} role="button">
+          <div className="arrow-left-top" />
+          <div className="arrow-left-bottom" />
+        </div>
 
         <div className="module-section clearfix">
           {/* eslint-disable-next-line react/no-string-refs */}
@@ -67,11 +66,10 @@ class MovieList extends React.Component {
           </ul>
         </div>
 
-        <span
-          onClick={this.handleRightClick}
-          className="right-controls"
-          role="button"
-        />
+        <div className="arrow-right" onClick={this.handleRightClick} role="button">
+          <div className="arrow-right-top" />
+          <div className="arrow-right-bottom" />
+        </div>
       </div>
     );
   }

@@ -14,12 +14,12 @@ class ListItem extends React.Component {
 
   renderTitle = (title) => {
     if (title.length < 20) {
-      return <Typography variant="display2" className="search-tile-title">{title}</Typography>;
+      return <Typography variant="h3" className="search-tile-title">{title}</Typography>;
     }
     if (title.length < 35) {
-      return <Typography variant="display2" className="search-tile-title long-title">{title}</Typography>;
+      return <Typography variant="h3" className="search-tile-title long-title">{title}</Typography>;
     }
-    return <Typography variant="display2" className="search-tile-title longer-title">{title}</Typography>;
+    return <Typography variant="h3" className="search-tile-title longer-title">{title}</Typography>;
   };
 
   renderDesc = (desc) => {
@@ -27,14 +27,14 @@ class ListItem extends React.Component {
       // eslint-disable-next-line no-param-reassign
       desc = desc.substring(0, 135);
       return (
-        <Typography variant="display3" className="tile-desc">
+        <Typography variant="h2" className="tile-desc">
           {desc}
           {' '}
 ... read more
         </Typography>
       );
     }
-    return <Typography variant="display3" className="tile-desc">{desc}</Typography>;
+    return <Typography variant="h2" className="tile-desc">{desc}</Typography>;
   };
 
   renderPic = movie => (

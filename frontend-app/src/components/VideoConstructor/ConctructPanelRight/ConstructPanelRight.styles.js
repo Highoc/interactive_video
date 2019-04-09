@@ -24,6 +24,9 @@ const styles = ({
     marginTop: '70px',
     justifyContent: 'center',
   },
+  rightIcon: {
+    marginLeft: spacing.unit,
+  },
 });
 
 export default styles;

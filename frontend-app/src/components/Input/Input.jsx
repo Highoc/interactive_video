@@ -171,7 +171,7 @@ class Input extends Component {
 
     return (
       <div className={classes.Input}>
-        <Typography variant="title">{this.props.description}</Typography>
+        <Typography variant="h6">{this.props.description}</Typography>
         {inputElement}
       </div>
     );

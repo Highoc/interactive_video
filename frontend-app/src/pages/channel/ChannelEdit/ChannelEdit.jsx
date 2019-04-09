@@ -106,7 +106,7 @@ class ChannelEdit extends Component {
     return (
       <div>
         <form>
-          <Typography>
+          <Typography variant="h6">
             Настройки канала
           </Typography>
           {Inputs}

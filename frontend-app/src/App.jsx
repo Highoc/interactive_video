@@ -45,7 +45,7 @@ class App extends Component {
   render() {
     let routes = (
       <Switch>
-        <Route path="/guest" exact component={Homepage} />
+        <Route path="/guest" exact component={Guest} />
         <Route path="/login" exact component={SignIn} />
         <Route path="/register" exact component={Register} />
         <Redirect to="/guest" />

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Typography } from '@material-ui/core';
-import ChannelPlaylist from '../../../components/Channel/ChannelInfo/ChannelPlaylist';
 import { RequestResolver } from '../../../helpers/RequestResolver';
 import ChannelHead from '../../../components/Channel/ChannelHead';
 import classes from './ChannelView.module.css';
@@ -8,6 +7,7 @@ import { perror } from '../../../helpers/SmartPrint';
 import date from '../../../helpers/Date/date';
 import PlaylistAll from '../../playlist/PlaylistAll/PlaylistAll';
 import { ListHeader, MovieList } from '../../../components/Channel/ChannelInfo/presentations';
+import ChannelEdit from '../ChannelEdit/ChannelEdit';
 
 function TabContainer(props) {
   return (
@@ -67,17 +67,7 @@ class ChannelView extends Component {
       return <div> Еще не загружено </div>;
     }
     const { channel, channelKey, value } = this.state;
-    const info = (
-      <Typography>
-Создатель:
-        {channel.owner.username}
-        <br />
-Создан:
-        {date(channel.created)}
-        <br />
-        {channel.description}
-      </Typography>
-    );
+    const info = (<Typography>Создатель:{channel.owner.username}<br />Создан:{date(channel.created)}<br />{channel.description}</Typography>);
 
     return (
       <div className={classes.root}>
@@ -92,6 +82,7 @@ class ChannelView extends Component {
           )}
           {value === 1 && <TabContainer><PlaylistAll channelKey={channelKey} /></TabContainer>}
           {value === 2 && <TabContainer>{info}</TabContainer>}
+          {value === 3 && <TabContainer><ChannelEdit /></TabContainer>}
         </ChannelHead>
       </div>
     );

@@ -14,6 +14,7 @@ import {
   BigPlayButton,
   DurationDisplay,
   ProgressControl,
+  FullscreenToggle,
 } from 'video-react';
 import { RequestResolver } from '../../../helpers/RequestResolver';
 
@@ -185,6 +186,7 @@ class InteractivePlayer extends Component {
             <TimeDivider disabled />
             <DurationDisplay disabled />
             <ProgressControl disabled />
+            <FullscreenToggle disabled />
             <VolumeMenuButton order={7} vertical />
           </ControlBar>
         </Player>

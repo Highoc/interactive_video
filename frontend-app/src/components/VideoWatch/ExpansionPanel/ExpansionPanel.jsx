@@ -48,7 +48,7 @@ class ExpansionPanelVideo extends Component {
 
     return (
       <div className={classes.root}>
-        <ExpansionPanel expanded={true} expandIcon={<ExpandMoreIcon color="secondary" />}>
+        <ExpansionPanel expanded={true}>
           <ExpansionPanelSummary>
             <div className={classes.row}>
               <div className={classes.columnContainer}>
@@ -92,4 +92,3 @@ ExpansionPanelVideo.propTypes = {
 };
 
 export default withStyles(styles)(ExpansionPanelVideo);
-

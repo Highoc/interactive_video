@@ -48,6 +48,7 @@ class EditAccount extends Component {
     if (isValid) {
       try {
         const data = this.getData();
+        pprint('account', data);
         await this.backend(multipart).post('core/profile/update/', data);
         this.setState({ isSent: true });
       } catch (error) {

@@ -52,7 +52,7 @@ class WatchVideo extends Component {
 
           <Card className={classes.card}>
             <CardContent>
-              <Typography gutterBottom variant="title" component="h2" align="center">
+              <Typography gutterBottom variant="h6" align="center">
                 {video.name}
               </Typography>
             </CardContent>

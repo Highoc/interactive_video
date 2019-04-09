@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import {
-  Card, CardContent, Typography,
+  Card, CardContent,
 } from '@material-ui/core';
-import ChannelPlaylist from '../../components/Channel/ChannelInfo/ChannelPlaylist';
 import { RequestResolver } from '../../helpers/RequestResolver';
 import classes from './Playlist.module.css';
 import { perror } from '../../helpers/SmartPrint';
-import {ListHeader, MovieList} from "../../components/Channel/ChannelInfo/presentations";
+import { ListHeader, MovieList } from '../../components/Channel/ChannelInfo/presentations';
 
 
 class Playlist extends Component {

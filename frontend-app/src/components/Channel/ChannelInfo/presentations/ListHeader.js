@@ -4,7 +4,7 @@ import '../HomeList.scss';
 
 const ListHeader = ({ header }) => (
   <div className="list-title">
-    <Typography variant="title">{header}</Typography>
+    <Typography variant="h1">{header}</Typography>
   </div>
 );
 

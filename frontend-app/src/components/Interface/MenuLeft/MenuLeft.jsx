@@ -68,17 +68,17 @@ class MenuLeft extends Component {
           open
         >
           <List className={classes.list} disablePadding>
-            <Typography variant="title" align="center">
+            <Typography variant="h4" align="center" color="textSecondary">
               Каналы
             </Typography>
             {channels.map(({ name, key }) => (
               <div key={`Channel${key}`}>
-                <Divider variant="secondary" />
+                <Divider />
                 <ChannelList name={name} keyChannel={key} />
               </div>
             ))}
             <Divider />
-            <Typography variant="title" align="center">
+            <Typography variant="h4" align="center" color="textSecondary">
               Подписки
             </Typography>
             {subscriptions.map(({ name, channel_key }) => (

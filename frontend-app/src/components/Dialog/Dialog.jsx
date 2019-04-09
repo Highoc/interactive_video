@@ -49,7 +49,7 @@ class DialogSmart extends Component {
         {this.props.children}
         <DialogActions>
           <Button onClick={(event) => { event.preventDefault(); this.submitHandler(); }} color="secondary">
-            Отправить
+            Добавить
           </Button>
         </DialogActions>
       </Dialog>
