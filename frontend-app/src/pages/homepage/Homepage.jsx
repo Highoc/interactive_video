@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { RequestResolver } from '../../helpers/RequestResolver';
 import { pprint, perror } from '../../helpers/SmartPrint';
+import date from '../../helpers/Date/date';
 import classes from './Homepage.module.css';
-import { MovieList, ListHeader } from "../../components/Channel/ChannelInfo/presentations";
+import { MovieList, ListHeader, HugeVideoPreview } from "../../components/Channel/ChannelInfo/presentations";
+import HomepageHead from './HomepageHead/HomepageHead';
 
 class Homepage extends Component {
   constructor(props) {
@@ -39,17 +41,23 @@ class Homepage extends Component {
     * */
     const { channel, channelKey } = this.state;
 
+    const testVideo = {
+      name: 'Человек муравей уничтожает людей и муравьев',
+      description: 'Самый маленький супергерой может победить все человечество или же нет? Как думаете? Я думаю, что\
+        это невозможно, потому что он слишком маленький, чтобы всех победить, как говорится один в поле не воин, да и вообще земля плоская!!',
+      channelName: 'Канал Супергероев',
+      key: '12312412',
+      created: date(channel.uploaded_playlist.video[0].created),
+      preview_url: 'https://disima.ru/wp-content/uploads/2016/01/chelovek-muravej-art.jpg',
+      rating: 500,
+      views: 100500,
+    };
     if (isLoaded) {
       result = (
         <div className={classes.root}>
           <ListHeader header="Тренды" />
           <MovieList movieList={channel.uploaded_playlist} channelKey={channelKey} />
-          <ListHeader header="Подписки" />
-          <MovieList movieList={channel.uploaded_playlist} channelKey={channelKey} />
-          <ListHeader header="Истории" />
-          <MovieList movieList={channel.uploaded_playlist} channelKey={channelKey} />
-          <ListHeader header="Подборка" />
-          <MovieList movieList={channel.uploaded_playlist} channelKey={channelKey} />
+          <HugeVideoPreview channelKey={channelKey} video={testVideo} />
         </div>
       );
     }
@@ -62,5 +70,10 @@ class Homepage extends Component {
     );
   }
 }
+
+/*
+*
+
+* */
 
 export default Homepage;

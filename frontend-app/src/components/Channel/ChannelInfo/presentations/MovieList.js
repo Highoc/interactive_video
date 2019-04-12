@@ -51,7 +51,8 @@ class MovieList extends React.Component {
   };
 
   render() {
-    const { movieList } = this.state;
+    const { movieList, tilesCounter } = this.state;
+    console.log(tilesCounter);
     return (
       <div className="list-container">
         <div className="arrow-left" onClick={this.handleLeftClick} role="button">

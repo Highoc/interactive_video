@@ -1,41 +1,32 @@
 import { createMuiTheme } from '@material-ui/core';
 
 const theme = createMuiTheme({
-  overrides: {
-    MuiGridList: { // Name of the component ⚛️ / style sheet
-      root: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
-        padding: 0,
-        listStyle: 'none',
-        overflowY: 'hidden',
-        WebkitOverflowScrolling: 'touch',
-      },
-    },
-  },
   typography: {
     useNextVariants: true,
-    fontFamily: 'Roboto',
+    fontFamily: ['Roboto', 'Helvetica Neue Cyr Medium'],
     h6: {
       fontSize: 26,
     },
     h1: {
       fontSize: 30,
-      fontFamily: 'fantasy',
-      lineHeight: 3,
+      fontFamily: 'Helvetica Neue Cyr Medium',
+      lineHeight: 2,
     },
     h2: {
       fontSize: 15,
-      fontFamily: 'Roboto',
+      fontFamily: 'Helvetica Neue Cyr Medium',
     },
     h3: {
       fontSize: 12,
-      fontFamily: 'Roboto',
+      fontFamily: 'Helvetica Neue Cyr Medium',
     },
     h4: {
       fontSize: 25,
-      fontFamily: 'fantasy',
+      fontFamily: 'Helvetica Neue Cyr Medium',
+    },
+    fontSize: {
+      medium: 20,
+      large: 35,
     },
   },
   palette: {
@@ -68,7 +59,7 @@ const theme = createMuiTheme({
     text: {
       primary: 'rgb(255,255,255)',
       secondary: 'rgb(156,156,156)',
-      disabled: 'rgba(255, 255, 255, 1)',
+      disabled: 'rgb(255,13,32)',
       hint: 'rgba(255, 255, 255, 0.38)',
     },
   },

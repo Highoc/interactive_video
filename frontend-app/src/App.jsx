@@ -30,7 +30,6 @@ import { loginCheckState } from './store/actions/authorization';
 import ConstructPanelRight from './components/VideoConstructor/ConctructPanelRight';
 
 import theme from './helpers/theme/theme';
-import 'typeface-roboto';
 
 
 const Guest = props => <div> Гостевая страница </div>;

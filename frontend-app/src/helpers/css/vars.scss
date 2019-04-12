@@ -8,6 +8,12 @@ $iconSize: 50px;
 $tileWidth: 280px;
 $tileHeight: 160px;
 
+$previewVideoWidth: 800px;
+$previewVideoHeight: 600px;
+
+$previewWidth: 800px;
+$previewHeight: 600px;
+
 /* mixins */
 
 /* responsive layout */
@@ -174,3 +180,65 @@ $tileHeight: 160px;
     @include playBtn;
   }
 }
+
+@mixin listingPreview {
+  .preview {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+    cursor: pointer;
+    padding: 5px;
+    overflow: hidden;
+    width: $previewWidth;
+    height: $previewHeight;
+    transition: 0.3s transform;
+    transform-origin: 0% 50%;
+    .preview-img {
+      transition: transform 0.6s ease-out;
+      object-fit: cover;
+      width: $previewVideoWidth;
+      height: $previewVideoHeight;
+    }
+  }
+  .photo-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding-left: 20px;
+    padding-right: 20px;
+    display: flex;
+    /*centering text inside .photo-overlay */
+    justify-content: space-between;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+  .photo-overlay:hover {
+    opacity: 1;
+  }
+  .preview-desc {
+    font-size: 0.6em;
+    line-height: 1.3;
+    margin: 0 0;
+  }
+  .preview-btn-container {
+    margin-top: 130px;
+    @include addListBtn;
+    .addListBtn {
+      font-size: 22px;
+      border: 1px solid $whiteGrey;
+      padding: 10px 4px;
+      &:hover {
+        border: 1px solid $White;
+      }
+    }
+  }
+  .playbtn-container {
+    margin: $previewVideoHeight/2px 0px 0px $previewVideoWidth/2px;
+    text-align: center;
+    @include playBtn;
+  }
+}
+
