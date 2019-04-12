@@ -9,7 +9,77 @@ from .models import Profile
 from .serializers import UserSerializer, ProfileSerializer, UserSerializerWithToken
 from .helpers import get_avatar_url, convert_to_byte_length, check_image_mime_type, check_image_size
 
+from video.models import Video
+from channel.models import Channel
+
 import jwt, time
+from datetime import datetime, timedelta
+
+class SearchView(APIView):
+    def get(self, request):
+
+        if not request.data:
+            return Response('Wrong GET data', status=status.HTTP_400_BAD_REQUEST)
+
+        search_word = request.data['search']
+        limit = 20
+
+        video = Video.objects.filter(name__icontains=search_word)[:limit]
+        channels = Channel.objects.filter(name__icontains=search_word)[:limit]
+
+        response = {
+            'video': [ {
+                'key': curr.key,
+                'name': curr.name,
+            } for curr in video],
+            'channels': [ {
+                'key': channel.key,
+                'name': channel.name
+            } for channel in channels]
+        }
+
+
+        return Response(response, status=status.HTTP_200_OK_NOT_IMPLEMENTED)
+
+
+class VideoTopView(APIView):
+    def get(self, request):
+        start_date = datetime.now() - timedelta(days=30)
+        new_start_date = datetime.now() - timedelta(days=7)
+        limit = 20
+
+        popular = Video.objects.filter(created__gte=start_date).order_by('-rating__counter')[:limit]
+        viewed = Video.objects.filter(created__gte=start_date).order_by('-views__counter')[:limit]
+        new = Video.objects.filter(created__gte=new_start_date)[:limit]
+
+        response = {
+            'popular': [ {
+                'key': video.key,
+                'name': video.name,
+                'created': video.created,
+                'preview_url': f'https://hb.bizmrg.com/interactive_video/public_pic/{video.id % 3 + 1}.jpg',
+                'rating': video.rating.counter,
+                'views': video.views.counter,
+            } for video in popular],
+            'viewed': [{
+                'key': video.key,
+                'name': video.name,
+                'created': video.created,
+                'preview_url': f'https://hb.bizmrg.com/interactive_video/public_pic/{video.id % 3 + 1}.jpg',
+                'rating': video.rating.counter,
+                'views': video.views.counter,
+            } for video in viewed],
+            'new': [{
+                'key': video.key,
+                'name': video.name,
+                'created': video.created,
+                'preview_url': f'https://hb.bizmrg.com/interactive_video/public_pic/{video.id % 3 + 1}.jpg',
+                'rating': video.rating.counter,
+                'views': video.views.counter,
+            } for video in new],
+        }
+
+        return Response(response, status=status.HTTP_200_OK)
 
 
 class UserCurrentView(APIView):
@@ -141,4 +211,3 @@ class ProfileCurrentView(APIView):
             'avatar_url': get_avatar_url(profile.key)
         }
         return Response(response, status=status.HTTP_200_OK)
-
