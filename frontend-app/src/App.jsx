@@ -24,17 +24,13 @@ import { Channel } from './pages/channel';
 import SignIn from './pages/login/SignIn';
 import Register from './pages/register/Register';
 import Test from './pages/test/Test';
-import NotReady from './pages/notReady/NotReady';
+import Guestpage from './pages/guest/Guestpage';
 import Centrifugo from './components/Centrifugo';
 
 import { loginCheckState } from './store/actions/authorization';
 import ConstructPanelRight from './components/VideoConstructor/ConctructPanelRight';
 
 import theme from './helpers/theme/theme';
-
-
-const Guest = props => <div> Гостевая страница </div>;
-
 
 class App extends Component {
   componentDidMount() {
@@ -45,7 +41,7 @@ class App extends Component {
   render() {
     let routes = (
       <Switch>
-        <Route path="/guest" exact component={Guest} />
+        <Route path="/guest" exact component={Guestpage} />
         <Route path="/login" exact component={SignIn} />
         <Route path="/register" exact component={Register} />
         <Redirect to="/guest" />
