@@ -24,7 +24,7 @@ import { Channel } from './pages/channel';
 import SignIn from './pages/login/SignIn';
 import Register from './pages/register/Register';
 import Test from './pages/test/Test';
-
+import NotReady from './pages/notReady/NotReady';
 import Centrifugo from './components/Centrifugo';
 
 import { loginCheckState } from './store/actions/authorization';
@@ -65,7 +65,7 @@ class App extends Component {
           <Route exact path="/account/edit" component={EditAccount} />
           <Route path="/account" component={Account} />
           <Route path="/channel" component={Channel} />
-          <Redirect to="/test" />
+          <Redirect to="/" />
         </Switch>
       );
 

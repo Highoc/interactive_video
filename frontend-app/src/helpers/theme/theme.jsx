@@ -38,6 +38,7 @@ const theme = createMuiTheme({
     background: {
       paper: 'rgb(31,31,31)',
       default: 'rgb(38,38,38)',
+      black: 'rgb(20, 20, 20)',
     },
     primary: {
       light: 'rgb(255,9,0)',

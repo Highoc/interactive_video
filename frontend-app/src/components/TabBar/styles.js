@@ -1,7 +1,6 @@
-
-const styles = theme => ({
+const styles = ({ palette }) => ({
   container: {
-    padding: 8 * 3,
+    backgroundColor: palette.background.black,
   },
 });
 

@@ -31,6 +31,7 @@ const styles = ({ palette, typography, breakpoints }) => ({
     height: '600px',
     maxWidth: '760px',
   },
+
   overlay: {
     position: 'absolute',
     top: 0,

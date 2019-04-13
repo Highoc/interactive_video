@@ -4,7 +4,9 @@ import { pprint, perror } from '../../helpers/SmartPrint';
 import date from '../../helpers/Date/date';
 import classes from './Homepage.module.css';
 import { HugeVideoPreview, Carousel } from '../../components/Video';
-import HomepageHead from './HomepageHead/HomepageHead';
+import { TabBar } from '../../components/TabBar';
+import { Whatshot, Subscriptions, FiberNew, Grade } from "@material-ui/icons";
+
 
 class Homepage extends Component {
   constructor(props) {
@@ -40,7 +42,6 @@ class Homepage extends Component {
     * Создать / Изменить / Удалить канал
     * */
     const { channel, channelKey } = this.state;
-    console.log(channel.uploaded_playlist);
 
     const testVideo = {
       name: 'Человек муравей уничтожает людей и муравьев',
@@ -59,21 +60,53 @@ class Homepage extends Component {
     for (let i = 0 ; i < 10; i++){
       testPlaylist.push(testVideo);
     }
+
+    const hot = (
+      <div>
+        <Carousel channelKey={channelKey} playlist={testPlaylist} label="Видео Про Человека Муравья" />
+        <HugeVideoPreview video={testVideo} />
+        <HugeVideoPreview video={testVideo} order="reverse" />
+        <HugeVideoPreview video={testVideo} />
+        <Carousel channelKey={channelKey} playlist={testPlaylist} label="Видео Про Человека Муравья" />
+        <HugeVideoPreview video={testVideo} />
+        <HugeVideoPreview video={testVideo} order="reverse" />
+        <HugeVideoPreview video={testVideo} />
+        <Carousel channelKey={channelKey} playlist={testPlaylist} label="Видео Про Человека Муравья" />
+        <HugeVideoPreview video={testVideo} />
+        <HugeVideoPreview video={testVideo} order="reverse" />
+        <HugeVideoPreview video={testVideo} />
+      </div>
+    );
+
+    const tabs = [
+      {
+        value: 1,
+        label: 'Горячее',
+        icon: <Whatshot />,
+        container: hot,
+      }, {
+        value: 2,
+        label: 'Свежее',
+        icon: <FiberNew />,
+        container: hot,
+      }, {
+        value: 3,
+        label: 'Популярное',
+        icon: <Grade />,
+        container: hot,
+      }, {
+        value: 4,
+        label: 'Подписки',
+        icon: <Subscriptions />,
+        container: hot,
+      },
+
+    ];
+
     if (isLoaded) {
       result = (
         <div className={classes.root}>
-          <Carousel channelKey={channelKey} playlist={testPlaylist} label="Видео Про Человека Муравья" />
-          <HugeVideoPreview video={testVideo} />
-          <HugeVideoPreview video={testVideo} order="reverse" />
-          <HugeVideoPreview video={testVideo} />
-          <Carousel channelKey={channelKey} playlist={testPlaylist} label="Видео Про Человека Муравья" />
-          <HugeVideoPreview video={testVideo} />
-          <HugeVideoPreview video={testVideo} order="reverse" />
-          <HugeVideoPreview video={testVideo} />
-          <Carousel channelKey={channelKey} playlist={testPlaylist} label="Видео Про Человека Муравья" />
-          <HugeVideoPreview video={testVideo} />
-          <HugeVideoPreview video={testVideo} order="reverse" />
-          <HugeVideoPreview video={testVideo} />
+          <TabBar defaultValue={1} tabs={tabs} />
         </div>
       );
     }
@@ -86,10 +119,5 @@ class Homepage extends Component {
     );
   }
 }
-
-/*
-*
-
-* */
 
 export default Homepage;
