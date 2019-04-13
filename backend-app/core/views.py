@@ -6,10 +6,11 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from application import settings
 
 from .models import Profile
-from .serializers import UserSerializer, ProfileSerializer, UserSerializerWithToken
+from .serializers import UserSerializer, ProfileSerializer, UserSerializerWithToken, TopSerializer
 from .helpers import get_avatar_url, convert_to_byte_length, check_image_mime_type, check_image_size
 
 from video.models import Video
+from video.serializers import VideoPreviewSerialiser
 from channel.models import Channel
 
 import jwt, time
@@ -40,46 +41,6 @@ class SearchView(APIView):
 
 
         return Response(response, status=status.HTTP_200_OK_NOT_IMPLEMENTED)
-
-
-class VideoTopView(APIView):
-    def get(self, request):
-        start_date = datetime.now() - timedelta(days=30)
-        new_start_date = datetime.now() - timedelta(days=7)
-        limit = 20
-
-        popular = Video.objects.filter(created__gte=start_date).order_by('-rating__counter')[:limit]
-        viewed = Video.objects.filter(created__gte=start_date).order_by('-views__counter')[:limit]
-        new = Video.objects.filter(created__gte=new_start_date)[:limit]
-
-        response = {
-            'popular': [ {
-                'key': video.key,
-                'name': video.name,
-                'created': video.created,
-                'preview_url': f'https://hb.bizmrg.com/interactive_video/public_pic/{video.id % 3 + 1}.jpg',
-                'rating': video.rating.counter,
-                'views': video.views.counter,
-            } for video in popular],
-            'viewed': [{
-                'key': video.key,
-                'name': video.name,
-                'created': video.created,
-                'preview_url': f'https://hb.bizmrg.com/interactive_video/public_pic/{video.id % 3 + 1}.jpg',
-                'rating': video.rating.counter,
-                'views': video.views.counter,
-            } for video in viewed],
-            'new': [{
-                'key': video.key,
-                'name': video.name,
-                'created': video.created,
-                'preview_url': f'https://hb.bizmrg.com/interactive_video/public_pic/{video.id % 3 + 1}.jpg',
-                'rating': video.rating.counter,
-                'views': video.views.counter,
-            } for video in new],
-        }
-
-        return Response(response, status=status.HTTP_200_OK)
 
 
 class UserCurrentView(APIView):
@@ -211,3 +172,34 @@ class ProfileCurrentView(APIView):
             'avatar_url': get_avatar_url(profile.key)
         }
         return Response(response, status=status.HTTP_200_OK)
+
+
+from .serializers import NEW, HOT, POPULAR
+
+_START_DELTA = 60
+_NEW_START_DELTA = 60
+_LIMIT = 20
+
+
+class VideoTopView(APIView):
+    def get(self, request):
+        serializer = TopSerializer(request.GET)
+        if serializer.is_valid():
+            type = serializer.validated_data['type']
+            start = datetime.now() - timedelta(days=_START_DELTA)
+            video = []
+            if type == NEW:
+                start = datetime.now() - timedelta(days=_NEW_START_DELTA)
+                video = Video.objects.filter(created__gte=start)[:_LIMIT]
+            elif type == HOT:
+                video = Video.objects.filter(created__gte=start).order_by('-views__counter')[:_LIMIT]
+            elif type == POPULAR:
+                video = Video.objects.filter(created__gte=start).order_by('-rating__counter')[:_LIMIT]
+
+            response = {
+                'top': [VideoPreviewSerialiser(current).data for current in video],
+            }
+
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

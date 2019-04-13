@@ -76,3 +76,15 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta():
         model = Profile
         fields = ('avatar', 'first_name', 'last_name', 'email')
+
+HOT = 'hot'
+NEW = 'new'
+POPULAR = 'popular'
+TYPE_CHOICES = (
+    (HOT, 'hot'),
+    (NEW, 'new'),
+    (POPULAR, 'popular'),
+)
+
+class TopSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=TYPE_CHOICES)

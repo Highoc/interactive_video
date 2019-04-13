@@ -61,7 +61,7 @@ class App extends Component {
           <Route exact path="/account/edit" component={EditAccount} />
           <Route path="/account" component={Account} />
           <Route path="/channel" component={Channel} />
-          <Redirect to="/" />
+          <Redirect to="/test" />
         </Switch>
       );
 
