@@ -5,19 +5,14 @@ import {
 import classes from './Input.module.css';
 import FileInput from './FileInput/FileInput';
 import VideoInput from './VideoInput/VideoInput';
-import { Typography } from "@material-ui/core";
 
 function checkValidity(value, rules) {
   let isValid = true;
 
   if (rules.required) {
     if (value !== undefined) {
-      if (!value.type){
+      if (!value.type) {
         isValid = value.trim() !== '' && isValid;
-      }
-      if (value.type === 'video' && value.file === null){
-        console.log('+');
-        isValid = false;
       }
     }
   }
@@ -171,7 +166,7 @@ class Input extends Component {
 
     return (
       <div className={classes.Input}>
-        <Typography variant="h6">{this.props.description}</Typography>
+        <label className={classes.Label}>{this.props.description}</label>
         {inputElement}
       </div>
     );

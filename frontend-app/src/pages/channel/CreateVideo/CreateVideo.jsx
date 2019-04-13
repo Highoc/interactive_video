@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import Input from '../../../components/Input/Input';
-import Dialog from '../../../components/Dialog';
+import { Dialog } from '../../../components/Dialog';
 import { perror, pprint } from '../../../helpers/SmartPrint';
 import classes from './CreateVideo.module.css';
 import { activeSvgShape, deactiveSvgShape, NodeImage } from './CreateVideo.styles';

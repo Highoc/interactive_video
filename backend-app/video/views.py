@@ -7,19 +7,71 @@ from application import settings
 
 from .serializers import SourceSerializer, VideoPartSerializer, VideoSerializer
 from .models import Source, VideoPart, Video
-from .helpers.video import is_supported_mime_type, get_file_url, get_mime_type, get_codec, get_duration, get_short_key
+from .helpers.video import is_supported_mime_type, get_file_url, get_mime_type, get_codec, get_duration, get_short_key, get_image_url
 
+from channel.models import Playlist
 from rating.models import Rating
 from views.models import Views
+from core.helpers import check_image_size, check_image_mime_type, convert_to_byte_length, get_file_url as test
 
 import io, tempfile
+
+def get_source_form(source=None):
+    name = ''
+    description = ''
+    preview_picture_url = ''
+    if source:
+        name = source.name
+        description = source.description
+        preview_picture_url = get_image_url(source.preview_picture)
+
+    forms = [{
+        'type': 'text',
+        'name': 'name',
+        'value': f'{name}',
+        'description': 'Название источника',
+        'rules': {
+            'max_length': 64,
+            'required': True
+        },
+    }, {
+        'type': 'textarea',
+        'name': 'description',
+        'value': f'{description}',
+        'description': 'Описание источника',
+        'rules': {
+            'max_length': 1024,
+            'required': False
+        },
+    }, {
+        'type': 'image',
+        'name': 'preview_picture',
+        'url': f'{preview_picture_url}',
+        'description': 'Превью источника',
+        'rules': {
+            'mime_type': ['image/png'],
+            'max_size': convert_to_byte_length(MB=10),
+            'required': False,
+        }
+    }, {
+        'type': 'video',
+        'name': 'content',
+        'description': 'Контент источника',
+        'rules': {
+            'mime_type': ['video/mp4'],
+            'max_size': convert_to_byte_length(MB=100),
+            'required': True,
+        }
+    }]
+
+    return forms
 
 class SourceUploadView(APIView):
 
     parser_classes = (MultiPartParser, FormParser)
 
     def get(self, request):
-        return Response({ 'username': request.user.username })
+        return Response(get_source_form(), status=status.HTTP_200_OK)
 
     def post(self, request):
         source_serializer = SourceSerializer(data=request.data)
@@ -30,26 +82,23 @@ class SourceUploadView(APIView):
             content = request.data['content']
 
             user = request.user
-            if isinstance(content.file, io.BytesIO):
-                with tempfile.NamedTemporaryFile() as temp:
-                    temp.write(content.file.read())
-                    temp.seek(0)
 
-                    mime_type = get_mime_type(temp.name)
-                    codec = get_codec(temp.name)
-                    time = get_duration(temp.name)
-                    '''
-                    elif should_call_external_command():
-                        temp.flush()
-                        subprocess.call(["wc", temp.name])
-                    '''
-            elif isinstance(content.file, tempfile._TemporaryFileWrapper):
-                temp = content.file
+            with tempfile.NamedTemporaryFile() as temp:
+                temp.write(content.read())
+                temp.flush()
+
+                content.seek(0)
+                temp.seek(0)
+
                 mime_type = get_mime_type(temp.name)
                 codec = get_codec(temp.name)
                 time = get_duration(temp.name)
-            else:
-                return Response('This source isn\'t supported.', status=status.HTTP_400_BAD_REQUEST)
+
+                '''
+                elif should_call_external_command():
+                    temp.flush()
+                    subprocess.call(["wc", temp.name])
+                '''
 
             if not is_supported_mime_type(mime_type):
                 return Response('This MIME type isn\'t supported.', status=status.HTTP_400_BAD_REQUEST)
@@ -64,10 +113,28 @@ class SourceUploadView(APIView):
                 status=Source.READY
             )
 
+            preview_picture = source_serializer.validated_data.get('preview_picture', None)
+            if preview_picture != '' or not preview_picture:
+                if not check_image_mime_type(preview_picture.content_type):
+                    return Response('Wrong preview picture mime type.', status=status.HTTP_400_BAD_REQUEST)
+
+                if not check_image_size(preview_picture.size):
+                    return Response('Size of preview picture must be less than 10MB.',
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                source.preview_picture.save(f'{user.id}/{source.key.hex}', preview_picture)
+
             source.content.save(f'{user.id}/{source.key.hex}', content)
             source.save()
 
-            return Response({'key': source.key.hex }, status=status.HTTP_201_CREATED)
+            response = {
+                'key': source.key.hex,
+                'name': source.name,
+                'content_url': test(source.content.name),
+                'preview_url': test(source.preview_picture.name)
+            }
+
+            return Response(response, status=status.HTTP_201_CREATED)
         else:
 
             return Response(source_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -81,6 +148,8 @@ class SourceListView(APIView):
         responce = [{
             'key': source.key.hex,
             'name': source.name,
+            'content_url': test(source.content.name),
+            'preview_url': test(source.preview_picture.name)
         } for source in sources ]
         return Response(responce, status=status.HTTP_200_OK)
 
@@ -125,10 +194,10 @@ class VideoUploadView(APIView):
 
             #print(video_parts)
             #print(request.data)
-
+            video.playlist = request.user.channel.playlists.get(status=Playlist.UPLOADED)
             video.save()
 
-            for part in video_parts: 
+            for part in video_parts:
                 if part.parent_ref is None:
                     part.parent = None
                 else:
@@ -141,6 +210,7 @@ class VideoUploadView(APIView):
             video.key = get_short_key(video.id)
             video.head_video_part = head
             video.codec = head.source.codec
+
             video.save()
 
             Views(video=video).save()

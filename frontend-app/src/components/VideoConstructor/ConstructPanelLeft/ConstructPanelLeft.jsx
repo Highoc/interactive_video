@@ -10,7 +10,7 @@ import {
 
 import { connect } from 'react-redux';
 import SourceList from '../SourceList';
-import Dialog from '../../Dialog';
+import { Dialog } from '../../Dialog';
 import { uploadFile } from '../../../store/actions/buttonActions';
 import {multipart, RequestResolver} from '../../../helpers/RequestResolver';
 import {perror, pprint} from '../../../helpers/SmartPrint';

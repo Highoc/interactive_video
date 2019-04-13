@@ -69,6 +69,22 @@ class UserSerializerWithToken(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(max_length=16, required=True)
+    last_name = serializers.CharField(max_length=16, required=True)
+    email = serializers.EmailField(required=False)
+
     class Meta():
         model = Profile
-        fields = ('avatar', )
+        fields = ('avatar', 'first_name', 'last_name', 'email')
+
+HOT = 'hot'
+NEW = 'new'
+POPULAR = 'popular'
+TYPE_CHOICES = (
+    (HOT, 'hot'),
+    (NEW, 'new'),
+    (POPULAR, 'popular'),
+)
+
+class TopSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=TYPE_CHOICES)

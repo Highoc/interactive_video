@@ -42,7 +42,8 @@ def get_comment_form(comment=None):
         'type': 'textarea',
         'name': 'text',
         'value': f'{text}',
-        'description': 'Текст комментария',
+        'label': 'Текст комментария',
+        'placeholder': 'Оставьте свой комментарий...',
         'rules': {
             'max_length': 512,
             'required': True,
