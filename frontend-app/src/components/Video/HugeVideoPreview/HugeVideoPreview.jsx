@@ -29,6 +29,9 @@ class HugeVideoPreview extends Component {
     } = this.props;
 
     const { channel } = video;
+    if (!video.preview_url) {
+      video.preview_url = 'https://disima.ru/wp-content/uploads/2016/01/chelovek-muravej-art.jpg';
+    }
 
     return (
       <div className={classes.root}>

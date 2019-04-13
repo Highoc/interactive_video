@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 
 import { Link } from 'react-router-dom';
 
@@ -9,8 +8,6 @@ import { Visibility, ThumbUp } from '@material-ui/icons';
 
 import styles from './styles';
 import playButton from '../../../static/images/play_circle_outline_white_48x48.png';
-
-import date from "../../../helpers/Date/date";
 
 
 class SmallVideoPreview extends Component {
@@ -25,6 +22,10 @@ class SmallVideoPreview extends Component {
     } = this.props;
 
     const { channel } = video;
+
+    if (!video.preview_url) {
+      video.preview_url = 'https://disima.ru/wp-content/uploads/2016/01/chelovek-muravej-art.jpg';
+    }
 
     return (
       <div className={classes.root}>
@@ -66,37 +67,8 @@ SmallVideoPreview.propTypes = {
     created: PropTypes.string,
     rating: PropTypes.number,
     views: PropTypes.number,
-    channelName: PropTypes.string,
     key: PropTypes.string,
   }).isRequired,
-  channelKey: PropTypes.shape().isRequired,
   classes: PropTypes.object.isRequired,
 };
 
-/*
-   <div className={classes.columnText}>
-          <div className={classes.name}>
-            <Typography color="textSecondary">{video.name}</Typography>
-          </div>
-          <div className={classNames(classes.channel, classes.row)}>
-            <Avatar alt="Remy Sharp" src={picturePatch} />
-            <Link to={`/channel/${channelKey}`} style={{ textDecoration: 'none' }}>
-              <Typography className={classes.channelName}>{video.channelName}</Typography>
-            </Link>
-          </div>
-          <div className={classes.created}>
-            <Typography>{`Создан: ${video.created}`}</Typography>
-          </div>
-          <div className={classNames(classes.rating, classes.row)}>
-            <ThumbUp color="secondary" />
-            <Typography className={classes.statistics}>{video.rating}</Typography>
-          </div>
-          <div className={classNames(classes.rating, classes.row)}>
-            <Visibility color="secondary" />
-            <Typography className={classes.statistics}>{video.views}</Typography>
-          </div>
-          <div className={classes.description}>
-            <Typography>{video.description}</Typography>
-          </div>
-        </div>
- */

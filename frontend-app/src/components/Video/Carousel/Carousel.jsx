@@ -1,16 +1,16 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { findDOMNode } from 'react-dom';
 import $ from 'jquery';
 
-import {Typography, withStyles} from '@material-ui/core';
+import { Typography, withStyles } from '@material-ui/core';
 import SmallVideoPreview from '../SmallVideoPreview/SmallVideoPreview';
 
 import styles from './styles';
 import './animation.css';
 
-class Carousel extends React.Component {
+class Carousel extends Component {
   constructor(props) {
     super(props);
     this.state = {
