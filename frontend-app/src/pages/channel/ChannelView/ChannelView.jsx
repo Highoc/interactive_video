@@ -6,8 +6,9 @@ import classes from './ChannelView.module.css';
 import { perror } from '../../../helpers/SmartPrint';
 import date from '../../../helpers/Date/date';
 import PlaylistAll from '../../playlist/PlaylistAll/PlaylistAll';
-import { ListHeader, MovieList } from '../../../components/Channel/ChannelInfo/presentations';
+
 import ChannelEdit from '../ChannelEdit/ChannelEdit';
+import {Carousel, HugeVideoPreview} from "../../../components/Video";
 
 function TabContainer(props) {
   return (
@@ -75,8 +76,6 @@ class ChannelView extends Component {
           {value === 0 && (
           <TabContainer>
             <div>
-              <ListHeader header="Загруженные" />
-              <MovieList movieList={channel.uploaded_playlist} channelKey={channelKey} />
             </div>
           </TabContainer>
           )}

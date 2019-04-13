@@ -1,3 +1,4 @@
 import HugeVideoPreview from './HugeVideoPreview/HugeVideoPreview';
+import Carousel from './Carousel/Carousel';
 
-export { HugeVideoPreview };
+export { HugeVideoPreview, Carousel };

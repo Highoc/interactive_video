@@ -8,6 +8,7 @@ import { Typography, Avatar, withStyles } from '@material-ui/core';
 import { Visibility, ThumbUp } from '@material-ui/icons';
 
 import picturePatch from '../../../static/images/channelPatch.png';
+import playButton from '../../../static/images/play_circle_outline_white_128x128.png';
 
 import styles from './styles';
 
@@ -24,18 +25,31 @@ class HugeVideoPreview extends Component {
 
   render() {
     const {
-      video, channelKey, order, classes,
+      video, order, classes,
     } = this.props;
+
+    const { channel } = video;
 
     return (
       <div className={classes.root}>
         {
           order === 'default' ? (
-            <img
-              alt="img"
-              src={video.preview_url}
-              className={classes.columnImg}
-            />
+            <div className={classes.columnImg}>
+              <Link to={`/channel/${channel.key}/watch/${video.key}`}>
+                <img
+                  alt="img"
+                  src={video.preview_url}
+                  className={classes.img}
+                >
+                </img>
+                <div className={classes.overlay}>
+                  <div className={classes.button}>
+                    <img alt="play" src={playButton} />
+                  </div>
+                </div>
+              </Link>
+            </div>
+
           ) : <div />
         }
         <div className={classes.columnText}>
@@ -44,8 +58,8 @@ class HugeVideoPreview extends Component {
           </div>
           <div className={classNames(classes.channel, classes.row)}>
             <Avatar alt="Remy Sharp" src={picturePatch} />
-            <Link to={`/channel/${channelKey}`} style={{ textDecoration: 'none' }}>
-              <Typography className={classes.channelName}>{video.channelName}</Typography>
+            <Link to={`/channel/${channel.key}`} style={{ textDecoration: 'none' }}>
+              <Typography className={classes.channelName}>{channel.name}</Typography>
             </Link>
           </div>
           <div className={classes.created}>
@@ -65,11 +79,22 @@ class HugeVideoPreview extends Component {
         </div>
         {
           order === 'reverse' ? (
-            <img
-              alt="img"
-              src={video.preview_url}
-              className={classes.columnImg}
-            />
+            <div className={classes.columnImg}>
+              <Link to={`/channel/${channel.key}/watch/${video.key}`}>
+                <img
+                  alt="img"
+                  src={video.preview_url}
+                  className={classes.img}
+                >
+                </img>
+                <div className={classes.overlay}>
+                  <div className={classes.button}>
+                    <img alt="play" src={playButton} />
+                  </div>
+                </div>
+              </Link>
+            </div>
+
           ) : <div />
         }
       </div>
@@ -87,10 +112,12 @@ HugeVideoPreview.propTypes = {
     created: PropTypes.string,
     rating: PropTypes.number,
     views: PropTypes.number,
-    channelName: PropTypes.string,
+    channel: PropTypes.shape({
+      name: PropTypes.string,
+      key: PropTypes.string,
+    }),
     key: PropTypes.string,
   }).isRequired,
-  channelKey: PropTypes.shape().isRequired,
   classes: PropTypes.object.isRequired,
   order: PropTypes.string,
 };

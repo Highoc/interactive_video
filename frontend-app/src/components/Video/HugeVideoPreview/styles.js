@@ -1,10 +1,12 @@
-const styles = ({ palette, typography }) => ({
+const styles = ({ palette, typography, breakpoints }) => ({
   root: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: '0 1.5% 0 1.5%',
+    margin: '1.5% 0 1.5% 0',
     backgroundColor: palette.background.paper,
+
   },
 
   columnText: {
@@ -19,14 +21,35 @@ const styles = ({ palette, typography }) => ({
   },
 
   columnImg: {
+    position: 'relative',
+    cursor: 'pointer',
     minHeight: '600px',
     minWidth: '760px',
   },
 
+  img: {
+    height: '600px',
+    maxWidth: '760px',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    display: 'flex',
+    justifyContent: 'center',
+    background: 'rgba(0, 0, 0, 0.5)',
+    opacity: 0,
+    transition: 'opacity 0.5s',
+    '&:hover': {
+      opacity: 1,
+    },
+  },
   name: {
     height: '160px',
     minHeight: '180px',
-    padding: '35px 0 10px 0',
+    padding: '20px 0 10px 0',
     fontSize: typography.fontSize.large,
   },
 
@@ -71,6 +94,11 @@ const styles = ({ palette, typography }) => ({
     lineHeight: '24px',
     marginLeft: '20px',
   },
+  button: {
+    display: 'flex',
+    alignItems: 'center',
+  },
 });
+
 
 export default styles;

@@ -3,7 +3,7 @@ import { RequestResolver } from '../../helpers/RequestResolver';
 import { pprint, perror } from '../../helpers/SmartPrint';
 import date from '../../helpers/Date/date';
 import classes from './Homepage.module.css';
-import { MovieList, ListHeader, HugeVideoPreview } from "../../components/Channel/ChannelInfo/presentations";
+import { HugeVideoPreview, Carousel } from '../../components/Video';
 import HomepageHead from './HomepageHead/HomepageHead';
 
 class Homepage extends Component {
@@ -40,24 +40,40 @@ class Homepage extends Component {
     * Создать / Изменить / Удалить канал
     * */
     const { channel, channelKey } = this.state;
+    console.log(channel.uploaded_playlist);
 
     const testVideo = {
       name: 'Человек муравей уничтожает людей и муравьев',
       description: 'Самый маленький супергерой может победить все человечество или же нет? Как думаете? Я думаю, что\
         это невозможно, потому что он слишком маленький, чтобы всех победить, как говорится один в поле не воин, да и вообще земля плоская!!',
-      channelName: 'Канал Супергероев',
-      key: '12312412',
+      channel: {
+        name: 'Канал Супергероев',
+        key: '12312412',
+      },
       created: date(channel.uploaded_playlist.video[0].created),
       preview_url: 'https://disima.ru/wp-content/uploads/2016/01/chelovek-muravej-art.jpg',
       rating: 500,
       views: 100500,
     };
+    const testPlaylist = [];
+    for (let i = 0 ; i < 10; i++){
+      testPlaylist.push(testVideo);
+    }
     if (isLoaded) {
       result = (
         <div className={classes.root}>
-          <ListHeader header="Тренды" />
-          <MovieList movieList={channel.uploaded_playlist} channelKey={channelKey} />
-          <HugeVideoPreview channelKey={channelKey} video={testVideo} />
+          <Carousel channelKey={channelKey} playlist={testPlaylist} label="Видео Про Человека Муравья" />
+          <HugeVideoPreview video={testVideo} />
+          <HugeVideoPreview video={testVideo} order="reverse" />
+          <HugeVideoPreview video={testVideo} />
+          <Carousel channelKey={channelKey} playlist={testPlaylist} label="Видео Про Человека Муравья" />
+          <HugeVideoPreview video={testVideo} />
+          <HugeVideoPreview video={testVideo} order="reverse" />
+          <HugeVideoPreview video={testVideo} />
+          <Carousel channelKey={channelKey} playlist={testPlaylist} label="Видео Про Человека Муравья" />
+          <HugeVideoPreview video={testVideo} />
+          <HugeVideoPreview video={testVideo} order="reverse" />
+          <HugeVideoPreview video={testVideo} />
         </div>
       );
     }
