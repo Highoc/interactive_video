@@ -57,6 +57,25 @@ const theme = createMuiTheme({
         color: 'rgb(255,255,255)',
       },
     },
+    MuiCardHeader: {
+      root: {
+        padding: '8px',
+      },
+      title: {
+        color: 'rgb(255,255,255)',
+        fontSize: 20,
+        fontFamily: 'Helvetica Neue Cyr Medium',
+        padding: '5px 20px 5px 20px',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+      },
+    },
+    MuiFormControl: {
+      root: {
+        borderColor: 'rgb(124,124,124)',
+      },
+    },
   },
   typography: {
     useNextVariants: true,
@@ -111,7 +130,7 @@ const theme = createMuiTheme({
     },
     error: {
       light: 'rgba(208, 2, 27, 1)',
-      main: 'rgb(6,6,6)',
+      main: 'rgba(147, 5, 22, 1)',
       dark: 'rgba(147, 5, 22, 1)',
       contrastText: 'rgba(208, 2, 27, 1)',
     },

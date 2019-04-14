@@ -68,9 +68,9 @@ class ServerForm extends Component {
       this.reloadForm();
       onSubmitSuccess(response.data);
     } catch (error) {
+      perror(`ServerForm[${name}]`, error);
       this.setState({ errors: JSON.parse(error.request.response) });
       onSubmitFailed(error);
-      perror(`ServerForm[${name}]`, error);
     }
   }
 
@@ -178,4 +178,5 @@ ServerForm.propTypes = {
   inputsHidden: PropTypes.arrayOf(PropTypes.object),
   onSubmitSuccess: PropTypes.func,
   onSubmitFailed: PropTypes.func,
+  classes: PropTypes.object.isRequired,
 };

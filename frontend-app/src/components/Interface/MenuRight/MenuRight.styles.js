@@ -18,6 +18,10 @@ const styles = ({
     marginLeft: '10%',
     marginRight: '1px',
   },
+  margin: {
+    margin: spacing.unit * 2,
+    marginRight: spacing.unit * 3,
+  },
 });
 
 export default styles;

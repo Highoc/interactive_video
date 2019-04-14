@@ -5,6 +5,9 @@ const styles = ({
   divider: {
     marginTop: spacing.unit * 2,
   },
+  title: {
+    marginLeft: '20px',
+  },
   drawerPaper: {
     position: 'relative',
     whiteSpace: 'nowrap',

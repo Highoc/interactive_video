@@ -15,7 +15,8 @@ import { json, RequestResolver } from '../../../helpers/RequestResolver';
 import { perror } from '../../../helpers/SmartPrint';
 import date from '../../../helpers/Date/date';
 
-import PlaylistAll from '../../playlist/PlaylistAll/PlaylistAll';
+import { PlaylistAll } from '../../playlist';
+
 import ChannelEdit from '../ChannelEdit/ChannelEdit';
 
 import { Carousel, HugeVideoPreview } from '../../../components/Video';

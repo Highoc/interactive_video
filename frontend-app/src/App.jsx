@@ -26,6 +26,7 @@ import Register from './pages/register/Register';
 import Test from './pages/test/Test';
 import Guestpage from './pages/guest/Guestpage';
 import Centrifugo from './components/Centrifugo';
+import NotReady from './pages/notReady/NotReady';
 
 import { loginCheckState } from './store/actions/authorization';
 import ConstructPanelRight from './components/VideoConstructor/ConctructPanelRight';
@@ -44,8 +45,7 @@ class App extends Component {
         <Route path="/guest" exact component={Guestpage} />
         <Route path="/login" exact component={SignIn} />
         <Route path="/register" exact component={Register} />
-        <Route path="/test" exact component={Test} />
-        <Redirect to="/test" />
+        <Redirect to="/guest" />
       </Switch>
     );
 
@@ -62,7 +62,8 @@ class App extends Component {
           <Route exact path="/account/edit" component={EditAccount} />
           <Route path="/account" component={Account} />
           <Route path="/channel" component={Channel} />
-          <Redirect to="/test" />
+          <Route path="/notready" component={NotReady} />
+          <Redirect to="/" />
         </Switch>
       );
 

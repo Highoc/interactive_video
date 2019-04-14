@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Avatar, Button, CssBaseline, FormControl, Paper, Typography, InputLabel, Input,
+  Avatar, Button, CssBaseline, FormControl, Paper, Typography, InputLabel, OutlinedInput,
 } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import withStyles from '@material-ui/core/styles/withStyles';
@@ -10,31 +10,38 @@ import { login } from '../../store/actions/authorization';
 import { openDrawer } from '../../store/actions/buttonActions';
 import styles from './SignIn.styles';
 
+
 class SignIn extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isLoaded: false,
-      isValid: false,
+      isCorrect: true,
     };
   }
 
   submitHandler(event) {
     event.preventDefault();
     const { onLogin } = this.props;
-    let isValid = true;
+
+    const passwordInput = document.getElementById('password');
+    const loginInput = document.getElementById('username');
+    const isValid = true;
+
     if (isValid) {
-      const passwordInput = document.getElementById('password');
-      const loginInput = document.getElementById('username');
       onLogin(event, loginInput.value, passwordInput.value);
     } else {
-      console.log('Invalid input');
+      this.setState({ isCorrect: false });
     }
   }
 
 
   render() {
-    const { classes } = this.props;
+    const { classes, error } = this.props;
+    let errorMessage = <div />;
+    if (error){
+      errorMessage = <Typography variant="h2" color="error">Неправильный логин и/или пароль</Typography>;
+    }
 
     return (
       <main className={classes.main}>
@@ -49,22 +56,23 @@ class SignIn extends Component {
           <form className={classes.form}>
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="username">Имя пользователя</InputLabel>
-              <Input id="username" name="username" autoFocus />
+              <OutlinedInput id="username" name="username" autoFocus />
             </FormControl>
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="password">Пароль</InputLabel>
-              <Input name="password" type="password" id="password" autoComplete="current-password" />
+              <OutlinedInput name="password" type="password" id="password" autoComplete="current-password" />
             </FormControl>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-            onClick={event => this.submitHandler(event)}
-          >
+            {errorMessage}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              onClick={event => this.submitHandler(event)}
+            >
             Войти
-          </Button>
+            </Button>
           </form>
         </Paper>
       </main>
@@ -75,6 +83,7 @@ class SignIn extends Component {
 const mapStateToProps = state => ({
   isAuthorized: state.authorization.isAuthorized,
   username: state.authorization.username,
+  error: state.authorization.error,
 });
 
 const mapDispatchToProps = dispatch => ({

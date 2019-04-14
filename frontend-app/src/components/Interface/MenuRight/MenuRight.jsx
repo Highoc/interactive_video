@@ -26,7 +26,7 @@ class MenuRight extends Component {
         >
           <List disablePadding>
             <Typography variant="h4" align="center" color="textSecondary">
-              Действия
+              Меню
             </Typography>
             <Divider />
             <MainListItems />
