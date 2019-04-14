@@ -5,69 +5,20 @@ from rest_framework import status
 
 from application import settings
 
-from .serializers import SourceSerializer, VideoPartSerializer, VideoSerializer
+from .serializers import SourceSerializer, PrettySourceSerializer, VideoPartSerializer, VideoSerializer
+from .serializers import get_source_form
+
 from .models import Source, VideoPart, Video
 from .helpers.video import is_supported_mime_type, get_file_url, get_mime_type, get_codec, get_duration, get_short_key, get_image_url
 
 from channel.models import Playlist
 from rating.models import Rating
 from views.models import Views
-from core.helpers import check_image_size, check_image_mime_type, convert_to_byte_length, get_file_url as test
 
-import io, tempfile
+import tempfile
 
-def get_source_form(source=None):
-    name = ''
-    description = ''
-    preview_picture_url = ''
-    if source:
-        name = source.name
-        description = source.description
-        preview_picture_url = get_image_url(source.preview_picture)
-
-    forms = [{
-        'type': 'text',
-        'name': 'name',
-        'value': f'{name}',
-        'description': 'Название источника',
-        'rules': {
-            'max_length': 64,
-            'required': True
-        },
-    }, {
-        'type': 'textarea',
-        'name': 'description',
-        'value': f'{description}',
-        'description': 'Описание источника',
-        'rules': {
-            'max_length': 1024,
-            'required': False
-        },
-    }, {
-        'type': 'image',
-        'name': 'preview_picture',
-        'url': f'{preview_picture_url}',
-        'description': 'Превью источника',
-        'rules': {
-            'mime_type': ['image/png'],
-            'max_size': convert_to_byte_length(MB=10),
-            'required': False,
-        }
-    }, {
-        'type': 'video',
-        'name': 'content',
-        'description': 'Контент источника',
-        'rules': {
-            'mime_type': ['video/mp4'],
-            'max_size': convert_to_byte_length(MB=100),
-            'required': True,
-        }
-    }]
-
-    return forms
 
 class SourceUploadView(APIView):
-
     parser_classes = (MultiPartParser, FormParser)
 
     def get(self, request):
@@ -77,12 +28,9 @@ class SourceUploadView(APIView):
         source_serializer = SourceSerializer(data=request.data)
 
         if source_serializer.is_valid():
-            name = request.data['name']
-            description = request.data['description']
-            content = request.data['content']
+            data = source_serializer.validated_data
 
-            user = request.user
-
+            content = data['content']
             with tempfile.NamedTemporaryFile() as temp:
                 temp.write(content.read())
                 temp.flush()
@@ -103,9 +51,10 @@ class SourceUploadView(APIView):
             if not is_supported_mime_type(mime_type):
                 return Response('This MIME type isn\'t supported.', status=status.HTTP_400_BAD_REQUEST)
 
+            user = request.user
             source = Source(
-                name=name,
-                description=description,
+                name=data['name'],
+                description=data['description'],
                 owner=user,
                 mime=mime_type,
                 time=time,
@@ -113,49 +62,26 @@ class SourceUploadView(APIView):
                 status=Source.READY
             )
 
-            preview_picture = source_serializer.validated_data.get('preview_picture', None)
-            if preview_picture != '' or not preview_picture:
-                if not check_image_mime_type(preview_picture.content_type):
-                    return Response('Wrong preview picture mime type.', status=status.HTTP_400_BAD_REQUEST)
-
-                if not check_image_size(preview_picture.size):
-                    return Response('Size of preview picture must be less than 10MB.',
-                                    status=status.HTTP_400_BAD_REQUEST)
-
+            preview_picture = data.get('preview_picture', None)
+            if preview_picture is not None:
                 source.preview_picture.save(f'{user.id}/{source.key.hex}', preview_picture)
 
             source.content.save(f'{user.id}/{source.key.hex}', content)
             source.save()
 
-            response = {
-                'key': source.key.hex,
-                'name': source.name,
-                'content_url': test(source.content.name),
-                'preview_url': test(source.preview_picture.name)
-            }
-
-            return Response(response, status=status.HTTP_201_CREATED)
+            return Response(PrettySourceSerializer(source).data, status=status.HTTP_201_CREATED)
         else:
-
             return Response(source_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SourceListView(APIView):
-
     def get(self, request):
-        # 4 части с Ready
         sources = Source.objects.filter(owner=request.user, status=Source.READY)
-        responce = [{
-            'key': source.key.hex,
-            'name': source.name,
-            'content_url': test(source.content.name),
-            'preview_url': test(source.preview_picture.name)
-        } for source in sources ]
-        return Response(responce, status=status.HTTP_200_OK)
+        response = [ PrettySourceSerializer(source).data for source in sources ]
+        return Response(response, status=status.HTTP_200_OK)
 
 
 class SourceView(APIView):
-
     def get(self, request, key=None):
         sources = Source.objects.filter(owner=request.user, key=key, status=Source.READY)
 

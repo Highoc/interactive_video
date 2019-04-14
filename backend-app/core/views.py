@@ -7,14 +7,18 @@ from application import settings
 
 from .models import Profile
 from .serializers import UserSerializer, ProfileSerializer, UserSerializerWithToken, TopSerializer
-from .helpers import get_avatar_url, convert_to_byte_length, check_image_mime_type, check_image_size
+from .serializers import get_profile_form
+
+from .helpers import get_file_url
 
 from video.models import Video
 from video.serializers import VideoPreviewSerialiser
 from channel.models import Channel
 
+from django.utils import timezone
+
 import jwt, time
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 class SearchView(APIView):
     def get(self, request):
@@ -86,76 +90,26 @@ class ProfileUpdateView(APIView):
     def get(self, request):
         user = request.user
         profile = Profile.objects.get(user=user)
-
-        form = [{
-            'type': 'image',
-            'name': 'avatar',
-            'url': f'{get_avatar_url(profile.key)}',
-            'description': 'Аватар профиля',
-            'rules': {
-                'mime_type': ['image/png'],
-                'max_size': convert_to_byte_length(MB=10),
-                'required': False,
-            }
-        }, {
-            'type': 'text',
-            'name': 'first_name',
-            'value': f'{user.first_name}',
-            'description': 'Имя',
-            'rules': {
-                'max_length': 16,
-                'required': True,
-            }
-        }, {
-            'type': 'text',
-            'name': 'last_name',
-            'value': f'{user.last_name}',
-            'description': 'Фамилия',
-            'rules': {
-                'max_length': 16,
-                'required': True,
-            }
-        }, {
-            'type': 'email',
-            'name': 'email',
-            'value': f'{user.email}',
-            'description': 'Электронная почта',
-            'rules': {
-                'required': False,
-            }
-        }]
-
-        return Response(form, status.HTTP_200_OK)
+        return Response(get_profile_form(profile), status.HTTP_200_OK)
 
     def post(self, request):
         profile_serializer = ProfileSerializer(data=request.data)
-
         if profile_serializer.is_valid():
             user = request.user
-            profile = Profile.objects.get(user=user)
             data = profile_serializer.validated_data
+            profile = Profile.objects.get(user=user)
 
             avatar = data.get('avatar', None)
-            if avatar != '' or not avatar:
-                if not check_image_mime_type(avatar.content_type):
-                    return Response('Wrong avatar mime type.', status=status.HTTP_400_BAD_REQUEST)
-
-                if not check_image_size(avatar.size):
-                    return Response('Size of avatar must be less than 10MB.', status=status.HTTP_400_BAD_REQUEST)
-
+            if avatar is not None:
                 profile.avatar.save(f'{profile.key.hex}', avatar)
-            profile.save()
+                profile.save()
 
-            first_name = data.get('first_name')
-            last_name = data.get('last_name')
-            email = data.get('email', '')
-
-            user.first_name = first_name
-            user.last_name = last_name
-            user.email = email
+            user.first_name = data.get('first_name')
+            user.last_name = data.get('last_name')
+            user.email = data.get('email', '')
             user.save()
 
-            return Response({ 'key': profile.key.hex }, status=status.HTTP_201_CREATED)
+            return Response({ 'key': profile.key.hex }, status=status.HTTP_200_OK)
         else:
             return Response(profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -169,7 +123,7 @@ class ProfileCurrentView(APIView):
             'last_name': user.last_name,
             'email': user.email,
             'date_joined': user.date_joined,
-            'avatar_url': get_avatar_url(profile.key)
+            'avatar_url': get_file_url(profile.avatar.name)
         }
         return Response(response, status=status.HTTP_200_OK)
 
@@ -182,14 +136,17 @@ _LIMIT = 20
 
 
 class VideoTopView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
     def get(self, request):
-        serializer = TopSerializer(request.GET)
+        serializer = TopSerializer(data=request.GET)
+
         if serializer.is_valid():
             type = serializer.validated_data['type']
-            start = datetime.now() - timedelta(days=_START_DELTA)
+            start = timezone.now() - timedelta(days=_START_DELTA)
             video = []
             if type == NEW:
-                start = datetime.now() - timedelta(days=_NEW_START_DELTA)
+                start = timezone.now() - timedelta(days=_NEW_START_DELTA)
                 video = Video.objects.filter(created__gte=start)[:_LIMIT]
             elif type == HOT:
                 video = Video.objects.filter(created__gte=start).order_by('-views__counter')[:_LIMIT]
