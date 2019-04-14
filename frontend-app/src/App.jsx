@@ -44,7 +44,8 @@ class App extends Component {
         <Route path="/guest" exact component={Guestpage} />
         <Route path="/login" exact component={SignIn} />
         <Route path="/register" exact component={Register} />
-        <Redirect to="/guest" />
+        <Route path="/test" exact component={Test} />
+        <Redirect to="/test" />
       </Switch>
     );
 
@@ -61,7 +62,7 @@ class App extends Component {
           <Route exact path="/account/edit" component={EditAccount} />
           <Route path="/account" component={Account} />
           <Route path="/channel" component={Channel} />
-          <Redirect to="/" />
+          <Redirect to="/test" />
         </Switch>
       );
 

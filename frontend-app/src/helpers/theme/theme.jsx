@@ -1,6 +1,63 @@
 import { createMuiTheme } from '@material-ui/core';
 
 const theme = createMuiTheme({
+  overrides: {
+    MuiInputBase: { // Name of the component ⚛️ / style sheet
+      input: {
+        color: 'rgb(255,255,255)',
+      },
+      error: {
+        color: 'rgba(147, 5, 22, 1)',
+      },
+    },
+    MuiButton: {
+      textPrimary: {
+        color: 'rgb(255,255,255)',
+      },
+      root: {
+        '&$disabled': {
+          color: 'rgb(124,124,124)',
+        },
+      },
+    },
+    MuiFormHelperText: { // Name of the component ⚛️ / style sheet
+      root: {
+        '&$error': {
+          color: 'rgba(147, 5, 22, 1)',
+        },
+      },
+    },
+    MuiFormLabel: {
+      root: {
+        color: 'rgb(124,124,124)',
+        '&$error': {
+          color: 'rgba(147, 5, 22, 1)',
+        },
+        '&$focused': {
+          color: 'rgb(178,235,255)',
+        },
+      },
+    },
+    // .MuiOutlinedInput-root-237 .MuiOutlinedInput-notchedOutline-244
+    MuiOutlinedInput: {
+      root: {
+        '& $notchedOutline': {
+          borderColor: 'rgb(124,124,124)',
+        },
+        '&$focused $notchedOutline': {
+          borderColor: 'rgb(178,235,255)',
+        },
+        '&$error $notchedOutline': {
+          borderColor: 'rgba(147, 5, 22, 1)',
+        },
+      },
+    },
+    MuiSelect: {
+      icon: {
+        color: 'rgb(255,255,255)',
+      },
+    },
+  },
   typography: {
     useNextVariants: true,
     fontFamily: ['Roboto', 'Helvetica Neue Cyr Medium'],
@@ -49,7 +106,7 @@ const theme = createMuiTheme({
     secondary: {
       light: 'rgb(255,255,255)',
       main: 'rgb(255,255,255)',
-      dark: 'rgba(255, 255, 255, 1)',
+      dark: 'rgb(124,124,124)',
       contrastText: 'rgba(255,255,255,0.38)',
     },
     error: {

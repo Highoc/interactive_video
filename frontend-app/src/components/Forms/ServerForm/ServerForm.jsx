@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 
 import clone from 'clone';
 
-import { Button } from '@material-ui/core';
+import { Button, withStyles, } from '@material-ui/core';
 
 import Input from '../../Inputs/Input';
 import { perror } from '../../../helpers/SmartPrint';
 import { RequestResolver, json, multipart } from '../../../helpers/RequestResolver';
 
+import styles from './styles';
 
 class ServerForm extends Component {
   static defaultProps = {
@@ -62,6 +63,7 @@ class ServerForm extends Component {
 
     try {
       const formData = this.getFormData();
+      console.log(formData);
       const response = await this.backend(type).post(action, formData);
       this.reloadForm();
       onSubmitSuccess(response.data);
@@ -130,6 +132,8 @@ class ServerForm extends Component {
       inputs, errors, isReady, isValid,
     } = this.state;
 
+    const { classes } = this.props;
+
     let inputList = <div />;
     if (isReady) {
       inputList = inputs.map(input => (
@@ -148,7 +152,7 @@ class ServerForm extends Component {
         <div>
           {inputList}
         </div>
-        <div>
+        <div className={classes.error}>
           {errorList}
         </div>
         <Button onClick={() => this.onSubmit()} color="primary" disabled={!isValid}>
@@ -159,7 +163,7 @@ class ServerForm extends Component {
   }
 }
 
-export default ServerForm;
+export default withStyles(styles)(ServerForm);
 
 const ENCTYPE = {
   MULTIPART: 'multipart/form-data',
