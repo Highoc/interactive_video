@@ -16,6 +16,7 @@ class ServerForm extends Component {
     onSubmitSuccess: () => {},
     onSubmitFailed: () => {},
     inputsHidden: [],
+    getInputsDynamic: () => ([]),
   };
 
   static checkValidity(inputs) {
@@ -63,7 +64,6 @@ class ServerForm extends Component {
 
     try {
       const formData = this.getFormData();
-      console.log(formData);
       const response = await this.backend(type).post(action, formData);
       this.reloadForm();
       onSubmitSuccess(response.data);
@@ -85,9 +85,10 @@ class ServerForm extends Component {
 
   getFormData() {
     const { inputs, inputsHidden, name } = this.state;
-    const { enctype } = this.props;
+    const { enctype, getInputsDynamic } = this.props;
 
-    const inputsAll = inputs.concat(inputsHidden);
+    const inputsDynamic = getInputsDynamic();
+    const inputsAll = inputs.concat(inputsHidden).concat(inputsDynamic);
 
     let formData;
     switch (enctype) {
@@ -103,7 +104,11 @@ class ServerForm extends Component {
         formData = new FormData();
         for (const input of inputsAll) {
           if (input.value) {
-            formData.append(input.name, input.value);
+            if (input.name === 'main') {
+              formData.append(input.name, JSON.stringify(input.value));
+            } else {
+              formData.append(input.name, input.value);
+            }
           }
         }
         break;
@@ -178,5 +183,6 @@ ServerForm.propTypes = {
   inputsHidden: PropTypes.arrayOf(PropTypes.object),
   onSubmitSuccess: PropTypes.func,
   onSubmitFailed: PropTypes.func,
+  getInputsDynamic: PropTypes.func,
   classes: PropTypes.object.isRequired,
 };

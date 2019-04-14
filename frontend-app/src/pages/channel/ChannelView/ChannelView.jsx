@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import {
-  Card, CardMedia, Typography, Button, withStyles,
+  Card, CardMedia, Typography, Button, withStyles, CardContent,
 } from '@material-ui/core';
 import {
   OndemandVideo, PlaylistPlay, Settings, Help, ThumbDown, ThumbUp,
@@ -16,8 +16,9 @@ import { perror } from '../../../helpers/SmartPrint';
 import date from '../../../helpers/Date/date';
 
 import { PlaylistAll } from '../../playlist';
-
+import ChannelInfo from '../../../components/Channel/ChannelInfo/ChannelInfo';
 import ChannelEdit from '../ChannelEdit/ChannelEdit';
+import head from '../../../static/images/head.png';
 
 import { Carousel, HugeVideoPreview } from '../../../components/Video';
 import { TabBar } from '../../../components/TabBar';
@@ -28,14 +29,14 @@ class ChannelView extends Component {
     super(props);
     this.state = {
       channelKey: props.match.params.channelKey,
-      channel: null,
+      channel: {},
       isLoaded: false,
       subStatus: false,
     };
     this.backend = RequestResolver.getBackend();
   }
 
-  async handleSubscribe(event) {
+  async onSubscribe(event) {
     event.preventDefault();
     try {
       const { channelKey } = this.state;
@@ -46,7 +47,7 @@ class ChannelView extends Component {
     }
   }
 
-  async handleUnsubscribe(event) {
+  async onUnsubscribe(event) {
     event.preventDefault();
     try {
       const { channelKey } = this.state;
@@ -57,31 +58,31 @@ class ChannelView extends Component {
     }
   }
 
-  async componentDidMount() {
-    try {
-      const { channelKey } = this.state;
-      const result = await this.backend().get(`channel/get/${channelKey}/`);
-      this.setState({
-        isLoaded: true,
-        channel: result.data,
-        subStatus: result.data.subscription.is_active,
-      });
-    } catch (error) {
-      perror('ChannelView', error);
-    }
+  componentDidMount() {
+    const { channelKey } = this.state;
+    this.reload(channelKey);
   }
 
-  async componentWillReceiveProps(nextProps, nextContext) {
+  componentWillReceiveProps(nextProps, nextContext) {
     const { channelKey } = this.props.match.params;
     const { channelKey: newChannelKey } = nextProps.match.params;
     if (newChannelKey !== channelKey) {
-      try {
-        const result = await this.backend().get(`channel/get/${newChannelKey}/`);
-        this.setState({ channel: result.data, channelKey: newChannelKey, isLoaded: true });
-      } catch (error) {
-        this.setState({ isLoaded: false });
-        perror('ChannelView', error);
-      }
+      this.reload(newChannelKey);
+    }
+  }
+
+  async reload(channelKey) {
+    try {
+      const result = await this.backend().get(`channel/get/${channelKey}/`);
+      this.setState({
+        channel: result.data,
+        channelKey,
+        isLoaded: true,
+        subStatus: result.data.subscription.is_active,
+      });
+    } catch (error) {
+      this.setState({ isLoaded: false });
+      perror('ChannelView', error);
     }
   }
 
@@ -91,13 +92,17 @@ class ChannelView extends Component {
     } = this.state;
     const { myChannelKey, classes } = this.props;
 
+    if (!channel.head_picture) {
+      channel.head_picture = head;
+    }
+
     let subscribe = (
       <Button
         color="secondary"
         variant="outlined"
         className={classes.subs}
         size="large"
-        onClick={event => this.handleSubscribe(event)}
+        onClick={event => this.onSubscribe(event)}
       >
         <ThumbUp color="secondary" />
         {' Подписаться'}
@@ -111,7 +116,7 @@ class ChannelView extends Component {
           variant="outlined"
           className={classes.subs}
           size="large"
-          onClick={event => this.handleUnsubscribe(event)}
+          onClick={event => this.onUnsubscribe(event)}
         >
           <ThumbDown color="secondary" />
           {' Отписаться'}
@@ -150,7 +155,7 @@ class ChannelView extends Component {
         value: 3,
         label: 'О канале',
         icon: <Help />,
-        container: Info,
+        container: <ChannelInfo channel={channel} />,
       },
     ];
 
@@ -159,7 +164,7 @@ class ChannelView extends Component {
         value: 4,
         label: 'Настройки',
         icon: <Settings />,
-        container: <ChannelEdit />,
+        container: <ChannelEdit onEdit={() => this.reload(channelKey)} />,
       };
       tabs.push(settings);
       subscribe = null;
@@ -170,10 +175,17 @@ class ChannelView extends Component {
         <Card className={classes.card} color="primary">
           <CardMedia
             className={classes.media}
-            image="http://sonoiocazzo.altervista.org/wp-content/uploads/2017/04/cropped-697297-1.jpg"
+            image={channel.head_picture}
             title={channel.name}
           />
-          {subscribe}
+          <CardContent>
+            <div className={classes.row}>
+              <Typography gutterBottom variant="h4" color="textSecondary">
+                {channel.name}
+              </Typography>
+              {subscribe}
+            </div>
+          </CardContent>
           <TabBar defaultValue={1} tabs={tabs} />
         </Card>
 

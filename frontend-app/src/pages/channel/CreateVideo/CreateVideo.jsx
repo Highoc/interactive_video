@@ -2,100 +2,79 @@ import React, { Component } from 'react';
 import 'react-tree-graph/dist/style.css';
 import Tree from 'react-d3-tree';
 import clone from 'clone';
-import {
-  MenuItem, Select, DialogContent, Typography,
-} from '@material-ui/core';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
-import { RequestResolver, json } from '../../../helpers/RequestResolver';
-import Input from '../../../components/Input/Input';
-import { Dialog } from '../../../components/Dialog';
+
+import {
+  Typography, Button,
+} from '@material-ui/core';
+
+
+import { RequestResolver } from '../../../helpers/RequestResolver';
 import { perror, pprint } from '../../../helpers/SmartPrint';
+
 import classes from './CreateVideo.module.css';
 import { activeSvgShape, deactiveSvgShape, NodeImage } from './CreateVideo.styles';
 import { buttonChoice, uploadFile } from '../../../store/actions/buttonActions';
 
+import { Dialog } from '../../../components/Dialog';
+import { ServerForm } from '../../../components/Forms';
+import { ChoiceInput, TextInput } from '../../../components/Inputs';
+
 class CreateVideo extends Component {
   constructor(props) {
     super(props);
-
-    const { channelKey } = props.match.params;
-
     this.state = {
+      channelKey: props.match.params,
       sources: [],
       tree: new TreeData(),
       nodeChosen: null,
       dialogOpen: false,
-      uploadStatus: false,
-      nameSource: '',
-      channelKey,
       videoKey: '',
-      inputData: {
-        text: '',
-        sourceKey: '',
+      dialogData: {
+        text: {
+          value: '',
+          isValid: false,
+        },
+        sourceKey: {
+          value: '',
+          isValid: false,
+        },
       },
       isValid: false,
       isSent: false,
-      inputs: [
-        {
-          type: 'text',
-          name: 'name',
-          value: '',
-          description: 'Название видео',
-          rules: {
-            max_length: 64,
-            required: true,
-          },
-        },
-        {
-          type: 'textarea',
-          name: 'description',
-          value: '',
-          description: 'Описание видео',
-          rules: {
-            max_length: 4096,
-            required: false,
-          },
-        },
-        {
-          type: 'text',
-          name: 'Dialog',
-          value: '',
-          description: 'Ответ ведущий к этому фрагменту видео',
-          rules: {
-            max_length: 64,
-            required: true,
-          },
-        },
-      ],
+      isLoaded: false,
+      inputs: [],
     };
     this.backend = RequestResolver.getBackend();
-    this.uploadVideo = this.uploadVideo.bind(this);
   }
 
   async componentDidMount() {
     const { onFileUpload } = this.props;
     try {
-      const result = await this.backend().get('video/source/list/');
+      let result = await this.backend().get('video/source/list/');
       pprint('CreateVIdeoSources', result.data);
       this.setState({ sources: result.data });
       result.data.map(source => onFileUpload(source));
+      result = await this.backend().get('video/upload/');
+      this.setState({ inputs: result.data, isLoaded: true });
     } catch (error) {
       perror('CreateVideo', error);
     }
   }
 
-  handleOpen = () => {
-    this.setState({ dialogOpen: true });
-  };
+  componentDidUpdate(prevProps) {
+    if (prevProps.choice !== this.props.choice) {
+      this.handleButtonChoice(this.props.choice);
+    }
+    if (prevProps.files !== this.props.files) {
+      this.setState({ sources: this.props.files });
+    }
+  }
 
-  handleChange = (event) => {
-    const { inputData, sources } = this.state;
-    const keySource = sources[event.target.value].key;
-    const nameSource = sources[event.target.value].name;
-    inputData.sourceKey = keySource;
-    this.setState({ inputData, nameSource });
-  };
+  handleOpen() {
+    this.setState({ dialogOpen: true });
+  }
 
   handleClick(key) {
     const { nodeChosen, tree } = this.state;
@@ -106,14 +85,6 @@ class CreateVideo extends Component {
       tree.deactivateNode(nodeChosen);
       this.setState({ nodeChosen: key });
     }
-  }
-
-  getVideoData() {
-    return {
-      name: this.state.inputs.find(elem => elem.name === 'name').value,
-      description: this.state.inputs.find(elem => elem.name === 'description').value,
-      main: this.getVideoPart(this.state.tree.getTreeData()),
-    };
   }
 
 
@@ -136,63 +107,21 @@ class CreateVideo extends Component {
     return obj;
   }
 
-  callbackInput(state) {
-    const { inputs } = this.state;
-    const input = inputs.find(elem => elem.name === state.name);
-    input.value = state.value;
-    input.isValid = state.isValid;
+  getData() {
+    const result = [{
+      name: 'main',
+      value: this.getVideoPart(this.state.tree.getTreeData()),
+    }];
+    return result;
   }
 
-  async uploadVideo() {
-    const { inputsVideo } = this.state;
-    let isValid = true;
-    for (const key in inputsVideo) {
-      isValid = isValid && inputsVideo[key].isValid;
-    }
-
-    if (isValid) {
-      try {
-        const data = this.getVideoData();
-        pprint('CreateVIdeo', data);
-        const result = await this.backend(json).post('video/upload/', data);
-        this.setState({ videoKey: result.data.key, isSent: true });
-      } catch (error) {
-        this.setState({ videoKey: 'error' });
-        perror('CreateVideo', error);
-      }
-    } else {
-      console.log('Invalid input');
-    }
-  }
-
-  callbackDialog() {
-    this.setState({ dialogOpen: false });
-    const { inputData, inputs } = this.state;
-    inputData.text = inputs.find(elem => elem.name === 'Dialog').value;
-    const { tree, nodeChosen } = this.state;
-    const node = tree.findNodeByKey(nodeChosen);
-    node.name = inputData.text;
-    node.sourceKey = inputData.sourceKey;
-    node.text = inputData.text;
-    node.isReady = true;
-    pprint('node', node);
-
-    this.onUpdateTree();
-  }
-
+  /*
+* main: this.getVideoPart(this.state.tree.getTreeData()),
+* */
   onUpdateTree() {
     const { tree } = this.state;
     tree.tree = tree.getTreeData();
     this.setState({ tree });
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.choice !== this.props.choice) {
-      this.handleButtonChoice(this.props.choice);
-    }
-    if (prevProps.files !== this.props.files) {
-      this.setState({ sources: this.props.files });
-    }
   }
 
   handleButtonChoice(choice) {
@@ -209,39 +138,77 @@ class CreateVideo extends Component {
       this.onUpdateTree();
     }
     if (choice === 3) {
-      this.uploadVideo();
+      // this.uploadVideo();
     }
     onChoice(0);
   }
 
+  onSubmitSuccess(data) {
+    this.setState({ isSent: true, videoKey: data.key });
+  }
+
+  onDialogClose() {
+    this.setState({ dialogOpen: false });
+  }
+
+  onStateChange(state) {
+    const { dialogData } = this.state;
+    dialogData[state.name] = {
+      value: state.value,
+      isValid: state.isValid,
+    };
+    this.setState({ dialogData });
+  }
+
+  onButtonClick() {
+    const { dialogData } = this.state;
+    const { text, sourceKey } = dialogData;
+
+    if (!text.isValid || !sourceKey.isValid) {
+      return;
+    }
+
+    const { tree, nodeChosen } = this.state;
+    const node = tree.findNodeByKey(nodeChosen);
+    node.name = text.value;
+    node.isReady = true;
+    node.sourceKey = sourceKey.value;
+    node.text = text.value;
+
+    this.setState({
+      dialogData: {
+        text: {
+          value: '',
+          isValid: false,
+        },
+        sourceKey: {
+          value: '',
+          isValid: false,
+        },
+      },
+    });
+
+    this.onDialogClose();
+    this.onUpdateTree();
+  }
+
   render() {
     const {
-      tree, dialogOpen, inputs, sources, isSent, channelKey, videoKey, nameSource,
+      tree, inputs, sources, channelKey, videoKey, isSent, isLoaded, dialogOpen, dialogData,
     } = this.state;
 
     if (isSent) {
       return <Redirect to={`/channel/${channelKey}/watch/${videoKey}`} />;
     }
-    const Inputs = Object.keys(inputs).map((key) => {
-      const inputElement = inputs[key];
-      return (
-        <Input
-          key={key}
-          type={inputElement.type}
-          name={inputElement.name}
-          description={inputElement.description}
-          value={inputElement.value}
-          rules={inputElement.rules}
-          callback={state => this.callbackInput(state)}
-        />
-      );
-    });
+
+    if (!isLoaded) {
+      return <div className={classes.root}>Загружается</div>;
+    }
 
     return (
       <div className={classes.container}>
         <Typography variant="h6">
           Создание видео
-          {this.state.videoKey}
         </Typography>
         <div id="treeWrapper" style={{ width: '100%', height: '60%' }}>
           <Tree
@@ -261,26 +228,39 @@ class CreateVideo extends Component {
             onClick={(nodeData, event) => { this.handleClick(nodeData.key); this.onUpdateTree(); }}
           />
         </div>
-        <Dialog dialogOpen={dialogOpen} callback={() => this.callbackDialog()} title="Выберите фрагмент">
-          <DialogContent>
-            {Inputs[2]}
-            <Select
-              value={nameSource}
-              name="sourceKey"
-              fullWidth
-              onChange={this.handleChange}
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              { sources.map((source, i) => (
-                <MenuItem key={i} value={i}>{source.name}</MenuItem>
-              ))}
-            </Select>
-          </DialogContent>
+        <ServerForm
+          action="video/upload/"
+          enctype="multipart/form-data"
+          name="video-upload"
+          inputs={inputs}
+          onSubmitSuccess={data => this.onSubmitSuccess(data)}
+          getInputsDynamic={() => this.getData()}
+        />
+        <Dialog title="Выберите фрагмент" open={dialogOpen} onClose={() => this.onDialogClose()}>
+          <ChoiceInput
+            label="Фрагмент видео"
+            name="sourceKey"
+            value={dialogData.sourceKey.value}
+            choices={sources.map(source => ({ value: source.key, text: source.name }))}
+            onStateChange={data => this.onStateChange(data)}
+            rules={{ required: true }}
+          />
+          <TextInput
+            label="Ответ"
+            name="text"
+            value={dialogData.text.value}
+            placeholder="Введите ответ, ведущий к этому фрагменту"
+            onStateChange={data => this.onStateChange(data)}
+            rules={{ required: true }}
+          />
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => this.onButtonClick()}
+          >
+            Сохранить
+          </Button>
         </Dialog>
-        {Inputs[0]}
-        {Inputs[1]}
       </div>
     );
   }

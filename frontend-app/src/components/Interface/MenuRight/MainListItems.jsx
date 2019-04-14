@@ -21,7 +21,7 @@ class MainListItems extends Component {
       <div>
         <ListItem
           button
-          component={Home}
+          component={HomeLink}
         >
           <ListItemIcon><RestorePage color="secondary" /></ListItemIcon>
           <ListItemText

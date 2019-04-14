@@ -1,22 +1,21 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles/index';
-import NavigationIcon from '@material-ui/icons/Navigation';
+
 import { Redirect } from 'react-router-dom';
-import {
-  Typography, Fab,
-} from '@material-ui/core';
-import Input from '../../../components/Input/Input';
-import { json, RequestResolver } from '../../../helpers/RequestResolver';
-import styles from './ChannelEdit.styles';
-import { perror, pprint } from '../../../helpers/SmartPrint';
+import { withStyles } from '@material-ui/core';
+
+import { RequestResolver } from '../../../helpers/RequestResolver';
+import { perror } from '../../../helpers/SmartPrint';
+
+import { ServerForm } from '../../../components/Forms';
+
+import styles from './styles';
 
 class ChannelEdit extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isLoaded: false,
-      isValid: false,
       inputs: [],
       channelKey: '',
       isSent: false,
@@ -33,45 +32,10 @@ class ChannelEdit extends Component {
     }
   }
 
-  getData() {
-    const { inputs } = this.state;
-    const result = {};
-    inputs.map((input) => { result[input.name] = input.value; return 0; });
-    return result;
-  }
-
-  async submitHandlerChange() {
-    const { inputs } = this.state;
-    let isValid = true;
-    for (const key in inputs) {
-      isValid = isValid && inputs[key].isValid;
-    }
-
-    if (isValid) {
-      try {
-        const data = this.getData();
-        const result = await this.backend(json).post('channel/update/', data);
-        pprint('ChannelEdit', result.data);
-        this.setState({ isSent: true, channelKey: result.data.key });
-      } catch (error) {
-        perror('ChannelEdit', error);
-      }
-    } else {
-      console.log('Invalid input');
-    }
-  }
-
-  submitHandlerDelete(event) {
-    console.log('Удаляю');
-    event.preventDefault();
-  }
-
-  callbackInput(state) {
-    const { inputs } = this.state;
-    const input = inputs.find(elem => elem.name === state.name);
-    input.value = state.value;
-    input.isValid = state.isValid;
-    this.setState({ inputs });
+  onSubmitSuccess(data) {
+    const { onEdit } = this.props;
+    this.setState({ isSent: true, channelKey: data.key });
+    onEdit();
   }
 
   render() {
@@ -84,61 +48,26 @@ class ChannelEdit extends Component {
       return <Redirect to={`/channel/${channelKey}`} />;
     }
 
-    let status = <div>Загружается</div>;
-    if (isLoaded) {
-      status = <div>Загрузилось</div>;
+    if (!isLoaded) {
+      return <div className={classes.root}>Загружается</div>;
     }
-    const Inputs = Object.keys(inputs).map((key) => {
-      const inputElement = inputs[key];
-      return (
-        <Input
-          key={key}
-          type={inputElement.type}
-          name={inputElement.name}
-          description={inputElement.description}
-          value={inputElement.value}
-          rules={inputElement.rules}
-          callback={state => this.callbackInput(state)}
-        />
-      );
-    });
 
     return (
       <div>
-        <form>
-          <Typography variant="h6">
-            Настройки канала
-          </Typography>
-          {Inputs}
-          <Fab
-            variant="extended"
-            color="primary"
-            aria-label="Add"
-            className={classes.margin}
-            style={styles.button}
-            onClick={event => this.submitHandlerChange(event)}
-          >
-            <NavigationIcon className={classes.extendedIcon} />
-            Изменить
-          </Fab>
-          <Fab
-            variant="extended"
-            color="primary"
-            aria-label="Add"
-            className={classes.margin}
-            style={styles.button}
-            onClick={event => this.submitHandlerDelete(event)}
-          >
-            <NavigationIcon className={classes.extendedIcon} />
-            Удалить канал
-          </Fab>
-        </form>
+        <ServerForm
+          action="channel/update/"
+          enctype="multipart/form-data"
+          name="channel-create"
+          inputs={inputs}
+          onSubmitSuccess={data => this.onSubmitSuccess(data)}
+        />
       </div>
     );
   }
 }
 
 ChannelEdit.propTypes = {
+  onEdit: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
 };
 

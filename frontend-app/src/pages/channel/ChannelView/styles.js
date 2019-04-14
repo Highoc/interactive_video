@@ -14,9 +14,12 @@ const styles = () => ({
     height: '150px',
   },
   subs: {
-    position: 'absolute',
-    top: '80px',
-    left: '30px',
+    float: 'right',
+  },
+  row: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });
 

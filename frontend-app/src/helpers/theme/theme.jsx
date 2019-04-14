@@ -100,6 +100,10 @@ const theme = createMuiTheme({
       fontSize: 25,
       fontFamily: 'Helvetica Neue Cyr Medium',
     },
+    h5: {
+      fontSize: 20,
+      fontFamily: 'Helvetica Neue Cyr Medium',
+    },
     fontSize: {
       small: 12,
       medium: 20,
