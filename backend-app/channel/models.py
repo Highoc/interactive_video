@@ -26,6 +26,12 @@ class Channel(models.Model):
         verbose_name='Ключ канала'
     )
 
+    head_picture = models.ImageField(
+        upload_to='head_channel',
+        null=True,
+        verbose_name='Шапка канала'
+    )
+
     subscribers = models.ManyToManyField(
         'auth.User',
         related_name='subscriptions',

@@ -1,5 +1,7 @@
 from django.db import models
 
+from tag.models import Tag
+
 import uuid
 
 
