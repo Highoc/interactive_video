@@ -86,11 +86,6 @@ const styles = ({ palette, typography, breakpoints }) => ({
     flexDirection: 'row',
   },
 
-  channelName: {
-    lineHeight: '40px',
-    marginLeft: '20px',
-  },
-
   statistics: {
     lineHeight: '24px',
     marginLeft: '20px',
@@ -98,6 +93,23 @@ const styles = ({ palette, typography, breakpoints }) => ({
   button: {
     display: 'flex',
     alignItems: 'center',
+  },
+
+  channelName: {
+    fontSize: 20,
+    color: 'rgb(255,255,255)',
+    margin: '12px 5px 10px 15px',
+    fontFamily: 'Helvetica Neue Cyr Medium',
+    display: '-webkit-box',
+    webkitBoxOrient: 'vertical',
+    webkitLineClamp: '1',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  link: {
+    textDecoration: 'none',
+    margin: '0px 5px 10px 5px',
+    overflow: 'hidden',
   },
 });
 

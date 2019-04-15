@@ -263,7 +263,6 @@ class AppendQueue {
     if (this.queue[0].isLoaded) {
       const currentPart = this.queue.shift();
       this.totalDuration += currentPart.time;
-      console.log(this.sourceBuffer);
       this.sourceBuffer.appendBuffer(currentPart.buf);
     }
   }

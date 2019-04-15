@@ -39,7 +39,7 @@ class Homepage extends Component {
   render() {
     const { isLoaded } = this.state;
     if (!isLoaded) {
-      return <div> Еще не загружено </div>;
+      return <div />;
     }
 
     const {

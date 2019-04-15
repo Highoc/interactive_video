@@ -1,63 +1,47 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 import {
-  Card, CardContent, Typography, withStyles,
+  Typography, withStyles, GridList, GridListTile, ListSubheader, GridListTileBar, IconButton,
 } from '@material-ui/core';
 
+import { Info } from '@material-ui/icons';
 
-import { RequestResolver } from '../../../helpers/RequestResolver';
-import { perror } from '../../../helpers/SmartPrint';
 
 import styles from './styles';
 
 class Playlist extends Component {
   constructor(props) {
     super(props);
-
-    const { channelKey, playlistKey } = props.match.params;
-
     this.state = {
-      channelKey,
-      playlistKey,
-      isLoaded: false,
-      playlist: null,
     };
-    this.backend = RequestResolver.getBackend();
-  }
-
-  async componentDidMount() {
-    try {
-      const { channelKey, playlistKey } = this.state;
-      const result = await this.backend().get(`channel/${channelKey}/playlist/${playlistKey}/`);
-      this.setState({ isLoaded: true, playlist: result.data });
-    } catch (error) {
-      perror('Playlist', error);
-    }
   }
 
   render() {
-    const { isLoaded, playlist } = this.state;
-    const { classes } = this.props;
-
-    if (!isLoaded) {
-      return <div> Еще не загружено </div>;
-    }
-
+    const { playlist, classes, channelKey } = this.props;
     return (
       <div>
-        <Card className={classes.card}>
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="h2" align="center">
-              Название плейлиста:
-              {' '}
-              {playlist.name}
-            </Typography>
-            <Typography component="p" align="center">
-              {playlist.description}
-            </Typography>
-          </CardContent>
-        </Card>
+        <GridList cellHeight="auto" spacing={10} classes={classes.gridList}>
+          <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
+            <ListSubheader component="div">
+              <Typography variant="h1" color="textSecondary">{playlist.name} </Typography>
+            </ListSubheader>
+          </GridListTile>
+          {playlist.video.map(video => (
+            <GridListTile key={video.name} cols={0.4} rows={1} component={props => <Link to={`/channel/${channelKey}/watch/${video.key}`} {...props} />}>
+              <img src={video.preview_url} alt={video.name} width="22%" height="100%" />
+              <GridListTileBar
+                title={video.name}
+                actionIcon={(
+                  <IconButton className={classes.icon}>
+                    <Info color="secondary" />
+                  </IconButton>
+                )}
+              />
+            </GridListTile>
+
+          ))}
+        </GridList>
       </div>
 
     );
@@ -66,7 +50,3 @@ class Playlist extends Component {
 
 export default withStyles(styles)(Playlist);
 
-Playlist.propTypes = {
-  match: PropTypes.object.isRequired,
-  classes: PropTypes.object.isRequired,
-};

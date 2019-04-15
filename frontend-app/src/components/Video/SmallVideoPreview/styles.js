@@ -34,7 +34,6 @@ const styles = ({ palette, typography }) => ({
 
   img: {
     transition: 'transform 0.6s ease-out',
-    objectFit: 'cover',
     height: '200px',
     width: '270px',
   },

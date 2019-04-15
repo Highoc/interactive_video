@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import {ListItem, ListItemIcon, ListItemText, Typography} from '@material-ui/core';
 import PermMediaOutlinedIcon from '@material-ui/icons/PhotoSizeSelectActual';
 
 class ChannelList extends Component {
@@ -24,9 +24,18 @@ class ChannelList extends Component {
         key={keyChannel}
       >
         <ListItemIcon>{icon}</ListItemIcon>
-        <ListItemText
-          primary={name}
-        />
+        <Typography style={{
+          fontSize: 15,
+          color: 'rgb(255,255,255)',
+          fontFamily: 'Helvetica Neue Cyr Medium',
+          webkitBoxOrient: 'vertical',
+          webkitLineClamp: '1',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+        >
+          {name}
+        </Typography>
       </ListItem>
     );
   }

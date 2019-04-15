@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import {
-  ExpansionPanel, ExpansionPanelSummary, CardContent, Typography, Card,
+  ExpansionPanel, CardContent, Typography, Card,
 } from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import InteractivePlayer from '../../../components/VideoWatch/InteractivePlayer/InteractivePlayer';
 import ExpansionPanelVideo from '../../../components/VideoWatch/ExpansionPanel';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
@@ -16,7 +15,6 @@ class WatchVideo extends Component {
     const { videoKey, channelKey } = props.match.params;
     this.state = {
       video: null,
-      author: 'admin',
       videoKey,
       channelKey,
       isLoaded: false,
@@ -42,7 +40,7 @@ class WatchVideo extends Component {
 
   render() {
     const {
-      video, isLoaded, channelKey, videoKey, author, openComments,
+      video, isLoaded, channelKey, videoKey, openComments,
     } = this.state;
 
     let result = null;
@@ -61,9 +59,7 @@ class WatchVideo extends Component {
           <InteractivePlayer main={video.head_video_part} codec={video.codec} />
 
           <ExpansionPanelVideo
-            created={video.created}
-            author={author}
-            description={video.description}
+            video={video}
             keyVideo={videoKey}
             keyChannel={channelKey}
             openComments={state => (this.openComments(state))}

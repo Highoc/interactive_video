@@ -21,6 +21,7 @@ const styles = theme => ({
     flex: 'auto',
   },
   ratingViews: {
+    marginTop: '10px',
     fontSize: theme.typography.pxToRem(22),
   },
   columnButton: {
@@ -30,6 +31,13 @@ const styles = theme => ({
   columnContainer: {
     display: 'flex',
     flexDirection: 'column',
+  },
+  description: {
+    marginTop: '20px',
+  },
+  line: {
+    display: 'flex',
+    flexDirection: 'row',
   },
 });
 

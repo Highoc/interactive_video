@@ -13,14 +13,13 @@ import styles from './styles';
 
 import { json, RequestResolver } from '../../../helpers/RequestResolver';
 import { perror } from '../../../helpers/SmartPrint';
-import date from '../../../helpers/Date/date';
 
 import { PlaylistAll } from '../../playlist';
 import ChannelInfo from '../../../components/Channel/ChannelInfo/ChannelInfo';
 import ChannelEdit from '../ChannelEdit/ChannelEdit';
 import head from '../../../static/images/head.png';
 
-import { Carousel, HugeVideoPreview } from '../../../components/Video';
+import Playlist from '../../playlist/Playlist/Playlist';
 import { TabBar } from '../../../components/TabBar';
 
 
@@ -128,24 +127,12 @@ class ChannelView extends Component {
       return <div className={classes.root}> Еще не загружено </div>;
     }
 
-    const Info = (
-      <Typography>
-        Создатель:
-        {channel.owner.username}
-        <br />
-        Создан:
-        {date(channel.created)}
-        <br />
-        {channel.description}
-      </Typography>
-    );
-
     const tabs = [
       {
         value: 1,
         label: 'Видео',
         icon: <OndemandVideo />,
-        container: <div />,
+        container: <Playlist playlist={channel.uploaded_playlist} channelKey={channelKey} />,
       }, {
         value: 2,
         label: 'Плейлисты',
