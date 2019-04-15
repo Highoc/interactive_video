@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import {
   ExpansionPanel, ExpansionPanelSummary, CardContent, Typography, Card,
 } from '@material-ui/core';
@@ -9,6 +10,8 @@ import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import classes from './WatchVideo.module.css';
 import { perror } from '../../../helpers/SmartPrint';
 import CommentBox from '../../../components/VideoWatch/CommentBox/CommentBox';
+import { TagList } from '../../../components/TagList';
+
 
 class WatchVideo extends Component {
   constructor(props) {
@@ -39,6 +42,8 @@ class WatchVideo extends Component {
       video, isLoaded, channelKey, videoKey, author,
     } = this.state;
 
+    const { username } = this.props;
+
     let result = null;
     if (isLoaded) {
       result = (
@@ -55,6 +60,8 @@ class WatchVideo extends Component {
           </Card>
 
           <InteractivePlayer main={video.head_video_part} codec={video.codec} />
+
+          <TagList videoKey={videoKey} tags={video.tags} editable={video.owner === username} />
 
           <ExpansionPanelVideo
             created={video.created}
@@ -85,4 +92,8 @@ class WatchVideo extends Component {
   }
 }
 
-export default WatchVideo;
+const mapStateToProps = state => ({
+  username: state.authorization.username,
+});
+
+export default connect(mapStateToProps)(WatchVideo);

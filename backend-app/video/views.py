@@ -6,7 +6,7 @@ from rest_framework import status
 from application import settings
 
 from .serializers import SourceSerializer, PrettySourceSerializer, VideoPartSerializer, VideoSerializer
-from .serializers import get_source_form
+from .serializers import get_source_form, get_video_form
 
 from .models import Source, VideoPart, Video
 from .helpers.video import is_supported_mime_type, get_file_url, get_mime_type, get_codec, get_duration, get_short_key, get_image_url
@@ -98,30 +98,35 @@ class SourceView(APIView):
             'created': source.created,
         })
 
-# Проверять кодеки, что совместимы
+
 class VideoUploadView(APIView):
-    parser_classes = (JSONParser, )
+    parser_classes = (MultiPartParser, FormParser)
 
     def get(self, request):
-        return Response({'username': request.user.username})
+        channel = request.user.channel
+        if channel:
+            return Response(get_video_form(channel), status=status.HTTP_200_OK)
+        else:
+            return Response('Invalid channel', status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         video_serializer = VideoSerializer(data=request.data)
         if video_serializer.is_valid() and 'main' in request.data:
-            video = video_serializer.create()
-            video.owner = request.user
+            data = video_serializer.validated_data
+            video = video_serializer.create(validated_data=data, user=request.user)
 
+            Views(video=video).save()
+            Rating(video=video).save()
+
+            print(request.data)
+
+            import json
             try:
-                main = request.data['main']
+                main = json.loads(request.data['main'])
                 video_parts = self.get_video_parts(main, user=request.user)
 
             except Exception as e:
                 return Response("Video parts are incorrect", status=status.HTTP_400_BAD_REQUEST)
-
-            #print(video_parts)
-            #print(request.data)
-            video.playlist = request.user.channel.playlists.get(status=Playlist.UPLOADED)
-            video.save()
 
             for part in video_parts:
                 if part.parent_ref is None:
@@ -133,14 +138,11 @@ class VideoUploadView(APIView):
                 part.save()
             
             head = video_parts[0]
-            video.key = get_short_key(video.id)
             video.head_video_part = head
+
+            # Проверять кодеки, что совместимы
             video.codec = head.source.codec
-
             video.save()
-
-            Views(video=video).save()
-            Rating(video=video).save()
 
             '''
             for all sources
@@ -180,6 +182,7 @@ class VideoUploadView(APIView):
             else:
                 raise Exception
 
+
 class VideoView(APIView):
     def get(self, request, key=None):
         video_list = Video.objects.filter(key=key, status=Video.PUBLIC)
@@ -192,8 +195,10 @@ class VideoView(APIView):
         response = {
             'name': video.name,
             'description': video.description,
+            'owner': video.owner.username,
             'head_video_part': video.head_video_part.key.hex,
             'head_comments': [ comment.id for comment in video.comments.filter(parent=None) ],
+            'tags': [ { 'text': tag.text } for tag in video.tags.all() ],
             'codec': video.codec,
             'created': video.created,
         }

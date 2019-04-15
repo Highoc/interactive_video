@@ -3,9 +3,9 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 from channel.models import Playlist
 from comment.models import Comment
+from tag.models import Tag
 
 import uuid
-
 
 class Source(models.Model):
 
@@ -173,6 +173,12 @@ class Video(models.Model):
         related_name='video',
         verbose_name='Стартовый фрагмент видео',
         on_delete=models.CASCADE
+    )
+
+    tags = models.ManyToManyField(
+        Tag,
+        related_name='video',
+        verbose_name='Теги видео',
     )
 
     codec = models.CharField(

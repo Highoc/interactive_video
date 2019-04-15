@@ -16,4 +16,5 @@ urlpatterns = [
 
     url(r'^auth/login/$', obtain_jwt_token),
     url(r'^test/$', TestView.as_view()),
+    url(r'^tag/', include('tag.urls')),
 ]

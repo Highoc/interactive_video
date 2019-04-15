@@ -58,7 +58,9 @@ class ChannelUpdateView(APIView):
                     description='Все ваши загруженные видео',
                     status=Playlist.UPLOADED,
                     channel=channel
-                ).save()
+                )
+                uploaded.save()
+
                 uploaded.key = get_short_key(uploaded.id)
                 uploaded.save()
 
@@ -67,7 +69,9 @@ class ChannelUpdateView(APIView):
                     description='Все ваши скрытые видео',
                     status=Playlist.HIDDEN,
                     channel=channel
-                ).save()
+                )
+                hidden.save()
+
                 hidden.key = get_short_key(hidden.id)
                 hidden.save()
 
@@ -76,7 +80,9 @@ class ChannelUpdateView(APIView):
                     description='Все ваши удаленные видео',
                     status=Playlist.DELETED,
                     channel=channel
-                ).save()
+                )
+                deleted.save()
+
                 deleted.key = get_short_key(deleted.id)
                 deleted.save()
 

@@ -90,7 +90,7 @@ def get_channel_form(channel=None):
         'rules': {
             'mimetypes': ['image/png'],
             'max_size': convert_to_byte_length(MB=10),
-            'required': False,
+            'required': True,
         }
     }]
 

@@ -1,4 +1,3 @@
-import Tag from './Tag/Tag';
-import Taglist from './Taglist';
+import TagList from './TagList';
 
-export { Taglist, Tag };
+export { TagList };

@@ -1,15 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import { Link } from 'react-router-dom';
 
 import {
-  Paper, Chip, Icon, withStyles,
+  Paper, Chip, withStyles, Button,
 } from '@material-ui/core';
 
 import { AddCircle } from '@material-ui/icons';
 
+import { Dialog } from '../Dialog';
+import { TextInput } from '../Inputs';
 
-import { Tag } from '.';
+import { RequestResolver } from '../../helpers/RequestResolver';
+import { perror } from '../../helpers/SmartPrint';
 
 import styles from './styles';
 
@@ -19,31 +23,73 @@ class TagList extends Component {
     super(props);
     this.state = {
       tags: props.tags,
+      dialogOpen: false,
+      newTag: '',
+      isValid: false,
     };
+    this.backend = RequestResolver.getBackend();
   }
 
-  onDelete(text) {
-    const { tags } = this.state;
+  async onDelete(event, text) {
+    event.preventDefault();
+    try {
+      const { tags } = this.state;
+      const { videoKey } = this.props;
 
-    //Запрос
+      await this.backend().post(`tag/video/${videoKey}/delete/`, { text });
 
+      this.setState({
+        tags: tags.filter(tag => tag.text !== text),
+      });
+    } catch (error) {
+      perror('TagList', error);
+    }
+  }
+
+  async onAdd(text) {
+    try {
+      const { tags } = this.state;
+      const { videoKey } = this.props;
+
+      const responce = await this.backend().post(`tag/video/${videoKey}/add/`, { text });
+
+      if (!tags.find(tag => tag.text === responce.data.text)) {
+        tags.push({ text: responce.data.text });
+      }
+
+      this.setState({ tags });
+    } catch (error) {
+      perror('TagList', error);
+    }
+  }
+
+  onDialogOpen() {
+    this.setState({ dialogOpen: true });
+  }
+
+  onDialogClose() {
+    this.setState({ dialogOpen: false });
+  }
+
+  onStateChange(state) {
+    this.setState({ newTag: state.value, isValid: state.isValid });
+  }
+
+  onSubmit() {
+    const { newTag } = this.state;
+    this.onDialogClose();
+    this.onAdd(newTag);
     this.setState({
-      tags: tags.filter(tag => tag.text !== text),
+      newTag: '',
+      isValid: false,
     });
-  }
-
-  onAdd(text) {
-    const { tags } = this.state;
-
-    //Запрос
-    tags.push({ text });
-
-    this.setState({ tags });
   }
 
   render() {
     const { editable, classes } = this.props;
-    const { tags } = this.state;
+    const {
+      tags, dialogOpen, newTag, isValid,
+    } = this.state;
 
     let addTag;
     if (editable) {
@@ -53,26 +99,56 @@ class TagList extends Component {
           color="secondary"
           variant="outlined"
           className={classes.chip}
-          onDelete={() => this.onAdd('танос')}
+          onClick={() => this.onDialogOpen()}
           deleteIcon={<AddCircle color="secondary" />}
         />
       );
     }
 
     return (
-      <Paper className={classes.root}>
-        {
-          tags.map(tag => (
-            <Tag
-              key={tag.text}
-              text={tag.text}
-              deletable={editable}
-              onDelete={text => this.onDelete(text)}
-            />
-          ))
-        }
-        {addTag}
-      </Paper>
+      <div>
+        <Paper className={classes.root}>
+          {
+            tags.map((tag) => {
+              const TagLink = props => <Link to={`/search/?tag=${tag.text}`} {...props} />;
+
+              let editProps;
+              if (editable) {
+                editProps = { onDelete: event => this.onDelete(event, tag.text) };
+              }
+
+              return (
+                <Chip
+                  label={`#${tag.text}`}
+                  component={TagLink}
+                  {...editProps}
+                  clickable
+                  color="secondary"
+                  variant="outlined"
+                  className={classes.chip}
+                />
+              );
+            })
+          }
+          {addTag}
+        </Paper>
+        <Dialog title="Добавление тега" open={dialogOpen} onClose={() => this.onDialogClose()}>
+          <TextInput
+            name="tag"
+            value={newTag}
+            label="Тег"
+            placeholder="Введите название тега..."
+            rules={{
+              max_length: 16,
+              required: true,
+            }}
+            onStateChange={state => this.onStateChange(state)}
+          />
+          <Button onClick={() => this.onSubmit()} color="primary" disabled={!isValid}>
+            Отправить
+          </Button>
+        </Dialog>
+      </div>
     );
   }
 }
@@ -85,6 +161,7 @@ TagList.propTypes = {
       text: PropTypes.string,
     }),
   ).isRequired,
+  videoKey: PropTypes.string.isRequired,
   editable: PropTypes.bool.isRequired,
   classes: PropTypes.object.isRequired,
 };
