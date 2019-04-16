@@ -19,6 +19,7 @@ import { RequestResolver } from '../../../helpers/RequestResolver';
 import { perror, pprint } from '../../../helpers/SmartPrint';
 
 import styles from './ConstructPanelLeft.styles';
+import add from '../../../static/images/add.jpg';
 
 
 class ConstructPanelLeft extends Component {
@@ -89,7 +90,7 @@ class ConstructPanelLeft extends Component {
               <CardMedia
                 className={classes.media}
                 title="Добавить видео"
-                image="https://get.wallhere.com/photo/red-cross-cross-red-hospital-1231489.jpg"
+                image={add}
                 onClick={event => this.onDialogOpen(event)}
               />
               <CardContent className={classes.content}>

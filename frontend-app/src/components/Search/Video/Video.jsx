@@ -60,9 +60,22 @@ class VideoCard extends Component {
                 </div>
               </Link>
             </div>
-            <Typography variant="h2" color="textSecondary" className={classes.description}>
-              {description}
-            </Typography>
+            <div className={classes.description}>
+              <div style={{
+                fontSize: 20,
+                color: 'rgb(124,124,124)',
+                lineHeight: '1.5',
+                fontFamily: 'Helvetica Neue Cyr Medium',
+                display: '-webkit-box',
+                webkitBoxOrient: 'vertical',
+                webkitLineClamp: '3',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+              >
+                {description}
+              </div>
+            </div>
             <Typography variant="h2" color="textSecondary" className={classes.created}>
               Создано:
               {' '}

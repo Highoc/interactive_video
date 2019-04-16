@@ -52,6 +52,8 @@ const styles = theme => ({
     fontSize: theme.typography.fontSize.medium,
   },
   description: {
+    height: '90px',
+    minHeight: '100px',
     fontSize: theme.typography.fontSize.medium,
   },
 });

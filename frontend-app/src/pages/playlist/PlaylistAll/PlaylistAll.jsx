@@ -13,6 +13,8 @@ import ChannelPlaylistView from '../../../components/Playlist/ChannelPlaylistVie
 import { json, RequestResolver } from '../../../helpers/RequestResolver';
 import { perror, pprint } from '../../../helpers/SmartPrint';
 
+import add from '../../../static/images/add.jpg';
+
 import styles from './styles';
 
 
@@ -82,7 +84,7 @@ class PlaylistAll extends Component {
                 component={AddPlaylist}
                 className={classes.media}
                 title="Добавить плейлист"
-                image="https://get.wallhere.com/photo/red-cross-cross-red-hospital-1231489.jpg"
+                image={add}
               />
               <CardContent className={classes.newContent}>
                 <Typography gutterBottom variant="h6" component="h2" align="center">
