@@ -1,29 +1,29 @@
 import { Link } from 'react-router-dom';
 import {
-  Divider, ListItem, ListItemIcon, ListItemText,
+  Divider, ListItem, ListItemIcon, ListItemText, Badge,
 } from '@material-ui/core';
 import React, { Component } from 'react';
-import VideoCamera from '@material-ui/icons/Videocam';
-import HomeIcon from '@material-ui/icons/Home';
-import CreateIcon from '@material-ui/icons/Create';
-import Page from '@material-ui/icons/RestorePage';
+import {
+  Videocam, Home, Create, RestorePage, Mail, Notifications, QuestionAnswer,
+} from '@material-ui/icons';
 import { connect } from 'react-redux';
-
+import { withStyles } from '@material-ui/core/styles/index';
+import menuRightStyles from './MenuRight.styles';
 
 class MainListItems extends Component {
   render() {
-    const { channelKey, channelExists } = this.props;
+    const { channelKey, channelExists, classes } = this.props;
     const CreateVideo = props => <Link to={`/channel/${channelKey}/create`} {...props} />;
     const MyChannel = props => <Link to={`/channel/${channelKey}`} {...props} />;
     const CreateChannel = props => <Link to="/channel/create" {...props} />;
-    const Home = props => <Link to="/" {...props} />;
+    const HomeLink = props => <Link to="/" {...props} />;
     let buttons = (
       <div>
         <ListItem
           button
-          component={Home}
+          component={HomeLink}
         >
-          <ListItemIcon><Page /></ListItemIcon>
+          <ListItemIcon><RestorePage color="secondary" /></ListItemIcon>
           <ListItemText
             primary="На главную"
           />
@@ -33,7 +33,7 @@ class MainListItems extends Component {
           button
           component={CreateChannel}
         >
-          <ListItemIcon><CreateIcon /></ListItemIcon>
+          <ListItemIcon><Create color="secondary" /></ListItemIcon>
           <ListItemText
             primary="Создать канал"
           />
@@ -46,31 +46,65 @@ class MainListItems extends Component {
         <div>
           <ListItem
             button
-            component={Home}
+            component={HomeLink}
           >
-            <ListItemIcon><Page /></ListItemIcon>
+            <ListItemIcon><RestorePage color="secondary" /></ListItemIcon>
             <ListItemText
               primary="На главную"
             />
           </ListItem>
-          <Divider />
           <ListItem
             button
             component={MyChannel}
           >
-            <ListItemIcon><HomeIcon /></ListItemIcon>
+            <ListItemIcon><Home color="secondary" /></ListItemIcon>
             <ListItemText
-              primary="My channel"
+              primary="Мой канал"
             />
           </ListItem>
-          <Divider />
           <ListItem
             button
             component={CreateVideo}
           >
-            <ListItemIcon><VideoCamera /></ListItemIcon>
+            <ListItemIcon><Videocam color="secondary" /></ListItemIcon>
             <ListItemText
-              primary="Create Video"
+              primary="Создать видео"
+            />
+          </ListItem>
+          <ListItem
+            button
+          >
+            <ListItemIcon>
+              <Badge badgeContent={10} max={999} color="primary">
+                <Mail color="secondary" />
+              </Badge>
+            </ListItemIcon>
+            <ListItemText
+              primary="Сообщения"
+            />
+          </ListItem>
+          <ListItem
+            button
+          >
+            <ListItemIcon>
+              <Badge badgeContent={17} color="primary">
+                <Notifications color="secondary" />
+              </Badge>
+            </ListItemIcon>
+            <ListItemText
+              primary="Уведомления"
+            />
+          </ListItem>
+          <ListItem
+            button
+          >
+            <ListItemIcon>
+              <Badge badgeContent={5} color="primary">
+                <QuestionAnswer color="secondary" />
+              </Badge>
+            </ListItemIcon>
+            <ListItemText
+              primary="Ответы"
             />
           </ListItem>
         </div>
@@ -85,4 +119,4 @@ const mapStateToProps = state => ({
   channelExists: state.authorization.channelExists,
 });
 
-export default connect(mapStateToProps)(MainListItems);
+export default withStyles(menuRightStyles)(connect(mapStateToProps)(MainListItems));

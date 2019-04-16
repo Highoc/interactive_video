@@ -102,19 +102,12 @@ class Test extends Component {
         value: 1,
         label: 'Aduin',
         icon: <Icon />,
+        container: <div>1111111111111</div>,
       }, {
         value: 2,
         label: 'Dva',
         icon: <Icon />,
-      },
-    ];
-    const containers = [
-      {
-        value: 1,
-        node: <div>1111111111111</div>,
-      }, {
-        value: 2,
-        node: <div>2222222222222</div>,
+        container: <div>2222222222222</div>,
       },
     ];
 
@@ -133,7 +126,6 @@ class Test extends Component {
         <TabBar
           defaultValue={1}
           tabs={tabs}
-          containers={containers}
         />
       </div>
     );

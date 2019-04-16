@@ -3,18 +3,20 @@ import PropTypes from 'prop-types';
 
 import clone from 'clone';
 
-import { Button } from '@material-ui/core';
+import { Button, withStyles, } from '@material-ui/core';
 
 import Input from '../../Inputs/Input';
 import { perror } from '../../../helpers/SmartPrint';
 import { RequestResolver, json, multipart } from '../../../helpers/RequestResolver';
 
+import styles from './styles';
 
 class ServerForm extends Component {
   static defaultProps = {
     onSubmitSuccess: () => {},
     onSubmitFailed: () => {},
     inputsHidden: [],
+    getInputsDynamic: () => ([]),
   };
 
   static checkValidity(inputs) {
@@ -66,9 +68,9 @@ class ServerForm extends Component {
       this.reloadForm();
       onSubmitSuccess(response.data);
     } catch (error) {
+      perror(`ServerForm[${name}]`, error);
       this.setState({ errors: JSON.parse(error.request.response) });
       onSubmitFailed(error);
-      perror(`ServerForm[${name}]`, error);
     }
   }
 
@@ -83,9 +85,10 @@ class ServerForm extends Component {
 
   getFormData() {
     const { inputs, inputsHidden, name } = this.state;
-    const { enctype } = this.props;
+    const { enctype, getInputsDynamic } = this.props;
 
-    const inputsAll = inputs.concat(inputsHidden);
+    const inputsDynamic = getInputsDynamic();
+    const inputsAll = inputs.concat(inputsHidden).concat(inputsDynamic);
 
     let formData;
     switch (enctype) {
@@ -101,7 +104,11 @@ class ServerForm extends Component {
         formData = new FormData();
         for (const input of inputsAll) {
           if (input.value) {
-            formData.append(input.name, input.value);
+            if (input.name === 'main') {
+              formData.append(input.name, JSON.stringify(input.value));
+            } else {
+              formData.append(input.name, input.value);
+            }
           }
         }
         break;
@@ -130,6 +137,8 @@ class ServerForm extends Component {
       inputs, errors, isReady, isValid,
     } = this.state;
 
+    const { classes } = this.props;
+
     let inputList = <div />;
     if (isReady) {
       inputList = inputs.map(input => (
@@ -148,7 +157,7 @@ class ServerForm extends Component {
         <div>
           {inputList}
         </div>
-        <div>
+        <div className={classes.error}>
           {errorList}
         </div>
         <Button onClick={() => this.onSubmit()} color="primary" disabled={!isValid}>
@@ -159,7 +168,7 @@ class ServerForm extends Component {
   }
 }
 
-export default ServerForm;
+export default withStyles(styles)(ServerForm);
 
 const ENCTYPE = {
   MULTIPART: 'multipart/form-data',
@@ -174,4 +183,6 @@ ServerForm.propTypes = {
   inputsHidden: PropTypes.arrayOf(PropTypes.object),
   onSubmitSuccess: PropTypes.func,
   onSubmitFailed: PropTypes.func,
+  getInputsDynamic: PropTypes.func,
+  classes: PropTypes.object.isRequired,
 };

@@ -1,34 +1,35 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Avatar, Button, CssBaseline, FormControl, Paper, Typography, Input, InputLabel,
+  Avatar, Button, CssBaseline, FormControl, Paper, Typography, OutlinedInput, InputLabel,
 } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { connect } from 'react-redux';
 import { registration } from '../../store/actions/register';
 import styles from './Register.styles';
+import { pprint, perror } from '../../helpers/SmartPrint';
 
 class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isLoaded: false,
-      isValid: false,
+      isValid: true,
     };
   }
 
   submitHandler(event) {
     event.preventDefault();
     const { onRegister } = this.props;
-    let isValid = true;
+    let isValid = false;
 
     const passwordInput1 = document.getElementById('password1');
     const passwordInput2 = document.getElementById('password2');
     const loginInput = document.getElementById('username');
 
-    if (passwordInput1.value !== passwordInput2.value) {
-      isValid = false;
+    if (passwordInput1.value === passwordInput2.value) {
+      isValid = true;
     }
 
     if (isValid) {
@@ -39,12 +40,21 @@ class Register extends Component {
       };
       onRegister(data);
     } else {
-      console.log('Invalid input');
+      this.setState({ isValid: isValid });
     }
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, error } = this.props;
+    const { isValid } = this.state;
+    let errorList = <div />;
+    if (error) {
+      const errors = JSON.parse(error.request.response)
+      errorList = Object.keys(errors).map(key => <Typography variant="h2" color="error">{`${key}: ${errors[key]}`}</Typography>);
+    }
+    if (!isValid) {
+      errorList = <Typography variant="h2" color="error">Не совпадают пароли</Typography>;
+    }
 
     return (
       <main className={classes.main}>
@@ -59,16 +69,17 @@ class Register extends Component {
           <form className={classes.form}>
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="username">Имя пользователя</InputLabel>
-              <Input id="username" name="username" autoFocus />
+              <OutlinedInput id="username" name="username" autoFocus />
             </FormControl>
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="password">Пароль</InputLabel>
-              <Input name="password1" type="password" id="password1" autoComplete="current-password" />
+              <OutlinedInput name="password1" type="password" id="password1" autoComplete="current-password" />
             </FormControl>
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="password">Подтвердите пароль</InputLabel>
-              <Input name="password2" type="password" id="password2" autoComplete="current-password" />
+              <OutlinedInput name="password2" type="password" id="password2" autoComplete="current-password" />
             </FormControl>
+            {errorList}
             <Button
               type="submit"
               fullWidth

@@ -6,6 +6,7 @@ import {
   BrowserRouter as Router, Switch, Route, Redirect,
 } from 'react-router-dom';
 
+import { MuiThemeProvider } from '@material-ui/core/styles';
 import HeaderLayout from './components/Layouts/Header';
 import { Main } from './components/Layouts/Main';
 import { Left } from './components/Layouts/Left';
@@ -23,14 +24,15 @@ import { Channel } from './pages/channel';
 import SignIn from './pages/login/SignIn';
 import Register from './pages/register/Register';
 import Test from './pages/test/Test';
-
+import Guestpage from './pages/guest/Guestpage';
 import Centrifugo from './components/Centrifugo';
+import NotReady from './pages/notReady/NotReady';
 
 import { loginCheckState } from './store/actions/authorization';
 import ConstructPanelRight from './components/VideoConstructor/ConctructPanelRight';
+import Search from './pages/search/Search';
 
-const Guest = props => <div> Гостевая страница </div>;
-
+import theme from './helpers/theme/theme';
 
 class App extends Component {
   componentDidMount() {
@@ -41,9 +43,10 @@ class App extends Component {
   render() {
     let routes = (
       <Switch>
-        <Route path="/guest" exact component={Guest} />
+        <Route path="/guest" exact component={Guestpage} />
         <Route path="/login" exact component={SignIn} />
         <Route path="/register" exact component={Register} />
+        <Route path="/search" exact component={Search} />
         <Redirect to="/guest" />
       </Switch>
     );
@@ -60,8 +63,10 @@ class App extends Component {
           <Route path="/test" exact component={Test} />
           <Route exact path="/account/edit" component={EditAccount} />
           <Route path="/account" component={Account} />
+          <Route path="/search" exact component={Search} />
           <Route path="/channel" component={Channel} />
-          <Redirect to="/test" />
+          <Route path="/notready" component={NotReady} />
+          <Redirect to="/" />
         </Switch>
       );
 
@@ -84,23 +89,25 @@ class App extends Component {
 
     return (
       <Router>
-        <div className="content-column">
-          <HeaderLayout>
-            <Header />
-          </HeaderLayout>
-          <div className="content-row">
-            <Left>
-              {componentLeft}
-            </Left>
-            <Main>
-              {routes}
-              {centrifuge}
-            </Main>
-            <Right>
-              {componentRight}
-            </Right>
+        <MuiThemeProvider theme={theme}>
+          <div className="content-column">
+            <HeaderLayout>
+              <Header />
+            </HeaderLayout>
+            <div className="content-row">
+              <Left>
+                {componentLeft}
+              </Left>
+              <Main>
+                {routes}
+                {centrifuge}
+              </Main>
+              <Right>
+                {componentRight}
+              </Right>
+            </div>
           </div>
-        </div>
+        </MuiThemeProvider>
       </Router>
     );
   }

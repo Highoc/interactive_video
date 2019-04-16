@@ -11,7 +11,7 @@ const styles = ({ palette }) => ({
       borderColor: palette.grey.A700,
     },
     '&[error="true"]': {
-      borderColor: 'red',
+      borderColor: palette.error.dark,
     },
   },
 
@@ -20,7 +20,7 @@ const styles = ({ palette }) => ({
     fontSize: '12px',
     color: palette.grey.A200,
     '&[error="true"]': {
-      color: 'red',
+      color: palette.error.dark,
     },
   },
 
@@ -37,9 +37,12 @@ const styles = ({ palette }) => ({
   button: {
     height: '100%',
     float: 'right',
+    color: palette.common.white,
   },
 
-  placeholder: {},
+  placeholder: {
+    color: palette.common.white,
+  },
 
   input: {
     position: 'absolute',
@@ -52,7 +55,7 @@ const styles = ({ palette }) => ({
     fontSize: '12px',
     color: palette.grey.A200,
     '&[error="true"]': {
-      color: 'red',
+      color: palette.error.dark,
     },
   },
 });

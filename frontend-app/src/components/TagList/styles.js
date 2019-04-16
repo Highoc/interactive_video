@@ -3,7 +3,7 @@ const styles = ({ spacing }) => ({
     display: 'flex',
     justifyContent: 'left',
     flexWrap: 'wrap',
-    padding: spacing.unit / 2,
+    padding: spacing.unit * 2.5,
   },
 
   chip: {

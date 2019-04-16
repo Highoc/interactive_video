@@ -1,29 +1,38 @@
 import React, { Component } from 'react';
-import ChannelPlaylist from '../../components/Channel/ChannelInfo/ChannelPlaylist';
-import Typography from '@material-ui/core/Typography';
+import {
+  Whatshot, Subscriptions, FiberNew, Grade,
+} from '@material-ui/icons';
 import { RequestResolver } from '../../helpers/RequestResolver';
 import { pprint, perror } from '../../helpers/SmartPrint';
-import classes from './Homepage.module.css';
+import { ContentGenerator } from '../../components/Video';
+import { TabBar } from '../../components/TabBar';
+import NotReady from '../notReady/NotReady';
 
 class Homepage extends Component {
   constructor(props) {
     super(props);
-
-    const channelKey = 'adminadmin00';
     this.state = {
-      channelKey,
-      channel: null,
       isLoaded: false,
+      hotPlaylist: [],
+      popularPlaylist: [],
+      newPlaylist: [],
     };
     this.backend = RequestResolver.getBackend();
   }
 
   async componentDidMount() {
-    const channelKey = 'adminadmin00';
     try {
-      const result = await this.backend().get(`channel/get/${channelKey}/`);
-      this.setState({ isLoaded: true, channel: result.data });
-      pprint('HomePage', result.data);
+      const hotPlaylist = await this.backend().get('core/top/?type=hot');
+      pprint('hotPlaylist', hotPlaylist.data);
+      this.setState({ hotPlaylist: hotPlaylist.data, isLoaded: true });
+
+      const popularPlaylist = await this.backend().get('core/top/?type=popular');
+      pprint('popularPlaylist', popularPlaylist.data);
+      this.setState({ popularPlaylist: popularPlaylist.data });
+
+      const newPlaylist = await this.backend().get('core/top/?type=new');
+      pprint('newPlaylist', newPlaylist.data);
+      this.setState({ newPlaylist: newPlaylist.data });
     } catch (error) {
       perror('HomePage', error);
     }
@@ -31,41 +40,43 @@ class Homepage extends Component {
 
   render() {
     const { isLoaded } = this.state;
-    let result;
     if (!isLoaded) {
-      return <div> Еще не загружено </div>;
+      return <div />;
     }
-    /*
-    * Создать / Изменить / Удалить канал
-    * */
-    const { channel, channelKey } = this.state;
 
-    if (isLoaded) {
-      result = (
-        <div className={classes.root}>
-          <Typography variant="h4">
-            Тренды:
-          </Typography>
-          <div>
-            <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
-          </div>
-          <div>
-            <Typography variant="h4">
-              Подписки:
-            </Typography>
-          </div>
-          <div>
-            <ChannelPlaylist playlist={channel.uploaded_playlist} channelKey={channelKey} />
-          </div>
-        </div>
-      );
-    }
-    else {
-      result = <div> Еще не загружено </div>;
-    }
+    const {
+      newPlaylist, hotPlaylist, popularPlaylist,
+    } = this.state;
+
+    const tabs = [
+      {
+        value: 1,
+        label: 'Горячее',
+        icon: <Whatshot />,
+        container: <ContentGenerator top={hotPlaylist.top} compilation={hotPlaylist.compilation} />,
+      }, {
+        value: 2,
+        label: 'Свежее',
+        icon: <FiberNew />,
+        container: <ContentGenerator top={newPlaylist.top} compilation={newPlaylist.compilation} />,
+      }, {
+        value: 3,
+        label: 'Популярное',
+        icon: <Grade />,
+        container: <ContentGenerator top={popularPlaylist.top} compilation={popularPlaylist.compilation} />,
+      }, {
+        value: 4,
+        label: 'Подписки',
+        icon: <Subscriptions />,
+        container: <NotReady />,
+      },
+
+    ];
 
     return (
-      result
+      <div>
+        <TabBar defaultValue={1} tabs={tabs} />
+      </div>
     );
   }
 }

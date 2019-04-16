@@ -1,10 +1,10 @@
-const styles = () => ({
+const styles = ({ palette }) => ({
   root: {
     padding: '10px 0 10px 0',
   },
 
   label: {
-    backgroundColor: 'white',
+    backgroundColor: palette.background.paper,
     padding: '0 5px 0 5px',
   },
 });

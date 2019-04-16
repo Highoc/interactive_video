@@ -25,13 +25,11 @@ class MenuRight extends Component {
           open={true}
         >
           <List disablePadding>
-            <Typography variant="h6" align="center">
-              Кнопки
+            <Typography variant="h4" align="center" color="textSecondary">
+              Меню
             </Typography>
-            <Divider />
             <MainListItems />
           </List>
-          <Divider />
         </Drawer>
       </div>
     );

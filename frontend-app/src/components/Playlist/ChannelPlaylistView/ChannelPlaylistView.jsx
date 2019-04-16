@@ -27,8 +27,8 @@ class ChannelPlaylistView extends Component {
     const Edit = props => <Link to={`/channel/${channelKey}/playlist/${playlist.key}/update`} {...props} />;
     const chosenPlaylist = props => <Link to={`/channel/${channelKey}/playlist/${playlist.key}`} {...props} />;
 
-    let deleteButton = <Button size="small" color="primary" onClick={() => this.onDelete()}>Удалить</Button>;
-    let changeButton = <Button size="small" color="primary" component={Edit}>Изменить</Button>;
+    let deleteButton = <Button size="small" color="error" onClick={() => this.onDelete()}>Удалить</Button>;
+    let changeButton = <Button size="small" color="error" component={Edit}>Изменить</Button>;
     if (myChannelKey !== channelKey) {
       deleteButton = <div />;
       changeButton = <div />;
@@ -46,9 +46,7 @@ class ChannelPlaylistView extends Component {
             title={playlist.name}
           />
           <CardContent className={classes.content}>
-            <Typography gutterBottom variant="h6" component="h2" align="center">
-              Плейлист:
-              {' '}
+            <Typography gutterBottom variant="title" align="center">
               {playlist.name}
             </Typography>
           </CardContent>

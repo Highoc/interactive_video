@@ -14,6 +14,7 @@ import {
   BigPlayButton,
   DurationDisplay,
   ProgressControl,
+  FullscreenToggle,
 } from 'video-react';
 import { RequestResolver } from '../../../helpers/RequestResolver';
 
@@ -149,7 +150,7 @@ class InteractivePlayer extends Component {
 
     let buttons = <div />;
     const d = timeFrame.end - currentTime;
-    if (d > 0 && d < 5) {
+    if (d > 0 && d < 5 && questions.length === 2) {
       buttons = (
         <div className={classes.buttonStyles}>
           {questions.map(elem => (
@@ -161,8 +162,8 @@ class InteractivePlayer extends Component {
             >
               <Typography
                 component="span"
-                variant="subtitle1"
-                color="primary"
+                variant="title"
+                color="secondary"
                 className={classes.textContainer}
               >
                 {elem.text}
@@ -174,9 +175,9 @@ class InteractivePlayer extends Component {
     }
 
     return (
-      <div>
+      <div className={classes.videoStyles}>
         {buttons}
-        <Player ref="player" src={url} fluid>
+        <Player ref="player" src={url}>
           <BigPlayButton position="center" />
           <ControlBar>
             <ReplayControl seconds={10} order={2} />
@@ -185,6 +186,7 @@ class InteractivePlayer extends Component {
             <TimeDivider disabled />
             <DurationDisplay disabled />
             <ProgressControl disabled />
+            <FullscreenToggle disabled />
             <VolumeMenuButton order={7} vertical />
           </ControlBar>
         </Player>
@@ -261,7 +263,6 @@ class AppendQueue {
     if (this.queue[0].isLoaded) {
       const currentPart = this.queue.shift();
       this.totalDuration += currentPart.time;
-      console.log(this.sourceBuffer);
       this.sourceBuffer.appendBuffer(currentPart.buf);
     }
   }

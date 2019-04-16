@@ -21,9 +21,9 @@ class SmartTabBar extends Component {
 
   render() {
     const { value } = this.state;
-    const { tabs, containers, classes } = this.props;
+    const { tabs, classes } = this.props;
 
-    const container = containers.find(curr => curr.value === value);
+    const { container } = tabs.find(curr => curr.value === value);
 
     return (
       <AppBar position="static" color="primary">
@@ -47,7 +47,7 @@ class SmartTabBar extends Component {
           }
         </Tabs>
         <div className={classes.container}>
-          {container.node}
+          {container}
         </div>
       </AppBar>
     );
@@ -63,12 +63,7 @@ SmartTabBar.propTypes = {
       value: PropTypes.number,
       label: PropTypes.string,
       icon: PropTypes.node,
-    }),
-  ).isRequired,
-  containers: PropTypes.arrayOf(
-    PropTypes.shape({
-      value: PropTypes.number,
-      node: PropTypes.node,
+      container: PropTypes.node,
     }),
   ).isRequired,
   classes: PropTypes.object.isRequired,

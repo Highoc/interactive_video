@@ -16,12 +16,16 @@ const styles = ({
   },
   root: {
     marginLeft: '5%',
+    marginRight: '1px',
   },
 
   buttonContainer: {
     display: 'flex',
     marginTop: '70px',
     justifyContent: 'center',
+  },
+  rightIcon: {
+    marginLeft: spacing.unit,
   },
 });
 

@@ -5,22 +5,22 @@ const styles = ({ palette }) => ({
 
   body: {
     border: '1px solid',
-    borderColor: palette.grey.A200,
+    borderColor: palette.secondary.dark,
     borderRadius: '5px',
     '&:hover': {
-      borderColor: palette.grey.A700,
+      borderColor: palette.secondary.light,
     },
     '&[error="true"]': {
-      borderColor: 'red',
+      borderColor: palette.error.dark,
     },
   },
 
   legend: {
     padding: '0 5px 0 5px',
     fontSize: '12px',
-    color: palette.grey.A200,
+    color: palette.secondary.dark,
     '&[error="true"]': {
-      color: 'red',
+      color: palette.error.dark,
     },
   },
 
@@ -28,7 +28,7 @@ const styles = ({ palette }) => ({
     height: '450px',
     width: '600px',
     border: '1px solid',
-    borderColor: palette.grey.A200,
+    borderColor: palette.secondary.dark,
     borderRadius: '5px',
   },
 
@@ -55,9 +55,12 @@ const styles = ({ palette }) => ({
   button: {
     height: '100%',
     float: 'right',
+    color: palette.secondary.main,
   },
 
-  placeholder: {},
+  placeholder: {
+    color: palette.secondary.main,
+  },
 
   input: {
     position: 'absolute',
@@ -68,9 +71,9 @@ const styles = ({ palette }) => ({
   error: {
     margin: '5px 0 0 15px',
     fontSize: '12px',
-    color: palette.grey.A200,
+    color: palette.secondary.dark,
     '&[error="true"]': {
-      color: 'red',
+      color: palette.error.dark,
     },
   },
 });

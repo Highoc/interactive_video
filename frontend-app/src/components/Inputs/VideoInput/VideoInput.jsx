@@ -32,7 +32,7 @@ class VideoInput extends Component {
     if (rules.mimetypes) {
       const mimetype = rules.mimetypes.find(elem => elem === value.type);
       if (!mimetype) {
-        result.error = 'Некорректный формат изображения (допустимый формат - mp3)';
+        result.error = 'Некорректный формат видео (допустимый формат - mp4)';
         return result;
       }
     }
