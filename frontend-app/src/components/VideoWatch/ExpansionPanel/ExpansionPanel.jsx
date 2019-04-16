@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles/index';
 import {
-  ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography, Button, Avatar,
+  ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography, Divider, Avatar,
 } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { RequestResolver } from '../../../helpers/RequestResolver';
@@ -30,26 +30,16 @@ class ExpansionPanelVideo extends Component {
     }
   }
 
-  handleChange(expanded) {
-    if (expanded) {
-      this.setState({
-        expanded: false,
-      });
-    } else {
-      this.setState({
-        expanded: true,
-      });
-    }
-  }
-
   render() {
     const {
-      classes, video,
+      classes, video, keyChannel,
     } = this.props;
 
     console.log(video);
     const { created, owner, description } = video;
-    const { expanded, videoKey } = this.state;
+    const { videoKey } = this.state;
+
+    const ChannelKey = props => <Link to={`/channel/${keyChannel}`} params={{ channelKey: keyChannel }} {...props} />;
 
     return (
       <div className={classes.root}>
@@ -75,29 +65,46 @@ class ExpansionPanelVideo extends Component {
                   </div>
                 </div>
                 <Typography className={classes.ratingViews} variant="h5">
-                  Создано:
-                  {date(created)}
+                  Создано: {date(created)}
                 </Typography>
                 <Typography className={classes.ratingViews} variant="h5">
-                  На канале:
-                  {date(created)}
+                  <div className={classes.line}>
+                    <Link
+                      to={`/channel/${keyChannel}`}
+                      style={{
+                        textDecoration: 'none',
+                        margin: '0px 5px 10px 0px',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <div style={{
+                        fontSize: 20,
+                        color: 'rgb(255,255,255)',
+                        margin: '12px 5px 10px 0px',
+                        fontFamily: 'Helvetica Neue Cyr Medium',
+                        display: '-webkit-box',
+                        webkitBoxOrient: 'vertical',
+                        webkitLineClamp: '1',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                      >
+                        На канале: {video.channel.name}
+                      </div>
+                    </Link>
+                  </div>
                 </Typography>
               </div>
             </div>
             <div className={classes.row}>
-              <Button
-                variant="outlined"
-                color="secondary"
-                className={classes.columnButton}
-                onClick={(event) => { event.preventDefault(); this.handleChange(expanded); }}
-              >
-                Оставить свой комментарий
-              </Button>
             </div>
 
-            <RatingViews videoKey={videoKey} />
+            <div className={classes.row}>
+              <RatingViews videoKey={videoKey} />
+            </div>
 
           </ExpansionPanelSummary>
+          <Divider />
           <ExpansionPanelDetails className={classes.details}>
             <Typography color="secondary" className={classes.description}>
               {description}

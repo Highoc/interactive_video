@@ -81,11 +81,9 @@ class ConstructPanelLeft extends Component {
           <Typography variant="h6" className={classes.title}>
             Фрагменты
           </Typography>
-          <Divider className={classes.divider} />
           {sources.map(video => (
             <SourceList video={video} key={video.key} />
           ))}
-          <Divider className={classes.divider} />
           <Card className={classes.card}>
             <CardActionArea>
               <CardMedia

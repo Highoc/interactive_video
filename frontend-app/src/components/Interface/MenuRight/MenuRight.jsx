@@ -28,10 +28,8 @@ class MenuRight extends Component {
             <Typography variant="h4" align="center" color="textSecondary">
               Меню
             </Typography>
-            <Divider />
             <MainListItems />
           </List>
-          <Divider />
         </Drawer>
       </div>
     );

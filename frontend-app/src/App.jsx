@@ -30,6 +30,7 @@ import NotReady from './pages/notReady/NotReady';
 
 import { loginCheckState } from './store/actions/authorization';
 import ConstructPanelRight from './components/VideoConstructor/ConctructPanelRight';
+import Search from './pages/search/Search';
 
 import theme from './helpers/theme/theme';
 
@@ -45,6 +46,7 @@ class App extends Component {
         <Route path="/guest" exact component={Guestpage} />
         <Route path="/login" exact component={SignIn} />
         <Route path="/register" exact component={Register} />
+        <Route path="/search" exact component={Search} />
         <Redirect to="/guest" />
       </Switch>
     );
@@ -61,6 +63,7 @@ class App extends Component {
           <Route path="/test" exact component={Test} />
           <Route exact path="/account/edit" component={EditAccount} />
           <Route path="/account" component={Account} />
+          <Route path="/search" exact component={Search} />
           <Route path="/channel" component={Channel} />
           <Route path="/notready" component={NotReady} />
           <Redirect to="/" />

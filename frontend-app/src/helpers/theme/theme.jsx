@@ -76,6 +76,19 @@ const theme = createMuiTheme({
         borderColor: 'rgb(124,124,124)',
       },
     },
+    MuiDivider: {
+      root: {
+        backgroundColor: 'rgb(124,124,124)',
+        height: '0.5px',
+      },
+    },
+    MuiIconButton: {
+      root: {
+        '&$disabled': {
+          color: 'rgb(124,124,124)',
+        },
+      },
+    },
   },
   typography: {
     useNextVariants: true,

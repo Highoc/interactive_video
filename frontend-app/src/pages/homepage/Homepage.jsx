@@ -22,15 +22,17 @@ class Homepage extends Component {
 
   async componentDidMount() {
     try {
-      let result = await this.backend().get('core/top/?type=hot');
-      this.setState({ hotPlaylist: result.data.top });
-      pprint('hotPlaylist', result.data);
-      result = await this.backend().get('core/top/?type=popular');
-      this.setState({ popularPlaylist: result.data.top });
-      pprint('popularPlaylist', result.data);
-      result = await this.backend().get('core/top/?type=new');
-      this.setState({ isLoaded: true, newPlaylist: result.data.top });
-      pprint('newPlaylist', result.data);
+      const hotPlaylist = await this.backend().get('core/top/?type=hot');
+      pprint('hotPlaylist', hotPlaylist.data);
+      this.setState({ hotPlaylist: hotPlaylist.data, isLoaded: true });
+
+      const popularPlaylist = await this.backend().get('core/top/?type=popular');
+      pprint('popularPlaylist', popularPlaylist.data);
+      this.setState({ popularPlaylist: popularPlaylist.data });
+
+      const newPlaylist = await this.backend().get('core/top/?type=new');
+      pprint('newPlaylist', newPlaylist.data);
+      this.setState({ newPlaylist: newPlaylist.data });
     } catch (error) {
       perror('HomePage', error);
     }
@@ -51,17 +53,17 @@ class Homepage extends Component {
         value: 1,
         label: 'Горячее',
         icon: <Whatshot />,
-        container: <ContentGenerator playlist={hotPlaylist} />,
+        container: <ContentGenerator top={hotPlaylist.top} compilation={hotPlaylist.compilation} />,
       }, {
         value: 2,
         label: 'Свежее',
         icon: <FiberNew />,
-        container: <ContentGenerator playlist={newPlaylist} />,
+        container: <ContentGenerator top={newPlaylist.top} compilation={newPlaylist.compilation} />,
       }, {
         value: 3,
         label: 'Популярное',
         icon: <Grade />,
-        container: <ContentGenerator playlist={popularPlaylist} />,
+        container: <ContentGenerator top={popularPlaylist.top} compilation={popularPlaylist.compilation} />,
       }, {
         value: 4,
         label: 'Подписки',

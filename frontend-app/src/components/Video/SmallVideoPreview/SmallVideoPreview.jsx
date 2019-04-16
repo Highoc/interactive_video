@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 import { Typography, withStyles } from '@material-ui/core';
-import { Visibility, ThumbUp } from '@material-ui/icons';
+import { Visibility, Grade } from '@material-ui/icons';
 
 import styles from './styles';
 import playButton from '../../../static/images/play_circle_outline_white_48x48.png';
@@ -42,7 +42,7 @@ class SmallVideoPreview extends Component {
             <Typography className={classes.name}>{video.name}</Typography>
             <div className={classes.statistics}>
               <div>
-                <ThumbUp color="secondary" />
+                <Grade color="secondary" />
                 <Typography className={classes.text}>{video.rating}</Typography>
               </div>
               <div>

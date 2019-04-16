@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
 import { IconButton, Typography } from '@material-ui/core';
-import ArrowDropDown from '@material-ui/icons/ArrowDropDownSharp';
-import ArrowDropUp from '@material-ui/icons/ArrowDropUpSharp';
+import {TrendingDown, TrendingUp, Grade, Visibility, ThumbUp} from '@material-ui/icons';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles/index';
 import styles from './ExpansionPanel.styles';
-import {perror, pprint} from '../../../helpers/SmartPrint';
+import { perror, pprint } from '../../../helpers/SmartPrint';
 import {
   subscribeToChannel as subscribe,
   unsubscribeFromChannel as unsubscribe,
 } from '../../../store/actions/centrifugo';
 import { RequestResolver } from '../../../helpers/RequestResolver';
+import classNames from "classnames";
 
 const statuses = {
   LOADED: 1,
@@ -88,34 +88,41 @@ class RatingViews extends Component {
     if (status !== statuses.LOADED) {
       return <div />;
     }
+   const button = (
+      <div className={classes.buttons}>
+        <IconButton
+          color="secondary"
+          onClick={() => this.onReply(1)}
+          disabled={choice === 1}
+        >
+          <TrendingUp fontSize="medium" />
+        </IconButton>
+        <IconButton
+          color="secondary"
+          onClick={() => this.onReply(-1)}
+          disabled={choice === -1}
+        >
+          <TrendingDown fontSize="medium" />
+        </IconButton>
+      </div>
+    );
     return (
-      <div className={classes.row}>
-        <div className={classes.columnContainer}>
-          <Typography className={classes.ratingViews}>
-            Рейтинг:
-            {ratingCounter}
+      <div className={classes.columnSpace}>
+        <div className={classes.line}>
+          <Typography className={classes.ratingViews} variant="h5">
+            <div className={classNames(classes.rating, classes.row)}>
+              <Grade color="secondary" />
+              <Typography className={classes.statistics}>Рейтинг: {ratingCounter}</Typography>
+            </div>
           </Typography>
-          <Typography className={classes.ratingViews}>
-            Просмотров:
-            {viewsCounter}
-          </Typography>
+          {button}
         </div>
-        <div className={classes.columnContainer}>
-          <IconButton
-            color="secondary"
-            onClick={event => this.onReply( 1)}
-            disabled={choice === 1}
-          >
-            <ArrowDropUp fontSize="large" />
-          </IconButton>
-          <IconButton
-            color="secondary"
-            onClick={event => this.onReply( -1)}
-            disabled={choice === -1}
-          >
-            <ArrowDropDown fontSize="large" />
-          </IconButton>
-        </div>
+        <Typography className={classes.ratingViews} variant="h5">
+          <div className={classNames(classes.rating, classes.row)}>
+            <Visibility color="secondary" />
+            <Typography className={classes.statistics}>Просмотров: {viewsCounter}</Typography>
+          </div>
+        </Typography>
       </div>
     );
   }

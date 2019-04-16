@@ -53,7 +53,6 @@ class MainListItems extends Component {
               primary="На главную"
             />
           </ListItem>
-          <Divider />
           <ListItem
             button
             component={MyChannel}
@@ -63,7 +62,6 @@ class MainListItems extends Component {
               primary="Мой канал"
             />
           </ListItem>
-          <Divider />
           <ListItem
             button
             component={CreateVideo}

@@ -19,14 +19,27 @@ import ProfileMenu from './ProfileMenu';
 import SearchField from './SearchField';
 
 class Header extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      text: '',
+    };
+  }
+
+  onSearch(text) {
+    this.setState({ text });
+  }
+
   render() {
     const {
       isAuthorized, classes, onOpenDrawer, openDrawerStatus, onCloseDrawer,
     } = this.props;
+    const { text } = this.state;
 
     const LoginPage = props => <Link to="/login" {...props} />;
     const RegisterPage = props => <Link to="/register" {...props} />;
     const HomePage = props => <Link to="/" {...props} />;
+    const Search = props => <Link to={`/search/?text=${text}`} {...props} />;
 
     const authorization = (
       <div className={classes.buttonContainer}>
@@ -51,7 +64,8 @@ class Header extends Component {
 
             <Button component={HomePage} size="large" color="inherit" variant="outlined">InteractiveVideo</Button>
 
-            <SearchField />
+            <SearchField onStateChange={data => this.onSearch(data)} />
+            <Button component={Search} size="small" color="inherit" variant="outlined">Поиск</Button>
 
             <div className={classes.grow} />
 

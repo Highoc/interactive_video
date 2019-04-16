@@ -2,13 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { HugeVideoPreview, Carousel } from '..';
 
-const ContentGenerator = ({ playlist }) => {
+const ContentGenerator = ({ top, compilation }) => {
   const list = [];
-  playlist.forEach((video, i) => {
+  let currentCompilation = 0;
+  top.forEach((video, i) => {
     switch (i % 3) {
       case 0:
-        list.push(<Carousel key={playlist.name} playlist={playlist} label={`Плейлист ${i}`} />);
+        list.push(<Carousel key={top.name} playlist={compilation[currentCompilation].list} label={`Подборка видео по тегу #${compilation[currentCompilation].tag}`} />);
         list.push(<HugeVideoPreview key={video.key} video={video} />);
+        currentCompilation = (currentCompilation + 1) % compilation.length;
         break;
       case 1:
         list.push(<HugeVideoPreview key={video.key} video={video} order="reverse" />);
@@ -31,7 +33,7 @@ const ContentGenerator = ({ playlist }) => {
 export default ContentGenerator;
 
 ContentGenerator.propTypes = {
-  playlist: PropTypes.arrayOf(PropTypes.shape(
+  top: PropTypes.arrayOf(PropTypes.shape(
     {
       name: PropTypes.string,
       description: PropTypes.string,

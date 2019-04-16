@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 
 import { Typography, Avatar, withStyles } from '@material-ui/core';
-import { Visibility, ThumbUp } from '@material-ui/icons';
+import { Visibility, Grade } from '@material-ui/icons';
 import date from '../../../helpers/Date/date';
 
 import picturePatch from '../../../static/images/channelPatch.png';
@@ -103,7 +103,7 @@ class HugeVideoPreview extends Component {
             <Typography>{`Создано: ${date(video.created)}`}</Typography>
           </div>
           <div className={classNames(classes.rating, classes.row)}>
-            <ThumbUp color="secondary" />
+            <Grade color="secondary" />
             <Typography className={classes.statistics}>{video.rating}</Typography>
           </div>
           <div className={classNames(classes.rating, classes.row)}>

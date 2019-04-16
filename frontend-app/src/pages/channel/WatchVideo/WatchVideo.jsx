@@ -36,14 +36,9 @@ class WatchVideo extends Component {
     }
   }
 
-
-  openComments(state) {
-    this.setState({ openComments: state.expanded });
-  }
-
   render() {
     const {
-      video, isLoaded, channelKey, videoKey, openComments,
+      video, isLoaded, channelKey, videoKey,
     } = this.state;
 
     const { username } = this.props;
@@ -55,7 +50,7 @@ class WatchVideo extends Component {
 
           <Card className={classes.card}>
             <CardContent>
-              <Typography gutterBottom variant="h6" align="center">
+              <Typography variant="h1" align="center">
                 {video.name}
               </Typography>
             </CardContent>
@@ -63,16 +58,17 @@ class WatchVideo extends Component {
 
           <InteractivePlayer main={video.head_video_part} codec={video.codec} />
 
-          <TagList videoKey={videoKey} tags={video.tags} editable={video.owner === username} />
+          <TagList videoKey={videoKey} tags={video.tags} editable={video.owner === username} classes={classes.tags} />
 
           <ExpansionPanelVideo
             video={video}
             keyVideo={videoKey}
             keyChannel={channelKey}
-            openComments={state => (this.openComments(state))}
           />
-
-          <ExpansionPanel expanded={openComments}>
+          <Typography variant="h1" color="textSecondary">
+            Комментарии
+          </Typography>
+          <ExpansionPanel expanded>
             <CommentBox
               channelKey={channelKey}
               videoKey={videoKey}

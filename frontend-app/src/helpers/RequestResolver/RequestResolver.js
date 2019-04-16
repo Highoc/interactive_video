@@ -5,7 +5,7 @@ export default class RequestResolver {
   static getBackend() {
     return headers => axios.create({
       baseURL: backendURL,
-      timeout: 5000,
+      timeout: 50000,
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
         ...headers,
@@ -16,7 +16,7 @@ export default class RequestResolver {
   static getCentrifuge() {
     return headers => axios.create({
       baseURL: centrifugeURL,
-      timeout: 5000,
+      timeout: 50000,
       headers: {
         Authorization: `JWT ${localStorage.getItem('jwt-token')}`,
         ...headers,
@@ -27,14 +27,14 @@ export default class RequestResolver {
   static getGuest() {
     return headers => axios.create({
       baseURL: backendURL,
-      timeout: 5000,
+      timeout: 50000,
       headers,
     });
   }
 
   static getAWS() {
     return headers => axios.create({
-      timeout: 5000,
+      timeout: 50000,
       responseType: 'arraybuffer',
       headers,
     });
