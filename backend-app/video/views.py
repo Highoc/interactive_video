@@ -199,6 +199,9 @@ class VideoView(APIView):
             'head_video_part': video.head_video_part.key.hex,
             'head_comments': [ comment.id for comment in video.comments.filter(parent=None) ],
             'tags': [ { 'text': tag.text } for tag in video.tags.all() ],
+            'channel': {
+                'name': video.owner.channel.name,
+            },
             'codec': video.codec,
             'created': video.created,
         }

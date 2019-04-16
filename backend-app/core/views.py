@@ -6,13 +6,15 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from application import settings
 
 from .models import Profile
-from .serializers import UserSerializer, ProfileSerializer, UserSerializerWithToken, TopSerializer
+from .serializers import UserSerializer, ProfileSerializer, UserSerializerWithToken, TopSerializer, SearchSerializer
 from .serializers import get_profile_form
+
 
 from .helpers import get_file_url
 
 from video.models import Video
 from video.serializers import VideoPreviewSerialiser
+from channel.serializers import ChannelSerializer
 from channel.models import Channel
 
 from django.utils import timezone
@@ -20,31 +22,35 @@ from django.utils import timezone
 import jwt, time
 from datetime import timedelta
 
+
 class SearchView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
     def get(self, request):
+        serializer = SearchSerializer(data=request.GET)
 
-        if not request.data:
-            return Response('Wrong GET data', status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid():
+            data = serializer.validated_data
+            text = data.get('text', '')
+            tag = data.get('tag', '')
+            limit = 10
 
-        search_word = request.data['search']
-        limit = 20
+            video_list = Video.objects.filter(name__icontains=text).order_by('-rating__counter')
+            channel_list = Channel.objects.filter(name__icontains=text)[:limit]
 
-        video = Video.objects.filter(name__icontains=search_word)[:limit]
-        channels = Channel.objects.filter(name__icontains=search_word)[:limit]
+            if tag == '':
+                video_list = video_list[:limit]
+            else:
+                video_list = video_list.filter(tags__text__exact=tag)[:limit]
 
-        response = {
-            'video': [ {
-                'key': curr.key,
-                'name': curr.name,
-            } for curr in video],
-            'channels': [ {
-                'key': channel.key,
-                'name': channel.name
-            } for channel in channels]
-        }
+            response = {
+                'video_list': [ VideoPreviewSerialiser(video).data for video in video_list ],
+                'channel_list': [ ChannelSerializer(channel).data for channel in channel_list],
+             }
 
-
-        return Response(response, status=status.HTTP_200_OK_NOT_IMPLEMENTED)
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
 class UserCurrentView(APIView):

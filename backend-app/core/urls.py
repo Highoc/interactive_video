@@ -10,6 +10,6 @@ urlpatterns = [
     url(r'^profile/update/$', ProfileUpdateView.as_view()),
     url(r'^profile/current/$', ProfileCurrentView.as_view()),
     url(r'^centrifuge/token/$', CentrifugoTokenView.as_view()),
-    url(r'^search', SearchView.as_view()),
+    url(r'^search/', SearchView.as_view()),
     url(r'^top/$', VideoTopView.as_view()),
 ]

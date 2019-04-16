@@ -81,6 +81,11 @@ class TopSerializer(serializers.Serializer):
     type = serializers.ChoiceField(choices=TYPE_CHOICES)
 
 
+class SearchSerializer(serializers.Serializer):
+    text = serializers.CharField(max_length=32, required=False)
+    tag = serializers.CharField(max_length=16, required=False)
+
+
 def get_profile_form(profile=None):
     avatar_url = ''
     first_name = ''
