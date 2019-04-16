@@ -1,29 +1,34 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import HTML5Backend from 'react-dnd-html5-backend/lib/cjs/index';
-import { DragDropContext } from 'react-dnd/lib/cjs/index';
+import { connect } from 'react-redux';
+
 import classNames from 'classnames';
-import { withStyles } from '@material-ui/core/styles/index';
+
 import {
-  Divider, Drawer, Card, CardActionArea, CardContent, CardMedia, Typography,
+  Divider, Drawer, Card, CardActionArea, CardContent, CardMedia, Typography, withStyles,
 } from '@material-ui/core';
 
-import { connect } from 'react-redux';
-import SourceList from '../SourceList';
-import Dialog from '../../Dialog';
+
+import SourceList from '../SourceItem';
+import { Dialog } from '../../Dialog';
+import { ServerForm } from '../../Forms';
+
 import { uploadFile } from '../../../store/actions/buttonActions';
-import {multipart, RequestResolver} from '../../../helpers/RequestResolver';
-import {perror, pprint} from '../../../helpers/SmartPrint';
-import leftStyles from './ConstructPanelLeft.styles';
-import Input from '../../Input/Input';
+
+import { RequestResolver } from '../../../helpers/RequestResolver';
+import { perror, pprint } from '../../../helpers/SmartPrint';
+
+import styles from './ConstructPanelLeft.styles';
+import add from '../../../static/images/add.jpg';
+
 
 class ConstructPanelLeft extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sources: [],
-      dialogOpen: false,
+      sources: props.sources,
       inputs: [],
+      dialogOpen: false,
     };
     this.backend = RequestResolver.getBackend();
   }
@@ -38,77 +43,32 @@ class ConstructPanelLeft extends Component {
     }
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.files !== this.props.files) {
-      this.setState({ sources: this.props.files });
+  componentWillReceiveProps(nextProps, nextContext) {
+    const { sources: oldSources } = this.props;
+    const { sources } = nextProps;
+    if (sources !== oldSources) {
+      this.setState({ sources });
     }
   }
 
-  handleAdd = () => {
+  onDialogOpen(event) {
+    event.preventDefault();
     this.setState({ dialogOpen: true });
-  };
-
-  callbackInput(state) {
-    const { inputs } = this.state;
-    const input = inputs.find(elem => elem.name === state.name);
-    input.value = state.value;
-    input.isValid = state.isValid;
-    if (state.file !== null) {
-      input.value = state.file;
-    }
-    if (state.source !== null) {
-      input.value = state.source;
-    }
-    this.setState({ inputs });
   }
 
-  getData() {
-    const { inputs } = this.state;
-    const result = new FormData();
-    inputs.map((input) => { result.append(input.name, input.value); return 0; });
-    return result;
+  onDialogClose() {
+    this.setState({ dialogOpen: false });
   }
 
-  async callbackDialog(state) {
-    const { inputs } = this.state;
+  onSubmitSuccess(data) {
     const { onFileUpload } = this.props;
-    const filePush = [];
-    let isValid = true;
-    for (const key in inputs) {
-      isValid = isValid && inputs[key].isValid;
-    }
-    if (isValid) {
-      try {
-        const data = this.getData();
-        const result = await this.backend(multipart).post('video/source/upload/', data);
-        filePush[0] = result.data;
-        filePush.map(source => onFileUpload(source));
-        this.setState({ isSent: true, dialogOpen: state });
-      } catch (error) {
-        perror('ConstructPanelRIght', error);
-      }
-    } else {
-      console.log('Invalid input');
-    }
+    onFileUpload(data);
+    this.setState({ dialogOpen: false });
   }
 
   render() {
     const { classes } = this.props;
     const { sources, dialogOpen, inputs } = this.state;
-    const Inputs = Object.keys(inputs).map((key) => {
-      const inputElement = inputs[key];
-      return (
-        <Input
-          key={key}
-          type={inputElement.type}
-          name={inputElement.name}
-          description={inputElement.description}
-          value={inputElement.value}
-          rules={inputElement.rules}
-          callback={state => this.callbackInput(state)}
-        />
-      );
-    });
 
     return (
       <div className={classes.root}>
@@ -117,23 +77,21 @@ class ConstructPanelLeft extends Component {
           classes={{
             paper: classNames(classes.drawerPaper),
           }}
-          open={true}
+          open
         >
-          <Typography variant="h6">
+          <Typography variant="h6" className={classes.title}>
             Фрагменты
           </Typography>
-          <Divider className={classes.divider} />
-          {sources.map((video, key) => (
-            <SourceList name={video.name} keyVideo={key} key={key} previewUrl={video.preview_url} />
+          {sources.map(video => (
+            <SourceList video={video} key={video.key} />
           ))}
-          <Divider className={classes.divider} />
           <Card className={classes.card}>
             <CardActionArea>
               <CardMedia
                 className={classes.media}
                 title="Добавить видео"
-                image="http://www.clipartbest.com/cliparts/xcg/LA8/xcgLA8a7i.jpg"
-                onClick={(event) => { event.preventDefault(); this.handleAdd(); }}
+                image={add}
+                onClick={event => this.onDialogOpen(event)}
               />
               <CardContent className={classes.content}>
                 <Typography gutterBottom variant="h6" component="h2" align="center">
@@ -142,8 +100,14 @@ class ConstructPanelLeft extends Component {
               </CardContent>
             </CardActionArea>
           </Card>
-          <Dialog dialogOpen={dialogOpen} callback={state => this.callbackDialog(state)} title="Загрузите видео">
-            {Inputs}
+          <Dialog title="Загрузите фрагмент видео" open={dialogOpen} onClose={() => this.onDialogClose()}>
+            <ServerForm
+              name="source-upload"
+              inputs={inputs}
+              action="/video/source/upload/"
+              enctype="multipart/form-data"
+              onSubmitSuccess={(data => this.onSubmitSuccess(data))}
+            />
           </Dialog>
         </Drawer>
       </div>
@@ -152,15 +116,24 @@ class ConstructPanelLeft extends Component {
 }
 
 ConstructPanelLeft.propTypes = {
+  sources: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string,
+      name: PropTypes.string,
+      preview_url: PropTypes.string,
+      content_url: PropTypes.string,
+    }),
+  ).isRequired,
+  onFileUpload: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = state => ({
-  files: state.buttonsAct.filesUpload,
+  sources: state.buttonsAct.filesUpload,
 });
 
 const mapDispatchToProps = dispatch => ({
   onFileUpload: files => dispatch(uploadFile(files)),
 });
 
-export default withStyles(leftStyles)(connect(mapStateToProps, mapDispatchToProps)(DragDropContext(HTML5Backend)(ConstructPanelLeft)));
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(ConstructPanelLeft));

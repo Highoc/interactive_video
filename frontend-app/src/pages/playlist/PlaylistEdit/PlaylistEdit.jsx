@@ -1,24 +1,28 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles/index';
-import Fab from '@material-ui/core/Fab/index';
-import NavigationIcon from '@material-ui/icons/Navigation';
+
 import { Redirect } from 'react-router-dom';
-import Input from '../../../components/Input/Input';
-import {RequestResolver, multipart} from '../../../helpers/RequestResolver';
+
+import { withStyles } from '@material-ui/core';
+
+import { RequestResolver } from '../../../helpers/RequestResolver';
 import { perror, pprint } from '../../../helpers/SmartPrint';
-import styles from './PlaylistEdit.styles';
+
+import { ServerForm } from '../../../components/Forms';
+
+import styles from './styles';
+
 
 class PlaylistEdit extends Component {
   constructor(props) {
     super(props);
     const { channelKey, playlistKey } = props.match.params;
     this.state = {
-      isValid: false,
       inputs: [],
       channelKey,
       playlistKey,
       isSent: false,
+      isLoaded: false,
     };
     this.backend = RequestResolver.getBackend();
   }
@@ -34,84 +38,33 @@ class PlaylistEdit extends Component {
     }
   }
 
-  getData() {
-    const { inputs } = this.state;
-    const result = new FormData();
-    inputs.map((input) => { result.append(input.name, input.value); return 0; });
-    return result;
-  }
-
-  async submitHandler() {
-    const { inputs, channelKey, playlistKey } = this.state;
-    let isValid = true;
-    for (const key in inputs) {
-      isValid = isValid && inputs[key].isValid;
-    }
-
-    if (isValid) {
-      try {
-        const data = this.getData();
-        await this.backend(multipart).post(`channel/${channelKey}/playlist/${playlistKey}/update/`, data);
-        this.setState({ isSent: true });
-      } catch (error) {
-        perror('PlaylistEdit', error);
-      }
-    } else {
-      console.log('Invalid input');
-    }
-  }
-
-  callbackInput(state) {
-    const { inputs } = this.state;
-    const input = inputs.find(elem => elem.name === state.name);
-    input.value = state.value;
-    input.isValid = state.isValid;
-    if (state.file !== null) {
-      input.value = state.file;
-    }
-    this.setState({ inputs });
+  onSubmitSuccess(data) {
+    this.setState({ isSent: true });
   }
 
   render() {
-    const { inputs, isSent, channelKey } = this.state;
+    const {
+      inputs, isSent, channelKey, playlistKey, isLoaded,
+    } = this.state;
     const { classes } = this.props;
 
     if (isSent) {
-      return <Redirect to={`/channel/${channelKey}/playlist/all`} />;
+      return <Redirect to={`/channel/${channelKey}`} />;
     }
-    const Inputs = Object.keys(inputs).map((key) => {
-      const inputElement = inputs[key];
-      return (
-        <Input
-          key={key}
-          type={inputElement.type}
-          name={inputElement.name}
-          description={inputElement.description}
-          value={inputElement.value}
-          rules={inputElement.rules}
-          callback={state => this.callbackInput(state)}
-          imageUrl={inputElement.url}
-        />
-      );
-    });
+
+    if (!isLoaded) {
+      return <div className={classes.root}>Не загружено</div>;
+    }
 
     return (
       <div>
-        <form>
-          <h2>Редактирование плейлиста</h2>
-          {Inputs}
-          <Fab
-            variant="extended"
-            color="primary"
-            aria-label="Add"
-            className={classes.margin}
-            style={styles.button}
-            onClick={event => this.submitHandler(event)}
-          >
-            <NavigationIcon className={classes.extendedIcon} />
-            Редактировать
-          </Fab>
-        </form>
+        <ServerForm
+          action={`channel/${channelKey}/playlist/${playlistKey}/update/`}
+          enctype="multipart/form-data"
+          name="playlist-update"
+          inputs={inputs}
+          onSubmitSuccess={data => this.onSubmitSuccess(data)}
+        />
       </div>
     );
   }
@@ -119,6 +72,7 @@ class PlaylistEdit extends Component {
 
 PlaylistEdit.propTypes = {
   classes: PropTypes.object.isRequired,
+  match: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(PlaylistEdit);

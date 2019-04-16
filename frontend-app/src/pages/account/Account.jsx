@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
+import {
+  Card, CardActionArea, CardMedia, CardContent, Typography, CardActions, Button,
+} from '@material-ui/core';
+import { Link } from 'react-router-dom';
 import { RequestResolver } from '../../helpers/RequestResolver';
 import { perror, pprint } from '../../helpers/SmartPrint';
 import date from '../../helpers/Date/date';
-import {
-  Card, CardActionArea, CardMedia, CardContent, Typography, CardActions, Button,
-} from "@material-ui/core";
-import {Link} from "react-router-dom";
 import classes from './Account.module.css';
 
 class Account extends Component {
@@ -36,10 +36,10 @@ class Account extends Component {
     let surname = `Фамилия: ${info.last_name}`;
     let email = `Почта:${info.email}`;
     let created = `Создан: ${date(info.date_joined)}`;
-    if (info.first_name === ''){
+    if (info.first_name === '') {
       name = '';
     }
-    if (info.last_name === ''){
+    if (info.last_name === '') {
       surname = '';
     }
     if (info.email === '') {
@@ -73,7 +73,7 @@ class Account extends Component {
             </CardContent>
           </CardActionArea>
           <CardActions className={classes.button}>
-            <Button size="small" color="primary" component={EditAccount}>
+            <Button size="small" color="secondary" component={EditAccount}>
               Изменить
             </Button>
           </CardActions>

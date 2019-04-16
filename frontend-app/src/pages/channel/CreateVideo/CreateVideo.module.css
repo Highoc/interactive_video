@@ -1,9 +1,10 @@
 .container {
     width: 100%;
-    overflow: hidden;
+    overflow: scroll;
     position: relative;
     display: inline-block;
     height: 900px;
+    background-color: rgb(31,31,31);
 }
 
 

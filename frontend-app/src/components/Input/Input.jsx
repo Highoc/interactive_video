@@ -5,14 +5,13 @@ import {
 import classes from './Input.module.css';
 import FileInput from './FileInput/FileInput';
 import VideoInput from './VideoInput/VideoInput';
-import { pprint } from "../../helpers/SmartPrint";
 
 function checkValidity(value, rules) {
   let isValid = true;
 
   if (rules.required) {
     if (value !== undefined) {
-      if (!value.type){
+      if (!value.type) {
         isValid = value.trim() !== '' && isValid;
       }
     }

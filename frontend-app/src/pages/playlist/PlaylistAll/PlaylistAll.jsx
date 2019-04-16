@@ -1,22 +1,30 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
 import { Link } from 'react-router-dom';
-import {
-  Card, CardContent, CardActionArea, CardMedia, Typography,
-} from '@material-ui/core';
 import { connect } from 'react-redux';
+
+import {
+  Card, CardContent, CardActionArea, CardMedia, Typography, withStyles,
+} from '@material-ui/core';
+
 import ChannelPlaylistView from '../../../components/Playlist/ChannelPlaylistView';
-import classes from './PlaylistAll.module.css';
-import {json, RequestResolver} from '../../../helpers/RequestResolver';
+
+import { json, RequestResolver } from '../../../helpers/RequestResolver';
 import { perror, pprint } from '../../../helpers/SmartPrint';
+
+import add from '../../../static/images/add.jpg';
+
+import styles from './styles';
+
 
 class PlaylistAll extends Component {
   constructor(props) {
     super(props);
-    const { channelKey } = props.match.params;
     this.state = {
-      channelKey,
+      channelKey: props.channelKey,
       isLoaded: false,
-      playlists: null,
+      playlists: [],
     };
     this.backend = RequestResolver.getBackend();
   }
@@ -32,7 +40,21 @@ class PlaylistAll extends Component {
     }
   }
 
-  async handleDelete(key) {
+  async componentWillReceiveProps(nextProps, nextContext) {
+    const { channelKey: oldChannelKey } = this.props;
+    const { channelKey } = nextProps;
+    if (oldChannelKey !== channelKey) {
+      try {
+        const result = await this.backend().get(`channel/${channelKey}/playlist/all/`);
+        pprint('PlaylistAll', result.data);
+        this.setState({ isLoaded: true, playlists: result.data, channelKey });
+      } catch (error) {
+        perror('PlaylistAll', error);
+      }
+    }
+  }
+
+  async onDelete(key) {
     const { playlists, channelKey } = this.state;
     const updatedPlaylists = playlists.filter(elem => elem.key !== key);
     this.setState({ playlists: updatedPlaylists });
@@ -45,54 +67,52 @@ class PlaylistAll extends Component {
 
   render() {
     const { isLoaded, playlists, channelKey } = this.state;
-    const { myChannelKey } = this.props;
+    const { myChannelKey, classes } = this.props;
     if (!isLoaded) {
-      return <div> Еще не загружено </div>;
+      return <div />;
     }
 
-    const AddPlaylist = props => <Link to={`/channel/${channelKey}/playlist/create`} {...props} />;
+    let addPlaylist;
+    if (myChannelKey === channelKey) {
+      const AddPlaylist = props => <Link to={`/channel/${channelKey}/playlist/create`} {...props} />;
 
-    let addPlaylist = (
-      <div className={classes.container}>
-        <Card className={classes.card}>
-          <CardActionArea>
-            <CardMedia
-              component={AddPlaylist}
-              className={classes.media}
-              title="Добавить плейлист"
-              image="http://www.clipartbest.com/cliparts/xcg/LA8/xcgLA8a7i.jpg"
-            />
-            <CardContent className={classes.newContent}>
-              <Typography gutterBottom variant="h6" component="h2" align="center">
-                Новый Плейлист
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
-      </div>
-
-    );
-    if (myChannelKey !== channelKey) {
-      addPlaylist = <div />;
+      addPlaylist = (
+        <div className={classes.container}>
+          <Card className={classes.card}>
+            <CardActionArea>
+              <CardMedia
+                component={AddPlaylist}
+                className={classes.media}
+                title="Добавить плейлист"
+                image={add}
+              />
+              <CardContent className={classes.newContent}>
+                <Typography gutterBottom variant="h6" component="h2" align="center">
+                  Новый Плейлист
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+        </div>
+      );
     }
-
 
     return (
       <div>
-        {playlists.map((playlist, i) => (
-          <div className={classes.container} key={playlist.key}>
-            <ChannelPlaylistView
-              playlist={playlist}
-              channelKey={channelKey}
-              key={playlist.key}
-              onDelete={(key) => { this.handleDelete(key); }}
-            />
-          </div>
-        ))
+        {
+          playlists.map(playlist => (
+            <div className={classes.container} key={playlist.key}>
+              <ChannelPlaylistView
+                playlist={playlist}
+                channelKey={channelKey}
+                key={playlist.key}
+                onDelete={(key) => { this.onDelete(key); }}
+              />
+            </div>
+          ))
         }
         {addPlaylist}
       </div>
-
     );
   }
 }
@@ -101,4 +121,10 @@ const mapStateToProps = state => ({
   myChannelKey: state.authorization.channelKey,
 });
 
-export default connect(mapStateToProps)(PlaylistAll);
+export default withStyles(styles)(connect(mapStateToProps)(PlaylistAll));
+
+PlaylistAll.propTypes = {
+  myChannelKey: PropTypes.string.isRequired,
+  channelKey: PropTypes.string.isRequired,
+  classes: PropTypes.object.isRequired,
+};

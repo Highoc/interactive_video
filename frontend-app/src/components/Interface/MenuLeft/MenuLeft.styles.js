@@ -13,6 +13,7 @@ const styles = ({
   },
   root: {
     marginRight: '10%',
+    marginLeft: '1px',
   },
   list: {
     display: 'flex',

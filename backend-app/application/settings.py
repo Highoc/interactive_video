@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'channel.apps.ChannelConfig',
     'comment.apps.CommentConfig',
     'rating.apps.RatingConfig',
-    'views.apps.ViewsConfig'
+    'views.apps.ViewsConfig',
+    'tag.apps.TagConfig'
 ]
 
 MIDDLEWARE = [

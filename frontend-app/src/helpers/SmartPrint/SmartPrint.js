@@ -13,7 +13,9 @@ export default class SmartPrint {
 
   static error(name, error) {
     if (SmartPrint.MODE === MODES.DEBUG_ONLY_ERRORS || SmartPrint.MODE === MODES.DEBUG_ALL_LOGS) {
-      if (error.response.status === 400) {
+      if (error.response === undefined) {
+        console.error('%s, error: %s, details: %O', name, error.message);
+      } else if (error.response.status === 400) {
         console.error('%s, error: %s, details: %s', name, error.message, error.request.response);
       } else {
         console.error('%s, error: %s, details: %O', name, error.message, error.response);

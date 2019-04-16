@@ -3,7 +3,7 @@ from rest_framework_jwt.settings import api_settings
 from django.contrib.auth.models import User
 
 from .models import Profile
-
+from .helpers import get_file_url, convert_to_byte_length, check_image_mime_type, check_image_size
 import re
 
 
@@ -68,10 +68,99 @@ class UserSerializerWithToken(serializers.ModelSerializer):
         fields = ('token', 'username', 'password1', 'password2')
 
 
+HOT = 'hot'
+NEW = 'new'
+POPULAR = 'popular'
+TYPE_CHOICES = (
+    (HOT, 'hot'),
+    (NEW, 'new'),
+    (POPULAR, 'popular'),
+)
+
+class TopSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=TYPE_CHOICES)
+
+
+class SearchSerializer(serializers.Serializer):
+    text = serializers.CharField(max_length=32, required=False)
+    tag = serializers.CharField(max_length=16, required=False)
+
+
+def get_profile_form(profile=None):
+    avatar_url = ''
+    first_name = ''
+    last_name = ''
+    email = ''
+
+    if profile:
+        user = profile.user
+        avatar_url = get_file_url(profile.avatar.name)
+        first_name = user.first_name
+        last_name = user.last_name
+        email = user.email
+
+    form = [{
+        'type': 'image',
+        'name': 'avatar',
+        'previewUrl': f'{avatar_url}',
+        'label': 'Аватар пользователя',
+        'placeholder': 'Выберите аватар пользователя...',
+        'rules': {
+            'mimetypes': ['image/png'],
+            'max_size': convert_to_byte_length(MB=10),
+            'required': False,
+        }
+    }, {
+        'type': 'text',
+        'name': 'first_name',
+        'label': 'Имя пользователя',
+        'placeholder': 'Напишите ваше имя...',
+        'value': f'{first_name}',
+        'rules': {
+            'max_length': 16,
+            'required': True,
+        }
+    }, {
+        'type': 'text',
+        'name': 'last_name',
+        'value': f'{last_name}',
+        'label': 'Фамилия пользователя',
+        'placeholder': 'Напишите вашу фамилию...',
+        'rules': {
+            'max_length': 16,
+            'required': True,
+        }
+    }, {
+        'type': 'email',
+        'name': 'email',
+        'value': f'{email}',
+        'label': 'Электронная почта',
+        'placeholder': 'Напишите вашу электронную почту...',
+        'rules': {
+            'required': False,
+        }
+    }]
+
+    return form
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=16, required=True)
     last_name = serializers.CharField(max_length=16, required=True)
     email = serializers.EmailField(required=False)
+
+    def validate_avatar(self, value):
+        avatar = value
+        if not avatar:
+            raise serializers.ValidationError('Empty avatar source.')
+
+        if not check_image_mime_type(avatar.content_type):
+            raise serializers.ValidationError('Wrong avatar mime type.')
+
+        if not check_image_size(avatar.size):
+            raise serializers.ValidationError('Size of avatar must be less than 10MB.')
+
+        return avatar
 
     class Meta():
         model = Profile

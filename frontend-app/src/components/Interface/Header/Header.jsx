@@ -10,7 +10,7 @@ import {
 
 import { Menu as MenuIcon } from '@material-ui/icons';
 
-import { withStyles } from '@material-ui/core/styles/index';
+import { withStyles } from '@material-ui/core/styles';
 
 import headerStyles from './styles/Header.styles';
 
@@ -19,40 +19,53 @@ import ProfileMenu from './ProfileMenu';
 import SearchField from './SearchField';
 
 class Header extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      text: '',
+    };
+  }
+
+  onSearch(text) {
+    this.setState({ text });
+  }
+
   render() {
     const {
       isAuthorized, classes, onOpenDrawer, openDrawerStatus, onCloseDrawer,
     } = this.props;
+    const { text } = this.state;
 
     const LoginPage = props => <Link to="/login" {...props} />;
     const RegisterPage = props => <Link to="/register" {...props} />;
     const HomePage = props => <Link to="/" {...props} />;
+    const Search = props => <Link to={`/search/?text=${text}`} {...props} />;
 
     const authorization = (
       <div className={classes.buttonContainer}>
         <div className={classes.buttonPlace}>
-          <Button component={LoginPage} color="inherit" size="medium">Войти</Button>
-          <Button component={RegisterPage} color="inherit" size="medium">Регистрация</Button>
+          <Button component={LoginPage} color="inherit" size="medium" variant="outlined">Войти</Button>
+          <Button component={RegisterPage} color="inherit" size="medium" variant="outlined">Регистрация</Button>
         </div>
       </div>
     );
 
     return (
       <div className={classes.root}>
-        <AppBar position="static">
+        <AppBar position="static" color="primary">
           <Toolbar>
             <IconButton
               className={classes.menuButton}
-              color="inherit"
               aria-label="Open drawer"
               onClick={(event) => { openDrawerStatus ? onCloseDrawer(event) : onOpenDrawer(event); }}
             >
-              <MenuIcon />
+              <MenuIcon color="secondary" />
             </IconButton>
 
-            <Button component={HomePage} color="inherit" size="large">InteractiveVideo</Button>
+            <Button component={HomePage} size="large" color="inherit" variant="outlined">InteractiveVideo</Button>
 
-            <SearchField />
+            <SearchField onStateChange={data => this.onSearch(data)} />
+            <Button component={Search} size="small" color="inherit" variant="outlined">Поиск</Button>
 
             <div className={classes.grow} />
 

@@ -1,21 +1,23 @@
-.textContainer {
-    justify-content: center;
-}
 .videoStyles {
     position: relative;
-    max-height: 560px;
+    height: 650px;
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+    width: 100%;
 }
 .buttonStyles {
     position: absolute;
-    z-index: 10;
-    top: 515px;
+    z-index: 10000;
+    display: block;
+    justify-content: center;
+    justify-items: center;
+    top: 80%;
     width: 100%;
     height: 20%;
+    background-image: url(https://ak8.picdn.net/shutterstock/videos/871678/thumb/1.jpg);
 }
 .oneBlock {
-    width: 40%;
+    width: 50%;
     height: 100%;
-    float: left;
-    background-image: url(https://ak8.picdn.net/shutterstock/videos/871678/thumb/1.jpg);
-    margin-left: 5%;
 }

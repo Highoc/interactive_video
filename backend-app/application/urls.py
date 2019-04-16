@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.urls import include
 
 from rest_framework_jwt.views import obtain_jwt_token
+from .test import TestView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -14,4 +15,6 @@ urlpatterns = [
     url(r'^rating/', include('rating.urls')),
 
     url(r'^auth/login/$', obtain_jwt_token),
+    url(r'^test/$', TestView.as_view()),
+    url(r'^tag/', include('tag.urls')),
 ]

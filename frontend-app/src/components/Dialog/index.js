@@ -1,3 +1,3 @@
-import Dialog from './Dialog';
+import Dialog from './SmartDialog';
 
-export default Dialog;
+export { Dialog };

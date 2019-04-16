@@ -23,7 +23,7 @@ export class NodeImage extends Component {
     const { nodeData } = this.props;
     return (
       <div>
-        <div>
+        <div style={{color: "white"}}>
           {nodeData.name}
         </div>
       </div>

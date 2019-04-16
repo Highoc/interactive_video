@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import {
-  ExpansionPanel, ExpansionPanelSummary, CardContent, Typography, Card,
+  ExpansionPanel, CardContent, Typography, Card,
 } from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import InteractivePlayer from '../../../components/VideoWatch/InteractivePlayer/InteractivePlayer';
 import ExpansionPanelVideo from '../../../components/VideoWatch/ExpansionPanel';
 import { RequestResolver, json } from '../../../helpers/RequestResolver';
 import classes from './WatchVideo.module.css';
 import { perror } from '../../../helpers/SmartPrint';
 import CommentBox from '../../../components/VideoWatch/CommentBox/CommentBox';
+import { TagList } from '../../../components/TagList';
+
 
 class WatchVideo extends Component {
   constructor(props) {
@@ -16,10 +18,10 @@ class WatchVideo extends Component {
     const { videoKey, channelKey } = props.match.params;
     this.state = {
       video: null,
-      author: 'admin',
       videoKey,
       channelKey,
       isLoaded: false,
+      openComments: false,
     };
     this.backend = RequestResolver.getBackend();
   }
@@ -36,8 +38,10 @@ class WatchVideo extends Component {
 
   render() {
     const {
-      video, isLoaded, channelKey, videoKey, author,
+      video, isLoaded, channelKey, videoKey,
     } = this.state;
+
+    const { username } = this.props;
 
     let result = null;
     if (isLoaded) {
@@ -46,9 +50,7 @@ class WatchVideo extends Component {
 
           <Card className={classes.card}>
             <CardContent>
-              <Typography gutterBottom variant="h5" component="h2" align="center">
-                Название:
-                {' '}
+              <Typography variant="h1" align="center">
                 {video.name}
               </Typography>
             </CardContent>
@@ -56,18 +58,17 @@ class WatchVideo extends Component {
 
           <InteractivePlayer main={video.head_video_part} codec={video.codec} />
 
+          <TagList videoKey={videoKey} tags={video.tags} editable={video.owner === username} classes={classes.tags} />
+
           <ExpansionPanelVideo
-            created={video.created}
-            author={author}
-            description={video.description}
+            video={video}
             keyVideo={videoKey}
             keyChannel={channelKey}
           />
-
-          <ExpansionPanel>
-            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="h5">Ко всем комментариям:</Typography>
-            </ExpansionPanelSummary>
+          <Typography variant="h1" color="textSecondary">
+            Комментарии
+          </Typography>
+          <ExpansionPanel expanded>
             <CommentBox
               channelKey={channelKey}
               videoKey={videoKey}
@@ -85,4 +86,8 @@ class WatchVideo extends Component {
   }
 }
 
-export default WatchVideo;
+const mapStateToProps = state => ({
+  username: state.authorization.username,
+});
+
+export default connect(mapStateToProps)(WatchVideo);

@@ -62,7 +62,8 @@ const Comment = (props) => {
             {text}
             <Button
               onClick={() => onReply(id)}
-              color="primary"
+              color="secondary"
+              variant="outlined"
               className={classes.button}
             >
               Ответить

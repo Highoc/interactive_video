@@ -28,11 +28,6 @@ def get_file_url(bucket, user, key):
 
 from pymediainfo import MediaInfo
 
-'''
-    ffmpeg -i source.mp4 -ss <start_time> -t <duration> part.mp4
-    MP4Box -dash 5000 -frag 5000 -rap part.mp4 
-
-'''
 
 supported_mime_types = [
     'video/mp4',
