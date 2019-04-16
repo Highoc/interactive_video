@@ -53,6 +53,21 @@ class SearchView(APIView):
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
+class MyTopView(APIView):
+    def get(self, request):
+        channel_list = request.user.subscriptions.all()
+
+        response = []
+        for channel in channel_list:
+            video_list = channel.owner.video.order_by('-created')[:10]
+
+            response.append({
+                'list': VideoPreviewSerialiser(video).data for video in video_list
+            })
+
+        return Response(response, status=status.HTTP_200_OK)
+
+
 class UserCurrentView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
@@ -150,17 +165,49 @@ class VideoTopView(APIView):
         if serializer.is_valid():
             type = serializer.validated_data['type']
             start = timezone.now() - timedelta(days=_START_DELTA)
+            video_list = Video.objects.all()
             video = []
+
+            tag_list = ['russia', 'mailru', 'interactive', 'видео', 'cool']
+            compilation = []
+
             if type == NEW:
                 start = timezone.now() - timedelta(days=_NEW_START_DELTA)
                 video = Video.objects.filter(created__gte=start)[:_LIMIT]
+                for tag in tag_list:
+                    compilation.append({
+                        'tag': tag,
+                        'list': video_list.filter(tags__text__exact=tag, created__gte=start)[:_LIMIT]
+                    })
+
             elif type == HOT:
                 video = Video.objects.filter(created__gte=start).order_by('-views__counter')[:_LIMIT]
+                for tag in tag_list:
+                    compilation.append({
+                        'tag': tag,
+                        'list': video_list.filter(
+                            tags__text__exact=tag,
+                            created__gte=start
+                        ).order_by('-views__counter')[:_LIMIT]
+                    })
+
             elif type == POPULAR:
                 video = Video.objects.filter(created__gte=start).order_by('-rating__counter')[:_LIMIT]
+                for tag in tag_list:
+                    compilation.append({
+                        'tag': tag,
+                        'list': video_list.filter(
+                            tags__text__exact=tag,
+                            created__gte=start
+                        ).order_by('-rating__counter')[:_LIMIT]
+                    })
 
             response = {
                 'top': [VideoPreviewSerialiser(current).data for current in video],
+                'compilation': [ {
+                    'tag': part['tag'],
+                    'list': [VideoPreviewSerialiser(current).data for current in part['list']]
+                } for part in compilation],
             }
 
             return Response(response, status=status.HTTP_200_OK)
