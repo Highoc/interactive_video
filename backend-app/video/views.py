@@ -49,11 +49,11 @@ class SourceUploadView(APIView):
                 '''
 
                 dash_filename = f'{temp.name}_dash'
-                subprocess.call(["MP4Box", f'-dash 5000 -frag 5000 -rap -out {dash_filename} {temp.name}'])
-                print(temp.name)
-                print(dash_filename)
+                #subprocess.call(["MP4Box", f'-dash 5000 -frag 5000 -rap -out {dash_filename} {temp.name}'])
+                #print(temp.name)
+                #print(dash_filename)
 
-            return Response('This MIME type isn\'t supported.', status=status.HTTP_400_BAD_REQUEST)
+            #return Response('This MIME type isn\'t supported.', status=status.HTTP_400_BAD_REQUEST)
 
             if not is_supported_mime_type(mime_type):
                 return Response('This MIME type isn\'t supported.', status=status.HTTP_400_BAD_REQUEST)

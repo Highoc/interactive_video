@@ -62,7 +62,9 @@ class MyTopView(APIView):
             video_list = channel.owner.video.order_by('-created')[:10]
 
             response.append({
-                'list': VideoPreviewSerialiser(video).data for video in video_list
+                'key': channel.key,
+                'name': channel.name,
+                'list': [ VideoPreviewSerialiser(video).data for video in video_list ]
             })
 
         return Response(response, status=status.HTTP_200_OK)
