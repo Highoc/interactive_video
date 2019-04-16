@@ -15,7 +15,7 @@ from channel.models import Playlist
 from rating.models import Rating
 from views.models import Views
 
-import tempfile
+import tempfile, subprocess
 
 
 class SourceUploadView(APIView):
@@ -31,7 +31,8 @@ class SourceUploadView(APIView):
             data = source_serializer.validated_data
 
             content = data['content']
-            '''dash_filename = \'\' '''
+            dash_filename = ''
+
             with tempfile.NamedTemporaryFile() as temp:
                 temp.write(content.read())
                 temp.flush()
@@ -46,10 +47,13 @@ class SourceUploadView(APIView):
                 ffmpeg -i source.mp4 -ss <start_time> -t <duration> part.mp4
                 MP4Box -dash 5000 -frag 5000 -rap part.mp4 
                 '''
-                '''
+
                 dash_filename = f'{temp.name}_dash'
                 subprocess.call(["MP4Box", f'-dash 5000 -frag 5000 -rap -out {dash_filename} {temp.name}'])
-                '''
+                print(temp.name)
+                print(dash_filename)
+
+            return Response('This MIME type isn\'t supported.', status=status.HTTP_400_BAD_REQUEST)
 
             if not is_supported_mime_type(mime_type):
                 return Response('This MIME type isn\'t supported.', status=status.HTTP_400_BAD_REQUEST)
