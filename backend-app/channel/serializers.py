@@ -162,6 +162,11 @@ class PlaylistFullSerializer(serializers.ModelSerializer):
 
 
 class ChannelSerializer(serializers.ModelSerializer):
+    key = serializers.SerializerMethodField()
+
+    def get_key(self, obj):
+        return obj.key
+
     def validate_head_picture(self, value):
         picture = value
         if not picture:
@@ -208,7 +213,7 @@ class ChannelSerializer(serializers.ModelSerializer):
 
     class Meta():
         model = Channel
-        fields = ('name', 'description', 'head_picture')
+        fields = ('name', 'key', 'description', 'head_picture')
 
 
 class PrettyChannelSerializer(serializers.ModelSerializer):

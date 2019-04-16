@@ -6,13 +6,15 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from application import settings
 
 from .models import Profile
-from .serializers import UserSerializer, ProfileSerializer, UserSerializerWithToken, TopSerializer
+from .serializers import UserSerializer, ProfileSerializer, UserSerializerWithToken, TopSerializer, SearchSerializer
 from .serializers import get_profile_form
+
 
 from .helpers import get_file_url
 
 from video.models import Video
 from video.serializers import VideoPreviewSerialiser
+from channel.serializers import ChannelSerializer
 from channel.models import Channel
 
 from django.utils import timezone
@@ -20,31 +22,52 @@ from django.utils import timezone
 import jwt, time
 from datetime import timedelta
 
+
 class SearchView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
     def get(self, request):
+        serializer = SearchSerializer(data=request.GET)
 
-        if not request.data:
-            return Response('Wrong GET data', status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid():
+            data = serializer.validated_data
+            text = data.get('text', '')
+            tag = data.get('tag', '')
+            limit = 10
 
-        search_word = request.data['search']
-        limit = 20
+            video_list = Video.objects.filter(name__icontains=text).order_by('-rating__counter')
+            channel_list = Channel.objects.filter(name__icontains=text)[:limit]
 
-        video = Video.objects.filter(name__icontains=search_word)[:limit]
-        channels = Channel.objects.filter(name__icontains=search_word)[:limit]
+            if tag == '':
+                video_list = video_list[:limit]
+            else:
+                video_list = video_list.filter(tags__text__exact=tag)[:limit]
 
-        response = {
-            'video': [ {
-                'key': curr.key,
-                'name': curr.name,
-            } for curr in video],
-            'channels': [ {
+            response = {
+                'video_list': [ VideoPreviewSerialiser(video).data for video in video_list ],
+                'channel_list': [ ChannelSerializer(channel).data for channel in channel_list],
+             }
+
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
+
+class MyTopView(APIView):
+    def get(self, request):
+        channel_list = request.user.subscriptions.all()
+
+        response = []
+        for channel in channel_list:
+            video_list = channel.owner.video.order_by('-created')[:10]
+
+            response.append({
                 'key': channel.key,
-                'name': channel.name
-            } for channel in channels]
-        }
+                'name': channel.name,
+                'list': [ VideoPreviewSerialiser(video).data for video in video_list ]
+            })
 
-
-        return Response(response, status=status.HTTP_200_OK_NOT_IMPLEMENTED)
+        return Response(response, status=status.HTTP_200_OK)
 
 
 class UserCurrentView(APIView):
@@ -144,17 +167,49 @@ class VideoTopView(APIView):
         if serializer.is_valid():
             type = serializer.validated_data['type']
             start = timezone.now() - timedelta(days=_START_DELTA)
+            video_list = Video.objects.all()
             video = []
+
+            tag_list = ['russia', 'mailru', 'interactive', 'видео', 'cool']
+            compilation = []
+
             if type == NEW:
                 start = timezone.now() - timedelta(days=_NEW_START_DELTA)
                 video = Video.objects.filter(created__gte=start)[:_LIMIT]
+                for tag in tag_list:
+                    compilation.append({
+                        'tag': tag,
+                        'list': video_list.filter(tags__text__exact=tag, created__gte=start)[:_LIMIT]
+                    })
+
             elif type == HOT:
                 video = Video.objects.filter(created__gte=start).order_by('-views__counter')[:_LIMIT]
+                for tag in tag_list:
+                    compilation.append({
+                        'tag': tag,
+                        'list': video_list.filter(
+                            tags__text__exact=tag,
+                            created__gte=start
+                        ).order_by('-views__counter')[:_LIMIT]
+                    })
+
             elif type == POPULAR:
                 video = Video.objects.filter(created__gte=start).order_by('-rating__counter')[:_LIMIT]
+                for tag in tag_list:
+                    compilation.append({
+                        'tag': tag,
+                        'list': video_list.filter(
+                            tags__text__exact=tag,
+                            created__gte=start
+                        ).order_by('-rating__counter')[:_LIMIT]
+                    })
 
             response = {
                 'top': [VideoPreviewSerialiser(current).data for current in video],
+                'compilation': [ {
+                    'tag': part['tag'],
+                    'list': [VideoPreviewSerialiser(current).data for current in part['list']]
+                } for part in compilation],
             }
 
             return Response(response, status=status.HTTP_200_OK)

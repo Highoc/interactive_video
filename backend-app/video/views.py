@@ -15,7 +15,7 @@ from channel.models import Playlist
 from rating.models import Rating
 from views.models import Views
 
-import tempfile
+import tempfile, subprocess
 
 
 class SourceUploadView(APIView):
@@ -31,6 +31,8 @@ class SourceUploadView(APIView):
             data = source_serializer.validated_data
 
             content = data['content']
+            dash_filename = ''
+
             with tempfile.NamedTemporaryFile() as temp:
                 temp.write(content.read())
                 temp.flush()
@@ -41,12 +43,17 @@ class SourceUploadView(APIView):
                 mime_type = get_mime_type(temp.name)
                 codec = get_codec(temp.name)
                 time = get_duration(temp.name)
+                '''
+                ffmpeg -i source.mp4 -ss <start_time> -t <duration> part.mp4
+                MP4Box -dash 5000 -frag 5000 -rap part.mp4 
+                '''
 
-                '''
-                elif should_call_external_command():
-                    temp.flush()
-                    subprocess.call(["wc", temp.name])
-                '''
+                dash_filename = f'{temp.name}_dash'
+                #subprocess.call(["MP4Box", f'-dash 5000 -frag 5000 -rap -out {dash_filename} {temp.name}'])
+                #print(temp.name)
+                #print(dash_filename)
+
+            #return Response('This MIME type isn\'t supported.', status=status.HTTP_400_BAD_REQUEST)
 
             if not is_supported_mime_type(mime_type):
                 return Response('This MIME type isn\'t supported.', status=status.HTTP_400_BAD_REQUEST)
@@ -65,6 +72,12 @@ class SourceUploadView(APIView):
             preview_picture = data.get('preview_picture', None)
             if preview_picture is not None:
                 source.preview_picture.save(f'{user.id}/{source.key.hex}', preview_picture)
+            '''
+            with open(dash_filename, 'rb+') as content:
+                source.content.save(f'{user.id}/{source.key.hex}', content)
+                        .
+            subprocess.call(["rm", f'{dash_filename}'])
+            '''
 
             source.content.save(f'{user.id}/{source.key.hex}', content)
             source.save()
@@ -199,6 +212,9 @@ class VideoView(APIView):
             'head_video_part': video.head_video_part.key.hex,
             'head_comments': [ comment.id for comment in video.comments.filter(parent=None) ],
             'tags': [ { 'text': tag.text } for tag in video.tags.all() ],
+            'channel': {
+                'name': video.owner.channel.name,
+            },
             'codec': video.codec,
             'created': video.created,
         }
