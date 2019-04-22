@@ -5,7 +5,7 @@ import {
 } from '@material-ui/core';
 import InteractivePlayer from '../../../components/VideoWatch/InteractivePlayer/InteractivePlayer';
 import ExpansionPanelVideo from '../../../components/VideoWatch/ExpansionPanel';
-import { RequestResolver, json } from '../../../helpers/RequestResolver';
+import { RequestResolver } from '../../../helpers/RequestResolver';
 import classes from './WatchVideo.module.css';
 import { perror } from '../../../helpers/SmartPrint';
 import CommentBox from '../../../components/VideoWatch/CommentBox/CommentBox';
@@ -23,7 +23,7 @@ class WatchVideo extends Component {
       isLoaded: false,
       openComments: false,
     };
-    this.backend = RequestResolver.getBackend();
+    this.backend = RequestResolver.getGuest();
   }
 
   async componentDidMount() {

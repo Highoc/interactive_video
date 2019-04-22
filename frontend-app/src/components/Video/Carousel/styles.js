@@ -1,6 +1,6 @@
 const styles = ({ palette, typography }) => ({
   root: {
-    height: '350px',
+    height: '352px',
     position: 'relative',
     margin: '1.5% 0 1.5% 0',
     overflow: 'scroll',

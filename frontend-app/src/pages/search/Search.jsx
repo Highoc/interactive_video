@@ -18,7 +18,7 @@ class Search extends Component {
       videoList: [],
       channelList: [],
     };
-    this.backend = RequestResolver.getBackend();
+    this.backend = RequestResolver.getGuest();
   }
 
   async componentDidMount() {

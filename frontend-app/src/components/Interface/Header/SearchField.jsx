@@ -33,7 +33,7 @@ class SearchField extends Component {
       <div className={classes.search}>
         <SearchIcon className={classes.searchIcon} />
         <InputBase
-          placeholder="Search…"
+          placeholder="Поиск…"
           classes={{
             root: classes.inputRoot,
             input: classes.inputInput,

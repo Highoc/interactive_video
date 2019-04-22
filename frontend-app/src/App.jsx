@@ -47,6 +47,7 @@ class App extends Component {
         <Route path="/login" exact component={SignIn} />
         <Route path="/register" exact component={Register} />
         <Route path="/search" exact component={Search} />
+        <Route path="/channel" component={Channel} />
         <Redirect to="/guest" />
       </Switch>
     );
