@@ -1,0 +1,23 @@
+.main_container {
+    float: left;
+    position: relative;
+    left:0;
+    top:0;
+}
+
+.overlay {
+     position: absolute;
+     left: 0px;
+     top: 0px;
+     background-color: red;
+     height: 50px;
+     width: 50px;
+     z-index: 9998;
+}
+
+.video {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 9997;
+}

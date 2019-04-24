@@ -35,11 +35,8 @@ class ExpansionPanelVideo extends Component {
       classes, video, keyChannel,
     } = this.props;
 
-    console.log(video);
     const { created, owner, description } = video;
     const { videoKey } = this.state;
-
-    const ChannelKey = props => <Link to={`/channel/${keyChannel}`} params={{ channelKey: keyChannel }} {...props} />;
 
     return (
       <div className={classes.root}>

@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import status, permissions
 
 from application import settings
 
@@ -9,9 +9,8 @@ from .serializers import SourceSerializer, PrettySourceSerializer, VideoPartSeri
 from .serializers import get_source_form, get_video_form
 
 from .models import Source, VideoPart, Video
-from .helpers.video import is_supported_mime_type, get_file_url, get_mime_type, get_codec, get_duration, get_short_key, get_image_url
+from .helpers.video import is_supported_mime_type, get_file_url, get_mime_type, get_codec, get_duration
 
-from channel.models import Playlist
 from rating.models import Rating
 from views.models import Views
 
@@ -31,7 +30,6 @@ class SourceUploadView(APIView):
             data = source_serializer.validated_data
 
             content = data['content']
-            dash_filename = ''
 
             with tempfile.NamedTemporaryFile() as temp:
                 temp.write(content.read())
@@ -43,17 +41,16 @@ class SourceUploadView(APIView):
                 mime_type = get_mime_type(temp.name)
                 codec = get_codec(temp.name)
                 time = get_duration(temp.name)
+
                 '''
                 ffmpeg -i source.mp4 -ss <start_time> -t <duration> part.mp4
-                MP4Box -dash 5000 -frag 5000 -rap part.mp4 
+                MP4Box -dash 5000 -frag 5000 -rap part.mp4
                 '''
 
-                dash_filename = f'{temp.name}_dash'
-                #subprocess.call(["MP4Box", f'-dash 5000 -frag 5000 -rap -out {dash_filename} {temp.name}'])
-                #print(temp.name)
-                #print(dash_filename)
+                dash_filename = f'{temp.name}_dashinit.mp4'
+                mpd_filename = f'{temp.name}.mpd'
 
-            #return Response('This MIME type isn\'t supported.', status=status.HTTP_400_BAD_REQUEST)
+                subprocess.call(['MP4Box', '-dash', '5000', '-frag', '5000', '-rap', '-out', temp.name, temp.name])
 
             if not is_supported_mime_type(mime_type):
                 return Response('This MIME type isn\'t supported.', status=status.HTTP_400_BAD_REQUEST)
@@ -72,14 +69,13 @@ class SourceUploadView(APIView):
             preview_picture = data.get('preview_picture', None)
             if preview_picture is not None:
                 source.preview_picture.save(f'{user.id}/{source.key.hex}', preview_picture)
-            '''
-            with open(dash_filename, 'rb+') as content:
-                source.content.save(f'{user.id}/{source.key.hex}', content)
-                        .
-            subprocess.call(["rm", f'{dash_filename}'])
-            '''
 
-            source.content.save(f'{user.id}/{source.key.hex}', content)
+            with open(dash_filename, 'rb+') as converted_file:
+                source.content.save(f'{user.id}/{source.key.hex}', converted_file)
+
+            subprocess.call(["rm", dash_filename])
+            subprocess.call(["rm", mpd_filename])
+
             source.save()
 
             return Response(PrettySourceSerializer(source).data, status=status.HTTP_201_CREATED)
@@ -197,6 +193,8 @@ class VideoUploadView(APIView):
 
 
 class VideoView(APIView):
+    permission_classes = (permissions.AllowAny, )
+
     def get(self, request, key=None):
         video_list = Video.objects.filter(key=key, status=Video.PUBLIC)
 
@@ -223,6 +221,8 @@ class VideoView(APIView):
 
 
 class VideoPartView(APIView):
+    permission_classes = (permissions.AllowAny, )
+
     def get(self, request, key=None):
         video_parts = VideoPart.objects.filter(key=key)
 

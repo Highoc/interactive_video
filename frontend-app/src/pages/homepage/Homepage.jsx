@@ -7,7 +7,6 @@ import { pprint, perror } from '../../helpers/SmartPrint';
 import { ContentGenerator } from '../../components/Video';
 import { TabBar } from '../../components/TabBar';
 import Carousel from '../../components/Video/Carousel/Carousel';
-import NotReady from '../notReady/NotReady';
 
 class Homepage extends Component {
   constructor(props) {
