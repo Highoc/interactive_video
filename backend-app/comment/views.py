@@ -2,7 +2,7 @@ from application import settings
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, permissions
 
 from channel.models import Channel
 from video.models import Video
@@ -14,6 +14,8 @@ from cent import Client
 
 
 class CommentView(APIView):
+    permission_classes = (permissions.AllowAny, )
+
     def get(self, request, comment_id):
 
         comments = Comment.objects.filter(id=comment_id)
@@ -107,6 +109,8 @@ class CommentCreateView(APIView):
 
 
 class CommentTree(APIView):
+    permission_classes = (permissions.AllowAny, )
+
     def get_comment(self, comment_id, level):
         if level == 0:
             return {}
