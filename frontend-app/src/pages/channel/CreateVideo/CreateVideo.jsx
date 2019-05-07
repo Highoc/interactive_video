@@ -219,11 +219,15 @@ class CreateVideo extends Component {
             allowForeignObjects
             nodeSvgShape={deactiveSvgShape}
             nodeLabelComponent={{
-              render: <NodeImage nodeData={tree} />,
+              render: <NodeImage nodeData={tree} sources={sources} />,
               foreignObjectWrapper: {
-                y: -25,
-                x: -25,
+                y: -50,
+                x: -50,
               },
+            }}
+            separation={{
+              siblings: 1.5,
+              nonSiblings: 2,
             }}
             onClick={(nodeData, event) => { this.handleClick(nodeData.key); this.onUpdateTree(); }}
           />

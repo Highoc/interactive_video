@@ -44,26 +44,27 @@ class WatchVideo extends Component {
 
     const { username, isAuthorized } = this.props;
     let comments = <div />;
-    if (isAuthorized) {
-      comments = (
-        <div>
-          <Typography variant="h1" color="textSecondary">
-          Комментарии
-          </Typography>
-          <ExpansionPanel expanded>
-            <CommentBox
-              channelKey={channelKey}
-              videoKey={videoKey}
-              level={3}
-              commentsId={video.head_comments}
-            />
-          </ExpansionPanel>
-        </div>
-      );
-    }
-
     let result = null;
+
     if (isLoaded) {
+      if (isAuthorized) {
+        comments = (
+          <div>
+            <Typography variant="h1" color="textSecondary">
+              Комментарии
+            </Typography>
+            <ExpansionPanel expanded>
+              <CommentBox
+                channelKey={channelKey}
+                videoKey={videoKey}
+                level={3}
+                commentsId={video.head_comments}
+              />
+            </ExpansionPanel>
+          </div>
+        );
+      }
+
       result = (
         <div className={classes.textStyles}>
 

@@ -50,7 +50,6 @@ class App extends Component {
         <Route path="/register" exact component={Register} />
         <Route path="/search" exact component={Search} />
         <Route exact path="/channel/:channelKey/watch/:videoKey" component={WatchVideo} />
-        <Redirect to="/guest" />
       </Switch>
     );
 
