@@ -26,7 +26,7 @@ export class ConstructPanelRight extends Component {
           }}
           open
         >
-          <Typography variant="h4" align="center" color="textSecondary">
+          <Typography variant="h6" align="center" color="textPrimary">
             Действия
           </Typography>
           <div className={classes.buttonContainer}>

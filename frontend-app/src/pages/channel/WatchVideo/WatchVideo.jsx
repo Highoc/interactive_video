@@ -7,7 +7,7 @@ import InteractivePlayer from '../../../components/VideoWatch/InteractivePlayer/
 import ExpansionPanelVideo from '../../../components/VideoWatch/ExpansionPanel';
 import { RequestResolver } from '../../../helpers/RequestResolver';
 import classes from './WatchVideo.module.css';
-import { perror } from '../../../helpers/SmartPrint';
+import { perror, pprint } from '../../../helpers/SmartPrint';
 import CommentBox from '../../../components/VideoWatch/CommentBox/CommentBox';
 import { TagList } from '../../../components/TagList';
 
@@ -30,6 +30,7 @@ class WatchVideo extends Component {
     try {
       const { videoKey } = this.state;
       const response = await this.backend().get(`video/get/${videoKey}/`);
+      pprint('WatchVideo', response.data);
       this.setState({ video: response.data, isLoaded: true });
     } catch (error) {
       perror('WatchVideo', error);
@@ -41,7 +42,25 @@ class WatchVideo extends Component {
       video, isLoaded, channelKey, videoKey,
     } = this.state;
 
-    const { username } = this.props;
+    const { username, isAuthorized } = this.props;
+    let comments = <div />;
+    if (isAuthorized) {
+      comments = (
+        <div>
+          <Typography variant="h1" color="textSecondary">
+          Комментарии
+          </Typography>
+          <ExpansionPanel expanded>
+            <CommentBox
+              channelKey={channelKey}
+              videoKey={videoKey}
+              level={3}
+              commentsId={video.head_comments}
+            />
+          </ExpansionPanel>
+        </div>
+      );
+    }
 
     let result = null;
     if (isLoaded) {
@@ -65,17 +84,7 @@ class WatchVideo extends Component {
             keyVideo={videoKey}
             keyChannel={channelKey}
           />
-          <Typography variant="h1" color="textSecondary">
-            Комментарии
-          </Typography>
-          <ExpansionPanel expanded>
-            <CommentBox
-              channelKey={channelKey}
-              videoKey={videoKey}
-              level={3}
-              commentsId={video.head_comments}
-            />
-          </ExpansionPanel>
+          { comments }
         </div>
       );
     } else {
@@ -88,6 +97,7 @@ class WatchVideo extends Component {
 
 const mapStateToProps = state => ({
   username: state.authorization.username,
+  isAuthorized: state.authorization.isAuthorized,
 });
 
 export default connect(mapStateToProps)(WatchVideo);

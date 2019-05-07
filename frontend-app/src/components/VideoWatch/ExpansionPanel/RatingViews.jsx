@@ -40,7 +40,7 @@ class RatingViews extends Component {
       this.setState({ viewsCounter: response.data.counter });
 
       response = await this.backend().get(`rating/get/${videoKey}/`);
-      pprint('eee', response);
+      pprint('RatingViews', response);
       this.setState({ ratingCounter: response.data.counter, choice: response.data.value });
 
       this.setState({ status: statuses.LOADED });
@@ -138,6 +138,7 @@ class RatingViews extends Component {
 
 const mapStateToProps = state => ({
   isReady: state.centrifugo.isInitialised,
+  isAuthorized: state.authorization.isAuthorized,
 });
 
 const mapDispatchToProps = dispatch => ({
