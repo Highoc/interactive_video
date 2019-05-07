@@ -34,31 +34,36 @@ class RatingViews extends Component {
   }
 
   async componentDidMount() {
-    try {
-      const { videoKey } = this.state;
-      let response = await this.backend().post(`views/add/${videoKey}/`, {});
-      this.setState({ viewsCounter: response.data.counter });
+    const { isAuthorized } = this.props;
+    if (isAuthorized){
+      try {
+        const { videoKey } = this.state;
+        let response = await this.backend().post(`views/add/${videoKey}/`, {});
+        this.setState({ viewsCounter: response.data.counter });
 
-      response = await this.backend().get(`rating/get/${videoKey}/`);
-      pprint('RatingViews', response);
-      this.setState({ ratingCounter: response.data.counter, choice: response.data.value });
+        response = await this.backend().get(`rating/get/${videoKey}/`);
+        pprint('RatingViews', response);
+        this.setState({ ratingCounter: response.data.counter, choice: response.data.value });
 
-      this.setState({ status: statuses.LOADED });
+        this.setState({ status: statuses.LOADED });
 
-      const { subscribeToChannel } = this.props;
-      subscribeToChannel(`video/${videoKey}/rating`, data => this.updateRatingCounter(data));
-      subscribeToChannel(`video/${videoKey}/views`, data => this.updateViewsCounter(data));
-    } catch (error) {
-      this.setState({ status: statuses.ERROR });
-      perror('WatchVideo', error);
+        const { subscribeToChannel } = this.props;
+        subscribeToChannel(`video/${videoKey}/rating`, data => this.updateRatingCounter(data));
+        subscribeToChannel(`video/${videoKey}/views`, data => this.updateViewsCounter(data));
+      } catch (error) {
+        this.setState({ status: statuses.ERROR });
+        perror('WatchVideo', error);
+      }
     }
   }
 
   componentWillUnmount() {
-    const { unsubscribeFromChannel } = this.props;
+    const { unsubscribeFromChannel, isAuthorized } = this.props;
     const { videoKey } = this.state;
-    unsubscribeFromChannel(`video/${videoKey}/rating`);
-    unsubscribeFromChannel(`video/${videoKey}/views`);
+    if (isAuthorized) {
+      unsubscribeFromChannel(`video/${videoKey}/rating`);
+      unsubscribeFromChannel(`video/${videoKey}/views`);
+    }
   }
 
   async onReply(choice) {

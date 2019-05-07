@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import 'video-react/dist/video-react.css';
-import { perror } from '../../../helpers/SmartPrint';
 import { ButtonBase, Typography } from '@material-ui/core';
-import classes from './InteractivePlayer.module.css';
-import classNames from 'classnames';
 import {
   Player,
   ReplayControl,
@@ -14,6 +11,8 @@ import {
   PlayToggle,
   FullscreenToggle,
 } from 'video-react';
+import { perror } from '../../../helpers/SmartPrint';
+import classes from './InteractivePlayer.module.css';
 import { RequestResolver } from '../../../helpers/RequestResolver';
 
 
@@ -85,7 +84,9 @@ class InteractivePlayer extends Component {
 
     const currentVideo = children.find(child => child.key === answerKey);
     const timeFrame = timeResolver.getTimeFrame(answerKey);
-
+    if (!currentVideo) {
+      return;
+    }
     this.setState({
       currentVideo,
       timeFrame,
