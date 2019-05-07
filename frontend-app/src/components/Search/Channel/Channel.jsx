@@ -4,12 +4,12 @@ import {
   withStyles, CardContent, Card, Typography, Avatar,
 } from '@material-ui/core';
 
+import classNames from 'classnames';
+import { Link } from 'react-router-dom';
 import styles from './styles';
 import picturePatch from '../../../static/images/channelPatch.png';
 import channelPatch from '../../../static/images/ava.png';
 
-import classNames from "classnames";
-import {Link} from "react-router-dom";
 
 class ChannelCard extends Component {
   constructor(props) {
@@ -26,7 +26,7 @@ class ChannelCard extends Component {
           <img
             alt="img"
             className={classes.cover}
-            src={ channelPatch }
+            src={channelPatch}
           />
         </Link>
         <div className={classes.details}>
@@ -49,8 +49,8 @@ class ChannelCard extends Component {
                   margin: '12px 5px 10px 15px',
                   fontFamily: 'Helvetica Neue Cyr Medium',
                   display: '-webkit-box',
-                  webkitBoxOrient: 'vertical',
-                  webkitLineClamp: '1',
+                  WebkitBoxOrient: 'vertical',
+                  WebkitLineClamp: '1',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                 }}
@@ -59,9 +59,23 @@ class ChannelCard extends Component {
                 </div>
               </Link>
             </div>
-            <Typography variant="h2" color="textSecondary" className={classes.description}>
-              {description}
-            </Typography>
+            <div className={classes.description}>
+              <div style={{
+                fontSize: 20,
+                color: 'rgb(124,124,124)',
+                lineHeight: '1.5',
+                margin: '10px 5px 10px 5px',
+                fontFamily: 'Helvetica Neue Cyr Medium',
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: '3',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+              >
+                {description}
+              </div>
+            </div>
           </CardContent>
         </div>
       </Card>
@@ -74,4 +88,3 @@ ChannelCard.propTypes = {
 };
 
 export default withStyles(styles)(ChannelCard);
-

@@ -188,7 +188,6 @@ const mapStateToProps = state => ({
 export default withStyles(styles)(connect(mapStateToProps)(ChannelView));
 
 ChannelView.propTypes = {
-  myChannelKey: PropTypes.string.isRequired,
   match: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,
 };

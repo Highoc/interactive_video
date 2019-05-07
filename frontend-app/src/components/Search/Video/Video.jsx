@@ -50,8 +50,8 @@ class VideoCard extends Component {
                   margin: '12px 5px 10px 15px',
                   fontFamily: 'Helvetica Neue Cyr Medium',
                   display: '-webkit-box',
-                  webkitBoxOrient: 'vertical',
-                  webkitLineClamp: '1',
+                  WebkitBoxOrient: 'vertical',
+                  WebkitLineClamp: '1',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                 }}
@@ -67,8 +67,8 @@ class VideoCard extends Component {
                 lineHeight: '1.5',
                 fontFamily: 'Helvetica Neue Cyr Medium',
                 display: '-webkit-box',
-                webkitBoxOrient: 'vertical',
-                webkitLineClamp: '3',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: '3',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
               }}

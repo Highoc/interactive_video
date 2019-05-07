@@ -8,7 +8,7 @@ const ContentGenerator = ({ top, compilation }) => {
   top.forEach((video, i) => {
     switch (i % 3) {
       case 0:
-        list.push(<Carousel key={top.name} playlist={compilation[currentCompilation].list} label={`Подборка видео по тегу #${compilation[currentCompilation].tag}`} />);
+        list.push(<Carousel key={`Carousel${top.name}${i}`} playlist={compilation[currentCompilation].list} label={`Подборка видео по тегу #${compilation[currentCompilation].tag}`} />);
         list.push(<HugeVideoPreview key={video.key} video={video} />);
         currentCompilation = (currentCompilation + 1) % compilation.length;
         break;

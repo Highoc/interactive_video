@@ -280,7 +280,6 @@ class AppendQueue {
   end() {
     this.isReady = false;
     this.mediaSource.endOfStream();
-    console.log('+');
   }
 }
 

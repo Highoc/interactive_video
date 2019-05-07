@@ -21,10 +21,10 @@ class Playlist extends Component {
     const { playlist, classes, channelKey } = this.props;
     return (
       <div>
-        <GridList cellHeight="auto" spacing={10} classes={classes.gridList}>
+        <GridList cellHeight="auto" spacing={10}>
           <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
             <ListSubheader component="div">
-              <Typography variant="h1" color="textSecondary">{playlist.name} </Typography>
+              <Typography variant="h1" color="textSecondary">{ playlist.name} </Typography>
             </ListSubheader>
           </GridListTile>
           {playlist.video.map(video => (

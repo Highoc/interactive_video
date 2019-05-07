@@ -67,7 +67,7 @@ class App extends Component {
           <Route path="/search" exact component={Search} />
           <Route path="/channel" component={Channel} />
           <Route path="/notready" component={NotReady} />
-          <Redirect to="/test" />
+          <Redirect to="/" />
         </Switch>
       );
 

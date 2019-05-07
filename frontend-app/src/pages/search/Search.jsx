@@ -52,11 +52,11 @@ class Search extends Component {
     }
 
     const videos = videoList.map(video => (
-      <Video video={video} />
+      <Video video={video} key={video.key} />
     ));
 
     const channels = channelList.map(channel => (
-      <Channel channel={channel} />
+      <Channel channel={channel} key={channel.key} />
     ));
 
 

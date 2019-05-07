@@ -58,7 +58,7 @@ class WatchVideo extends Component {
 
           <InteractivePlayer main={video.head_video_part} codec={video.codec} />
 
-          <TagList videoKey={videoKey} tags={video.tags} editable={video.owner === username} classes={classes.tags} />
+          <TagList videoKey={videoKey} tags={video.tags} editable={video.owner === username} className={classes.tags} />
 
           <ExpansionPanelVideo
             video={video}

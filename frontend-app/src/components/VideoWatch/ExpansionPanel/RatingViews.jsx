@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import { IconButton, Typography } from '@material-ui/core';
-import {TrendingDown, TrendingUp, Grade, Visibility, ThumbUp} from '@material-ui/icons';
+import {
+  TrendingDown, TrendingUp, Grade, Visibility,
+} from '@material-ui/icons';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles/index';
+import classNames from 'classnames';
 import styles from './ExpansionPanel.styles';
 import { perror, pprint } from '../../../helpers/SmartPrint';
 import {
@@ -11,7 +14,6 @@ import {
   unsubscribeFromChannel as unsubscribe,
 } from '../../../store/actions/centrifugo';
 import { RequestResolver } from '../../../helpers/RequestResolver';
-import classNames from "classnames";
 
 const statuses = {
   LOADED: 1,
@@ -88,21 +90,21 @@ class RatingViews extends Component {
     if (status !== statuses.LOADED) {
       return <div />;
     }
-   const button = (
+    const button = (
       <div className={classes.buttons}>
         <IconButton
           color="secondary"
           onClick={() => this.onReply(1)}
           disabled={choice === 1}
         >
-          <TrendingUp fontSize="medium" />
+          <TrendingUp fontSize="default" />
         </IconButton>
         <IconButton
           color="secondary"
           onClick={() => this.onReply(-1)}
           disabled={choice === -1}
         >
-          <TrendingDown fontSize="medium" />
+          <TrendingDown fontSize="default" />
         </IconButton>
       </div>
     );
@@ -112,7 +114,10 @@ class RatingViews extends Component {
           <Typography className={classes.ratingViews} variant="h5">
             <div className={classNames(classes.rating, classes.row)}>
               <Grade color="secondary" />
-              <Typography className={classes.statistics}>Рейтинг: {ratingCounter}</Typography>
+              <Typography className={classes.statistics}>
+Рейтинг:
+                {ratingCounter}
+              </Typography>
             </div>
           </Typography>
           {button}
@@ -120,7 +125,10 @@ class RatingViews extends Component {
         <Typography className={classes.ratingViews} variant="h5">
           <div className={classNames(classes.rating, classes.row)}>
             <Visibility color="secondary" />
-            <Typography className={classes.statistics}>Просмотров: {viewsCounter}</Typography>
+            <Typography className={classes.statistics}>
+Просмотров:
+              {viewsCounter}
+            </Typography>
           </div>
         </Typography>
       </div>

@@ -7,6 +7,7 @@ import { RequestResolver } from '../../helpers/RequestResolver';
 import { perror, pprint } from '../../helpers/SmartPrint';
 import date from '../../helpers/Date/date';
 import classes from './Account.module.css';
+import avatarPatch from '../../static/images/masculine-avatar-on-circle_icon-icons.com_68297.png';
 
 class Account extends Component {
   constructor(props) {
@@ -14,7 +15,7 @@ class Account extends Component {
     this.state = {
       info: {},
       isSent: false,
-      avatar: null,
+      avatar: avatarPatch,
     };
     this.backend = RequestResolver.getBackend();
   }
