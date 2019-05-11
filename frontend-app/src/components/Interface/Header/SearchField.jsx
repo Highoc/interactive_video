@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Search as SearchIcon } from '@material-ui/icons';
-import {InputBase, withStyles, Button, Toolbar, TextField} from '@material-ui/core';
+import {InputBase, withStyles } from '@material-ui/core';
 
 import styles from './styles/SearchField.styles';
 

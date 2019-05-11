@@ -12,9 +12,6 @@ import channelPatch from '../../../static/images/ava.png';
 
 
 class ChannelCard extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     const { classes, channel } = this.props;

@@ -5,7 +5,6 @@ import { withStyles } from '@material-ui/core/styles/index';
 import {
   Button, Drawer, Typography,
 } from '@material-ui/core';
-import VideoCamera from '@material-ui/icons/Videocam';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { connect } from 'react-redux';
 import rightStyles from './ConstructPanelRight.styles';
@@ -39,12 +38,6 @@ export class ConstructPanelRight extends Component {
             <Button color="secondary" variant="outlined" className={classes.button} size="large" onClick={() => onChoice(2)}>
               Удалить
               <DeleteIcon className={classes.rightIcon} />
-            </Button>
-          </div>
-          <div className={classes.buttonContainer}>
-            <Button color="secondary" variant="outlined" className={classes.button} onClick={() => onChoice(3)}>
-              Создать видео
-              <VideoCamera fontSize="large" className={classes.rightIcon} />
             </Button>
           </div>
           <div className={classes.buttonContainer} />

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import {ListItem, ListItemIcon, ListItemText, Typography} from '@material-ui/core';
+import {ListItem, ListItemIcon, Typography} from '@material-ui/core';
 import PermMediaOutlinedIcon from '@material-ui/icons/PhotoSizeSelectActual';
 
 class ChannelList extends Component {

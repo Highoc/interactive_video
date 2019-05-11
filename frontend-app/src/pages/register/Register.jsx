@@ -8,7 +8,6 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import { connect } from 'react-redux';
 import { registration } from '../../store/actions/register';
 import styles from './Register.styles';
-import { pprint, perror } from '../../helpers/SmartPrint';
 
 class Register extends Component {
   constructor(props) {
