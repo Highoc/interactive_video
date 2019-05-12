@@ -6,25 +6,30 @@ import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 
 import {
-  Typography, Button,
+  Typography, Button, Step, StepLabel, Stepper, withStyles,
 } from '@material-ui/core';
-
 
 import { RequestResolver } from '../../../helpers/RequestResolver';
 import { perror, pprint } from '../../../helpers/SmartPrint';
 
-import classes from './CreateVideo.module.css';
-import { activeSvgShape, deactiveSvgShape, NodeImage } from './CreateVideo.styles';
+import {
+  activeSvgShape, deactiveSvgShape, NodeImage, styles,
+} from './CreateVideo.styles';
 import { buttonChoice, uploadFile } from '../../../store/actions/buttonActions';
 
 import { Dialog } from '../../../components/Dialog';
 import { ServerForm } from '../../../components/Forms';
 import { ChoiceInput, TextInput } from '../../../components/Inputs';
 
+function getSteps() {
+  return ['Создайте видео', 'Заполните описание', 'Видео создается'];
+}
+
 class CreateVideo extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      activeStep: 0,
       channelKey: props.match.params,
       sources: [],
       tree: new TreeData(),
@@ -48,6 +53,18 @@ class CreateVideo extends Component {
     };
     this.backend = RequestResolver.getBackend();
   }
+
+  handleNext = () => {
+    this.setState(state => ({
+      activeStep: state.activeStep + 1,
+    }));
+  };
+
+  handleBack = () => {
+    this.setState(state => ({
+      activeStep: state.activeStep - 1,
+    }));
+  };
 
   async componentDidMount() {
     const { onFileUpload } = this.props;
@@ -115,9 +132,6 @@ class CreateVideo extends Component {
     return result;
   }
 
-  /*
-* main: this.getVideoPart(this.state.tree.getTreeData()),
-* */
   onUpdateTree() {
     const { tree } = this.state;
     tree.tree = tree.getTreeData();
@@ -137,13 +151,11 @@ class CreateVideo extends Component {
       this.setState({ nodeChosen: null });
       this.onUpdateTree();
     }
-    if (choice === 3) {
-      // this.uploadVideo();
-    }
     onChoice(0);
   }
 
   onSubmitSuccess(data) {
+    this.handleNext();
     this.setState({ isSent: true, videoKey: data.key });
   }
 
@@ -192,79 +204,133 @@ class CreateVideo extends Component {
     this.onUpdateTree();
   }
 
-  render() {
+  getStepContent(stepIndex) {
+    const { classes } = this.props;
     const {
-      tree, inputs, sources, channelKey, videoKey, isSent, isLoaded, dialogOpen, dialogData,
+      tree, sources, inputs, dialogOpen, dialogData,
     } = this.state;
+    switch (stepIndex) {
+      case 0:
+        return (
+          <div className={classes.container}>
+            <Typography variant="h6" className={classes.title}>
+              Создание видео
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={this.handleNext}
+                className={classes.stepButton}
+              >
+                Дальше
+              </Button>
+            </Typography>
+            <div id="treeWrapper" style={{ width: '100%', height: '60%' }}>
+              <Tree
+                data={tree.tree}
+                translate={{ x: 25, y: 400 }}
+                collapsible={false}
+                zoomable
+                allowForeignObjects
+                nodeSvgShape={deactiveSvgShape}
+                nodeLabelComponent={{
+                  render: <NodeImage nodeData={tree} sources={sources} />,
+                  foreignObjectWrapper: {
+                    y: -50,
+                    x: -50,
+                  },
+                }}
+                separation={{
+                  siblings: 1.5,
+                  nonSiblings: 2,
+                }}
+                onClick={(nodeData, event) => { this.handleClick(nodeData.key); this.onUpdateTree(); }}
+              />
+            </div>
+            <Dialog title="Выберите фрагмент" open={dialogOpen} onClose={() => this.onDialogClose()}>
+              <ChoiceInput
+                label="Фрагмент видео"
+                name="sourceKey"
+                value={dialogData.sourceKey.value}
+                choices={sources.map(source => ({ value: source.key, text: source.name }))}
+                onStateChange={data => this.onStateChange(data)}
+                rules={{ required: true }}
+              />
+              <TextInput
+                label="Ответ"
+                name="text"
+                value={dialogData.text.value}
+                placeholder="Введите ответ, ведущий к этому фрагменту"
+                onStateChange={data => this.onStateChange(data)}
+                rules={{ required: true }}
+              />
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => this.onButtonClick()}
+              >
+                Сохранить
+              </Button>
+            </Dialog>
+          </div>
+        );
+
+      case 1:
+        return (
+          <div>
+            <Typography variant="h6" className={classes.title}>
+              Заполните описание
+              <Button
+                onClick={this.handleBack}
+                className={classes.stepButton}
+              >
+                Назад
+              </Button>
+            </Typography>
+            <ServerForm
+              action="video/upload/"
+              enctype="multipart/form-data"
+              name="video-upload"
+              inputs={inputs}
+              onSubmitSuccess={data => this.onSubmitSuccess(data)}
+              getInputsDynamic={() => this.getData()}
+            />
+          </div>
+        );
+      case 2:
+        return <Typography variant="h6">Подождите,пожалуйста </Typography>;
+      default:
+        return 'Unknown stepIndex';
+    }
+  }
+
+  render() {
+    const { classes } = this.props;
+    const {
+      channelKey, videoKey, isSent, isLoaded, activeStep,
+    } = this.state;
+
+    const steps = getSteps();
 
     if (isSent) {
       return <Redirect to={`/channel/${channelKey}/watch/${videoKey}`} />;
     }
 
     if (!isLoaded) {
-      return <div className={classes.root}>Загружается</div>;
+      return <div />;
     }
 
     return (
       <div className={classes.container}>
-        <Typography variant="h6">
-          Создание видео
-        </Typography>
-        <div id="treeWrapper" style={{ width: '100%', height: '60%' }}>
-          <Tree
-            data={tree.tree}
-            translate={{ x: 25, y: 270 }}
-            collapsible={false}
-            zoomable
-            allowForeignObjects
-            nodeSvgShape={deactiveSvgShape}
-            nodeLabelComponent={{
-              render: <NodeImage nodeData={tree} sources={sources} />,
-              foreignObjectWrapper: {
-                y: -50,
-                x: -50,
-              },
-            }}
-            separation={{
-              siblings: 1.5,
-              nonSiblings: 2,
-            }}
-            onClick={(nodeData, event) => { this.handleClick(nodeData.key); this.onUpdateTree(); }}
-          />
+        <Stepper activeStep={activeStep} alternativeLabel>
+          {steps.map(label => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+        <div>
+          {this.getStepContent(activeStep)}
         </div>
-        <ServerForm
-          action="video/upload/"
-          enctype="multipart/form-data"
-          name="video-upload"
-          inputs={inputs}
-          onSubmitSuccess={data => this.onSubmitSuccess(data)}
-          getInputsDynamic={() => this.getData()}
-        />
-        <Dialog title="Выберите фрагмент" open={dialogOpen} onClose={() => this.onDialogClose()}>
-          <ChoiceInput
-            label="Фрагмент видео"
-            name="sourceKey"
-            value={dialogData.sourceKey.value}
-            choices={sources.map(source => ({ value: source.key, text: source.name }))}
-            onStateChange={data => this.onStateChange(data)}
-            rules={{ required: true }}
-          />
-          <TextInput
-            label="Ответ"
-            name="text"
-            value={dialogData.text.value}
-            placeholder="Введите ответ, ведущий к этому фрагменту"
-            onStateChange={data => this.onStateChange(data)}
-            rules={{ required: true }}
-          />
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => this.onButtonClick()}
-          >
-            Сохранить
-          </Button>
-        </Dialog>
       </div>
     );
   }
@@ -280,7 +346,7 @@ const mapDispatchToProps = dispatch => ({
   onChoice: choice => dispatch(buttonChoice(choice)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateVideo);
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(CreateVideo));
 
 class TreeData {
   constructor() {

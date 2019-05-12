@@ -13,6 +13,7 @@ import authorizationReducer from './store/reducers/authorization';
 import centrifugoReducer from './store/reducers/centrifugo';
 import registrationReducer from './store/reducers/register';
 import buttonsReducer from './store/reducers/buttonReducers';
+import dataReducer from './store/reducers/homepageData';
 
 import './index.css';
 import App from './App';
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   centrifugo: centrifugoReducer,
   reg: registrationReducer,
   buttonsAct: buttonsReducer,
+  fetchedData: dataReducer,
 });
 
 /* eslint-disable no-underscore-dangle */

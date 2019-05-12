@@ -21,15 +21,15 @@ class Playlist extends Component {
     const { playlist, classes, channelKey } = this.props;
     return (
       <div>
-        <GridList cellHeight="auto" spacing={10}>
-          <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
+        <GridList cellHeight="170px" spacing={10}>
+          <GridListTile key="Subheader" cols={2} style={{ height: '70px' }}>
             <ListSubheader component="div">
               <Typography variant="h1" color="textSecondary">{ playlist.name} </Typography>
             </ListSubheader>
           </GridListTile>
           {playlist.video.map(video => (
             <GridListTile key={video.name} cols={0.4} rows={1} component={props => <Link to={`/channel/${channelKey}/watch/${video.key}`} {...props} />}>
-              <img src={video.preview_url} alt={video.name} width="22%" height="100%" />
+              <img src={video.preview_url} alt={video.name} width="22%" height="170px" />
               <GridListTileBar
                 title={video.name}
                 actionIcon={(

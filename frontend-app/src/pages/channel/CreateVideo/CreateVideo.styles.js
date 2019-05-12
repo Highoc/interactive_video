@@ -19,6 +19,31 @@ export const deactiveSvgShape = {
   transitionDuration: 0,
 };
 
+export const styles = theme => ({
+  container: {
+    width: '100%',
+    overflow: 'scroll',
+    position: 'relative',
+    display: 'inline-block',
+    height: '1200px',
+    backgroundColor: 'rgb(31,31,31)',
+  },
+  backButton: {
+    marginRight: theme.spacing.unit,
+  },
+  instructions: {
+    marginTop: theme.spacing.unit,
+    marginBottom: theme.spacing.unit,
+  },
+  stepButton: {
+    float: 'right',
+    marginRight: '50px',
+  },
+  title: {
+    marginLeft: '20px',
+  },
+});
+
 export class NodeImage extends Component {
   render() {
     const { nodeData, sources } = this.props;
@@ -47,3 +72,5 @@ export class NodeImage extends Component {
     );
   }
 }
+
+

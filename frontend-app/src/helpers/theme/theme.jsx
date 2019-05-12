@@ -38,7 +38,6 @@ const theme = createMuiTheme({
         },
       },
     },
-    // .MuiOutlinedInput-root-237 .MuiOutlinedInput-notchedOutline-244
     MuiOutlinedInput: {
       root: {
         '& $notchedOutline': {
@@ -87,6 +86,21 @@ const theme = createMuiTheme({
         '&$disabled': {
           color: 'rgb(124,124,124)',
         },
+      },
+    },
+    MuiStepIcon: {
+      root: {
+        color: 'rgb(156,156,156)',
+        '&$active': {
+          color: 'rgba(162, 24, 24, 1)',
+        },
+        '&$completed': {
+          color: '#fff',
+        },
+      },
+      text: {
+        fontSize: 15,
+        fontFamily: 'Helvetica Neue Cyr Medium',
       },
     },
   },
@@ -154,7 +168,7 @@ const theme = createMuiTheme({
     text: {
       primary: 'rgb(255,255,255)',
       secondary: 'rgb(156,156,156)',
-      disabled: 'rgb(255,13,32)',
+      disabled: 'rgb(156,156,156)',
       hint: 'rgba(255, 255, 255, 0.38)',
     },
   },

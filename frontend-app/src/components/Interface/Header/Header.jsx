@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import {
-  AppBar, Toolbar, IconButton, Button,
+  AppBar, Toolbar, IconButton, Button, Typography,
 } from '@material-ui/core';
 
 import { Timeline } from '@material-ui/icons';
@@ -56,10 +56,13 @@ class Header extends Component {
           <Toolbar>
             <IconButton
               className={classes.menuButton}
+              component={HomePage}
             >
               <Timeline color="secondary" fontSize="large" />
             </IconButton>
-            <Button component={HomePage} size="large" color="secondary">ForkMe</Button>
+            <Typography variant="h6" color="inherit">
+              ForkMe
+            </Typography>
 
             <div className={classes.grow} />
 
