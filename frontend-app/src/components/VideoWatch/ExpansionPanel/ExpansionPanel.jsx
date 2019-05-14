@@ -52,8 +52,8 @@ class ExpansionPanelVideo extends Component {
                     margin: '12px 5px 10px 15px',
                     fontFamily: 'Helvetica Neue Cyr Medium',
                     display: '-webkit-box',
-                    webkitBoxOrient: 'vertical',
-                    webkitLineClamp: '1',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: '1',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                   }}
@@ -80,8 +80,8 @@ class ExpansionPanelVideo extends Component {
                         margin: '12px 5px 10px 0px',
                         fontFamily: 'Helvetica Neue Cyr Medium',
                         display: '-webkit-box',
-                        webkitBoxOrient: 'vertical',
-                        webkitLineClamp: '1',
+                        WebkitBoxOrient: 'vertical',
+                        WebkitLineClamp: '1',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                       }}

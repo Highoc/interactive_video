@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles/index';
 
 import {
-  Drawer, Divider, Typography, List,
+  Drawer, Typography, List,
 } from '@material-ui/core';
 import MainListItems from './MainListItems';
 import menuRightStyles from './MenuRight.styles';

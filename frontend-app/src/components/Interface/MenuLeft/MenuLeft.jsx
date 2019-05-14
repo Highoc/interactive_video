@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles/index';
 import {
-  Drawer, Typography, List, Divider,
+  Drawer, Typography, List,
 } from '@material-ui/core';
 
 import PropTypes from 'prop-types';

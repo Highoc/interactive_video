@@ -42,7 +42,7 @@ const styles = ({
     transition: transitions.create('width'),
     width: '100%',
     [breakpoints.up('md')]: {
-      width: 200,
+      width: 700,
     },
   },
 });

@@ -23,3 +23,7 @@ export const BUTTONCHOICE = 'BUTTON_CHOICE';
 export const UPLOADFILE = 'UPLOAD_FILE';
 export const ADD_CHANNEL = 'ADD_CHANNEL';
 
+export const FETCH_HOT = 'FETCH_HOT';
+export const FETCH_NEW = 'FETCH_NEW';
+export const FETCH_SUBS = 'FETCH_SUBS';
+export const FETCH_POP = 'FETCH_POP';

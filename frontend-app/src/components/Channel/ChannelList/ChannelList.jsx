@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import {ListItem, ListItemIcon, ListItemText, Typography} from '@material-ui/core';
+import {ListItem, ListItemIcon, Typography} from '@material-ui/core';
 import PermMediaOutlinedIcon from '@material-ui/icons/PhotoSizeSelectActual';
 
 class ChannelList extends Component {
@@ -28,8 +28,8 @@ class ChannelList extends Component {
           fontSize: 15,
           color: 'rgb(255,255,255)',
           fontFamily: 'Helvetica Neue Cyr Medium',
-          webkitBoxOrient: 'vertical',
-          webkitLineClamp: '1',
+          WebkitBoxOrient: 'vertical',
+          WebkitLineClamp: '1',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
         }}

@@ -56,11 +56,11 @@ class SignIn extends Component {
           <form className={classes.form}>
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="username">Имя пользователя</InputLabel>
-              <OutlinedInput id="username" name="username" autoFocus />
+              <OutlinedInput id="username" name="username" autoFocus labelWidth={0} />
             </FormControl>
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="password">Пароль</InputLabel>
-              <OutlinedInput name="password" type="password" id="password" autoComplete="current-password" />
+              <OutlinedInput name="password" type="password" id="password" autoComplete="current-password" labelWidth={0} />
             </FormControl>
             {errorMessage}
             <Button

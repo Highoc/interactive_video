@@ -3,7 +3,7 @@ const styles = ({ palette, typography }) => ({
     height: '352px',
     position: 'relative',
     margin: '1.5% 0 1.5% 0',
-    overflow: 'scroll',
+    overflow: 'hidden',
     backgroundColor: palette.background.paper,
   },
 

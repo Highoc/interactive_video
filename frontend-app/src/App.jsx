@@ -18,6 +18,7 @@ import MenuRight from './components/Interface/MenuRight';
 import ConstructPanelLeft from './components/VideoConstructor/ConstructPanelLeft';
 import Header from './components/Interface/Header';
 import Homepage from './pages/homepage/Homepage';
+import WatchVideo from './pages/channel/WatchVideo/WatchVideo';
 import Account from './pages/account/Account';
 import EditAccount from './pages/account/Edit/EditAccount';
 import { Channel } from './pages/channel';
@@ -34,6 +35,7 @@ import Search from './pages/search/Search';
 
 import theme from './helpers/theme/theme';
 
+
 class App extends Component {
   componentDidMount() {
     const { onTryAutoLogin } = this.props;
@@ -47,7 +49,7 @@ class App extends Component {
         <Route path="/login" exact component={SignIn} />
         <Route path="/register" exact component={Register} />
         <Route path="/search" exact component={Search} />
-        <Route path="/channel" component={Channel} />
+        <Route exact path="/channel/:channelKey/watch/:videoKey" component={WatchVideo} />
         <Redirect to="/guest" />
       </Switch>
     );
@@ -67,7 +69,7 @@ class App extends Component {
           <Route path="/search" exact component={Search} />
           <Route path="/channel" component={Channel} />
           <Route path="/notready" component={NotReady} />
-          <Redirect to="/test" />
+          <Redirect to="/" />
         </Switch>
       );
 

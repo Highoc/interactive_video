@@ -90,7 +90,6 @@ class TagList extends Component {
     const {
       tags, dialogOpen, newTag, isValid,
     } = this.state;
-
     let addTag;
     if (editable) {
       addTag = (
@@ -126,6 +125,7 @@ class TagList extends Component {
                   color="secondary"
                   variant="outlined"
                   className={classes.chip}
+                  key={`#${tag.text}`}
                 />
               );
             })

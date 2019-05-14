@@ -7,7 +7,6 @@ const styles = ({
 
   menuButton: {
     marginLeft: 12,
-    marginRight: 36,
   },
 
   buttonContainer: {
@@ -28,7 +27,10 @@ const styles = ({
   },
 
   grow: {
-    flexGrow: 1,
+    flexGrow: 0.5,
+  },
+  register: {
+    marginLeft: '20px',
   },
 });
 

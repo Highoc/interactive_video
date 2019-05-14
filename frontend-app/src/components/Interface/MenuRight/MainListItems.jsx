@@ -12,7 +12,7 @@ import menuRightStyles from './MenuRight.styles';
 
 class MainListItems extends Component {
   render() {
-    const { channelKey, channelExists, classes } = this.props;
+    const { channelKey, channelExists } = this.props;
     const CreateVideo = props => <Link to={`/channel/${channelKey}/create`} {...props} />;
     const MyChannel = props => <Link to={`/channel/${channelKey}`} {...props} />;
     const CreateChannel = props => <Link to="/channel/create" {...props} />;

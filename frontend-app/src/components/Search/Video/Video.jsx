@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  withStyles, CardContent, Card, CardMedia, Typography, Avatar,
+  withStyles, CardContent, Card, Typography, Avatar,
 } from '@material-ui/core';
 
 import classNames from 'classnames';
@@ -11,9 +11,6 @@ import date from '../../../helpers/Date/date';
 import picturePatch from '../../../static/images/channelPatch.png';
 
 class VideoCard extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     const { classes, video } = this.props;
@@ -50,8 +47,8 @@ class VideoCard extends Component {
                   margin: '12px 5px 10px 15px',
                   fontFamily: 'Helvetica Neue Cyr Medium',
                   display: '-webkit-box',
-                  webkitBoxOrient: 'vertical',
-                  webkitLineClamp: '1',
+                  WebkitBoxOrient: 'vertical',
+                  WebkitLineClamp: '1',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                 }}
@@ -67,8 +64,8 @@ class VideoCard extends Component {
                 lineHeight: '1.5',
                 fontFamily: 'Helvetica Neue Cyr Medium',
                 display: '-webkit-box',
-                webkitBoxOrient: 'vertical',
-                webkitLineClamp: '3',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: '3',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
               }}

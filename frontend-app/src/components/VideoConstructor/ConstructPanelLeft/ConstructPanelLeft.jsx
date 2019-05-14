@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 
 import {
-  Divider, Drawer, Card, CardActionArea, CardContent, CardMedia, Typography, withStyles,
+  Drawer, Card, CardActionArea, CardContent, CardMedia, Typography, withStyles,
 } from '@material-ui/core';
 
 

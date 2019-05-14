@@ -6,7 +6,7 @@ import {
   Card, CardMedia, CardActionArea, CardActions, Button, CardHeader,
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles/index';
-import { Settings, Delete, Home } from '@material-ui/icons';
+import { Settings, Delete } from '@material-ui/icons';
 import styles from './styles';
 
 

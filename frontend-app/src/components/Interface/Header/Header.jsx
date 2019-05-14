@@ -5,10 +5,10 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import {
-  AppBar, Toolbar, IconButton, Button,
+  AppBar, Toolbar, IconButton, Button, Typography,
 } from '@material-ui/core';
 
-import { Menu as MenuIcon } from '@material-ui/icons';
+import { Timeline } from '@material-ui/icons';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -32,7 +32,7 @@ class Header extends Component {
 
   render() {
     const {
-      isAuthorized, classes, onOpenDrawer, openDrawerStatus, onCloseDrawer,
+      isAuthorized, classes,
     } = this.props;
     const { text } = this.state;
 
@@ -45,7 +45,7 @@ class Header extends Component {
       <div className={classes.buttonContainer}>
         <div className={classes.buttonPlace}>
           <Button component={LoginPage} color="inherit" size="medium" variant="outlined">Войти</Button>
-          <Button component={RegisterPage} color="inherit" size="medium" variant="outlined">Регистрация</Button>
+          <Button component={RegisterPage} color="inherit" size="medium" variant="outlined" className={classes.register}>Регистрация</Button>
         </div>
       </div>
     );
@@ -56,13 +56,15 @@ class Header extends Component {
           <Toolbar>
             <IconButton
               className={classes.menuButton}
-              aria-label="Open drawer"
-              onClick={(event) => { openDrawerStatus ? onCloseDrawer(event) : onOpenDrawer(event); }}
+              component={HomePage}
             >
-              <MenuIcon color="secondary" />
+              <Timeline color="secondary" fontSize="large" />
             </IconButton>
+            <Typography variant="h6" color="inherit">
+              ForkMe
+            </Typography>
 
-            <Button component={HomePage} size="large" color="inherit" variant="outlined">InteractiveVideo</Button>
+            <div className={classes.grow} />
 
             <SearchField onStateChange={data => this.onSearch(data)} />
             <Button component={Search} size="small" color="inherit" variant="outlined">Поиск</Button>

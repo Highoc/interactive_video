@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import 'video-react/dist/video-react.css';
-import { perror } from '../../../helpers/SmartPrint';
 import { ButtonBase, Typography } from '@material-ui/core';
-import classes from './InteractivePlayer.module.css';
-import classNames from 'classnames';
 import {
   Player,
   ReplayControl,
@@ -14,7 +11,13 @@ import {
   PlayToggle,
   FullscreenToggle,
 } from 'video-react';
+import { perror, pprint } from '../../../helpers/SmartPrint';
+import classes from './InteractivePlayer.module.css';
 import { RequestResolver } from '../../../helpers/RequestResolver';
+
+const styles = {
+  transition: 'all 1s ease-out',
+};
 
 
 class InteractivePlayer extends Component {
@@ -38,12 +41,30 @@ class InteractivePlayer extends Component {
   }
 
   async componentDidMount() {
+    this.loadData();
+  }
+
+  componentWillUpdate(nextProps, nextState, nextContext) {
+    const { currentTime, timeFrame } = nextState;
+    const d = timeFrame.end - currentTime;
+    if (d < 0) {
+      this.videoByChoice(nextState.nextKey);
+    }
+  }
+
+  async loadData() {
+    const { videoQueue, timeResolver } = this.state;
+    videoQueue.reload();
+    timeResolver.reload();
+    this.setState({
+      questions: [],
+      children: [],
+    });
     try {
       this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
       const { codec, main } = this.props;
       const mimeCodec = `video/mp4; codecs="${codec}"`;
 
-      const { videoQueue, timeResolver } = this.state;
       this.setState({ url: videoQueue.addMediaSource(mimeCodec) });
 
       videoQueue.pushKey(main);
@@ -55,22 +76,16 @@ class InteractivePlayer extends Component {
       videoQueue.pushSource(main, responseSource.data, responseMain.data.time);
       timeResolver.pushTimeSource(main, responseMain.data.time);
 
+      pprint('InteractivePlayer', responseMain.data);
+      pprint('InteractivePlayer', responseSource.data);
+
       this.setState({
         children: [responseMain.data],
         timeFrame: timeResolver.getTimeFrame(main),
       });
-
       this.videoByChoice(main);
     } catch (error) {
       perror('InteractivePlayer', error);
-    }
-  }
-
-  componentWillUpdate(nextProps, nextState, nextContext) {
-    const { currentTime, timeFrame } = nextState;
-    const d = timeFrame.end - currentTime;
-    if (d < 0) {
-      this.videoByChoice(nextState.nextKey);
     }
   }
 
@@ -85,7 +100,9 @@ class InteractivePlayer extends Component {
 
     const currentVideo = children.find(child => child.key === answerKey);
     const timeFrame = timeResolver.getTimeFrame(answerKey);
-
+    if (!currentVideo) {
+      return;
+    }
     this.setState({
       currentVideo,
       timeFrame,
@@ -97,8 +114,10 @@ class InteractivePlayer extends Component {
     this.seek(timeFrame.begin);
 
     if (currentVideo.children.length === 0) {
+      console.log('Currentvideo');
       this.setState({ videoTimeEnd: timeFrame.end, isVideoFinished: true });
       videoQueue.pushKey(null);
+      return;
     }
 
     for (const childKey of currentVideo.children) {
@@ -107,18 +126,20 @@ class InteractivePlayer extends Component {
       try {
         const response = await this.backend().get(`video/part/get/${childKey}/`);
 
-        const { questions } = this.state;
+        const { questions, children } = this.state;
         const { key, text } = response.data;
         this.setState({
           questions: [...questions, { key, text }],
         });
+
         const responseSource = await this.aws().get(response.data.content_url);
         videoQueue.pushSource(childKey, responseSource.data, response.data.time);
         timeResolver.pushTimeSource(childKey, response.data.time);
 
         this.setState({
-          children: [...this.state.children, response.data],
+          children: [...children, response.data],
         });
+
       } catch (error) {
         perror('InteractivePlayer', error);
       }
@@ -126,12 +147,12 @@ class InteractivePlayer extends Component {
   }
 
   handleStateChange(state, prevState) {
-    const { isVideoFinished, videoTimeEnd, timeResolver } = this.state;
-    if (isVideoFinished) {
-      if (state.currentTime >= videoTimeEnd) {
-        this.seek(timeResolver.totalDuration);
+    const { isVideoFinished, videoTimeEnd } = this.state;
+    if (isVideoFinished && state.currentTime >= videoTimeEnd) {
+      this.loadData().then(() => {
+        console.log('loadData;');
         this.setState({ isVideoFinished: false });
-      }
+      });
     }
     this.setState({
       currentTime: state.currentTime,
@@ -164,6 +185,7 @@ class InteractivePlayer extends Component {
     if (d > 0 && d < 5 && questions.length === 2) {
       buttons = (
         <div className={classes.buttonStyles}>
+          <div className={classes.animationTime} style={{...styles, transform: 'translate3d(-' + d * 20 + '%,0,0)' }} />
           {questions.map(elem => (
             <ButtonBase
               focusRipple
@@ -185,15 +207,15 @@ class InteractivePlayer extends Component {
 
     return (
       <div className={classes.videoStyles}>
-        {buttons}
         <Player ref="player" src={url} fluid={false} width="100%" height="650px">
+          {buttons}
           <BigPlayButton position="center" />
           <ControlBar disableDefaultControls className={classes.controlBar}>
             <PlayToggle order={2} className={classes.Button} />
-            <ReplayControl seconds={10} order={3} className={classes.Button} />
-            <ForwardControl seconds={10} order={4} className={classes.Button} />
+            <ReplayControl seconds={5} order={3} className={classes.Button} />
+            <ForwardControl seconds={5} order={4} className={classes.Button} />
             <VolumeMenuButton order={7} vertical className={classes.Button} />
-            <FullscreenToggle order={9} className={classes.ButtonRight} />
+            <FullscreenToggle order={9} className={classes.ButtonFullScreen} />
           </ControlBar>
         </Player>
       </div>
@@ -205,6 +227,17 @@ export default InteractivePlayer;
 
 class AppendQueue {
   constructor() {
+    this.mediaSource = null;
+    this.sourceBuffer = null;
+
+    this.isReady = false;
+
+    this.queue = [];
+
+    this.totalDuration = 0;
+  }
+
+  reload() {
     this.mediaSource = null;
     this.sourceBuffer = null;
 
@@ -253,6 +286,9 @@ class AppendQueue {
 
   pushSource(key, buf, time) {
     const videoPart = this.queue.find(elem => elem.key === key);
+    if (!videoPart) {
+      return;
+    }
     videoPart.isLoaded = true;
     videoPart.buf = buf;
     videoPart.time = time;
@@ -280,13 +316,17 @@ class AppendQueue {
   end() {
     this.isReady = false;
     this.mediaSource.endOfStream();
-    console.log('+');
   }
 }
 
 
 class TimeResolver {
   constructor() {
+    this.timestore = [];
+    this.totalDuration = 0;
+  }
+
+  reload() {
     this.timestore = [];
     this.totalDuration = 0;
   }
