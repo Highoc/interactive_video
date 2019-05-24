@@ -182,7 +182,7 @@ class VideoPreviewSerialiser(serializers.ModelSerializer):
 
     class Meta():
         model = Video
-        fields = ('name', 'description', 'key', 'preview_url', 'created', 'channel', 'preview_url', 'rating', 'views')
+        fields = ('name', 'description', 'key', 'created', 'channel', 'preview_url', 'rating', 'views')
 
 
 class PrettyVideoSerializer(serializers.ModelSerializer):

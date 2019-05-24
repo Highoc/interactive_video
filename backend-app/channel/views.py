@@ -95,7 +95,7 @@ class ChannelUpdateView(APIView):
 class ChannelListView(APIView):
     def get(self, request):
         channels = Channel.objects.filter(status=Channel.AVAILABLE)
-        response = [ { 'name': channel.name, 'key': channel.key } for channel in channels]
+        response = [{ 'name': channel.name, 'key': channel.key } for channel in channels]
         return Response(response, status.HTTP_200_OK)
 
 

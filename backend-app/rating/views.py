@@ -1,5 +1,7 @@
 from application import settings
 
+from django.db import transaction, IntegrityError
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -24,27 +26,32 @@ class RatingRecordUpdateView(APIView):
         rating = ratings[0]
 
         records = rating.records.filter(author=request.user)
-        if not records:
-            rating.counter += new_value
-            record = RatingRecord(
-                author=request.user,
-                rating=rating,
-                value=new_value
-            )
-        else:
-            record = records[0]
-            if record.value != new_value:
-                if new_value == 0:
-                    rating.counter -= record.value
-                elif record.value == 0:
+
+        try:
+            with transaction.atomic():
+                if not records:
                     rating.counter += new_value
+                    record = RatingRecord(
+                        author=request.user,
+                        rating=rating,
+                        value=new_value
+                    )
                 else:
-                    rating.counter += 2*new_value
+                    record = records[0]
+                    if record.value != new_value:
+                        if new_value == 0:
+                            rating.counter -= record.value
+                        elif record.value == 0:
+                            rating.counter += new_value
+                        else:
+                            rating.counter += 2*new_value
 
-                record.value = new_value
+                        record.value = new_value
 
-        record.save()
-        rating.save()
+                record.save()
+                rating.save()
+        except IntegrityError:
+            return Response('Error working with the DB.', status=status.HTTP_400_BAD_REQUEST)
 
         response = {
             'counter': rating.counter,
