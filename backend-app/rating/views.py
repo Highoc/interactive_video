@@ -1,6 +1,6 @@
 from application import settings
 
-from django.db import transaction, IntegrityError
+from django.db import transaction, DatabaseError
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -50,7 +50,8 @@ class RatingRecordUpdateView(APIView):
 
                 record.save()
                 rating.save()
-        except IntegrityError:
+        except DatabaseError:
+            # Логирование
             return Response('Error working with the DB.', status=status.HTTP_400_BAD_REQUEST)
 
         response = {
