@@ -48,9 +48,10 @@ class App extends Component {
         <Route path="/guest" exact component={Guestpage} />
         <Route path="/login" exact component={SignIn} />
         <Route path="/register" exact component={Register} />
+        <Route path="/test" exact component={Test} />
         <Route path="/search" exact component={Search} />
         <Route exact path="/channel/:channelKey/watch/:videoKey" component={WatchVideo} />
-        <Redirect to="/guest" />
+        <Redirect to="/test" />
       </Switch>
     );
 
@@ -69,7 +70,7 @@ class App extends Component {
           <Route path="/search" exact component={Search} />
           <Route path="/channel" component={Channel} />
           <Route path="/notready" component={NotReady} />
-          <Redirect to="/" />
+          <Redirect to="/test" />
         </Switch>
       );
 

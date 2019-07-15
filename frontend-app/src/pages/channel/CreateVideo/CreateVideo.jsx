@@ -30,7 +30,7 @@ class CreateVideo extends Component {
     super(props);
     this.state = {
       activeStep: 0,
-      channelKey: props.match.params,
+      channelKey: props.match.params.channelKey,
       sources: [],
       tree: new TreeData(),
       nodeChosen: null,

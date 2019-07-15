@@ -18,10 +18,12 @@ from channel.serializers import ChannelSerializer
 from channel.models import Channel
 
 from django.utils import timezone
+from django.shortcuts import render
 
 import jwt, time
 from datetime import timedelta
 
+import mysql.connector
 
 class SearchView(APIView):
     permission_classes = (permissions.AllowAny,)
@@ -215,3 +217,35 @@ class VideoTopView(APIView):
             return Response(response, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def sqlInjection(request):
+    template_name = 'users.html'
+    context = {}
+    connection = mysql.connector.connect(host='172.19.0.2',
+                                         database='interactive_video',
+                                         user='django',
+                                         password='2346785Das_',
+                                         use_pure=True)
+
+    cursor = connection.cursor(prepared=True)
+    text = (request.GET.get('text') or '').strip()
+    print(text)
+
+    sql = """SELECT first_name FROM auth_user WHERE first_name LIKE %s"""
+        # Боб' UNION SELECT last_name FROM auth_user WHERE first_name LIKE 'Боб
+
+    print(sql)
+
+    cursor.execute(sql, (text, ))
+
+    rows = cursor.fetchall()
+    rows = [row[0] for row in rows]
+
+    context = {
+        'rows': rows,
+    }
+
+    return render(request, template_name, context)
+
+
