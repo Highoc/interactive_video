@@ -3,7 +3,7 @@ botocore==1.12.106
 cent==3.0.1
 certifi==2019.3.9
 chardet==3.0.4
-Django==2.1.7
+Django==2.2.13
 django-cors-headers==2.4.1
 django-js-asset==1.2.2
 django-mptt==0.9.1
