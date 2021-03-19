@@ -8,7 +8,7 @@ django-cors-headers==2.4.1
 django-js-asset==1.2.2
 django-mptt==0.9.1
 django-storages==1.7.1
-djangorestframework==3.9.1
+djangorestframework==3.11.2
 djangorestframework-jwt==1.11.0
 docutils==0.14
 filetype==1.0.5
